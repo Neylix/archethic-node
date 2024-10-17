@@ -183,4 +183,12 @@ defmodule Archethic.TransactionChain.Transaction.ProofOfValidation do
   def cast(map = %{}) do
     %__MODULE__{signature: Map.get(map, :signature), nodes_bitmask: Map.get(map, :nodes_bitmask)}
   end
+
+  @spec to_map(sorted_nodes :: SortedNode.t(), proof :: t()) :: nil | map()
+  def to_map(sorted_nodes = %SortedNode{}, proof) do
+    node_public_keys = sorted_nodes |> get_nodes(proof) |> Enum.map(& &1.first_public_key)
+    %{signature: proof.signature, node_public_keys: node_public_keys}
+  end
+
+  def to_map(_, _), do: nil
 end

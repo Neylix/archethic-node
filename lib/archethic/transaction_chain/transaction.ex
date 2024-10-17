@@ -12,6 +12,8 @@ defmodule Archethic.TransactionChain.Transaction do
   alias __MODULE__.ValidationStamp
   alias __MODULE__.ValidationStamp.LedgerOperations.TransactionMovement
 
+  alias Archethic.P2P
+
   alias Archethic.TransactionChain.TransactionData
   alias Archethic.TransactionChain.TransactionData.Ledger
   alias Archethic.TransactionChain.TransactionData.TokenLedger
@@ -795,7 +797,7 @@ defmodule Archethic.TransactionChain.Transaction do
   end
 
   @spec to_map(t()) :: map()
-  def to_map(tx = %__MODULE__{}) do
+  def to_map(tx = %__MODULE__{validation_stamp: validation_stamp}) do
     %{
       version: tx.version,
       address: tx.address,
@@ -805,11 +807,25 @@ defmodule Archethic.TransactionChain.Transaction do
       previous_address: previous_address(tx),
       previous_signature: tx.previous_signature,
       origin_signature: tx.origin_signature,
-      validation_stamp: ValidationStamp.to_map(tx.validation_stamp),
+      validation_stamp: ValidationStamp.to_map(validation_stamp),
       cross_validation_stamps:
-        Enum.map(tx.cross_validation_stamps, &CrossValidationStamp.to_map/1)
+        Enum.map(tx.cross_validation_stamps, &CrossValidationStamp.to_map/1),
+      proof_of_validation: map_proof_of_validation(tx.proof_of_validation, tx.validation_stamp)
     }
   end
+
+  defp map_proof_of_validation(proof = %ProofOfValidation{}, %ValidationStamp{
+         protocol_version: protocol_version,
+         timestamp: timestamp
+       })
+       when protocol_version > 8 do
+    timestamp
+    |> P2P.authorized_and_available_nodes()
+    |> ProofOfValidation.sort_nodes()
+    |> ProofOfValidation.to_map(proof)
+  end
+
+  defp map_proof_of_validation(_, _), do: nil
 
   @spec cast(map()) :: t()
   def cast(tx = %{}) do
