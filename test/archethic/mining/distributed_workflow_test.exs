@@ -735,10 +735,11 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
             stamp = %CrossValidationStamp{
               inconsistencies: [],
               signature: sig,
-              node_public_key: mining_pub
+              node_mining_key: mining_pub,
+              node_public_key: pub
             }
 
-            send(coordinator_pid, {:add_cross_validation_stamp, stamp, pub})
+            send(coordinator_pid, {:add_cross_validation_stamp, stamp})
           else
             sig =
               validation_stamp
@@ -748,10 +749,11 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
             stamp = %CrossValidationStamp{
               inconsistencies: [],
               signature: sig,
-              node_public_key: mining_pub3
+              node_mining_key: mining_pub3,
+              node_public_key: pub3
             }
 
-            send(coordinator_pid, {:add_cross_validation_stamp, stamp, pub3})
+            send(coordinator_pid, {:add_cross_validation_stamp, stamp})
           end
 
           {:wait_cross_validation_stamps,
@@ -983,44 +985,39 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
 
             stamp = %CrossValidationStamp{
               signature: sig,
-              node_public_key: mining_pub,
+              node_mining_key: mining_pub,
+              node_public_key: pub,
               inconsistencies: []
             }
 
-            send(coordinator_pid, {:add_cross_validation_stamp, stamp, pub})
+            send(coordinator_pid, {:add_cross_validation_stamp, stamp})
           end
 
           receive do
             {:cross_replication_stamp, tx} ->
-              public_key = elem(mining_node_keypair, 0)
-              private_key = elem(mining_node_keypair, 1)
-
               cross_stamp1 = %CrossValidationStamp{
-                node_public_key: public_key,
+                node_mining_key: elem(mining_node_keypair, 0),
+                node_public_key: elem(storage_node_keypair, 0),
                 inconsistencies: [],
                 signature:
                   CrossValidationStamp.get_row_data_to_sign(tx.validation_stamp, [])
-                  |> Crypto.sign(private_key)
+                  |> Crypto.sign(elem(mining_node_keypair, 1))
               }
 
-              public_key = elem(storage_node_keypair, 0)
-              send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp1, public_key})
-              send(cross_validator_pid, {:add_cross_validation_stamp, cross_stamp1, public_key})
-
-              public_key = elem(mining_node_keypair2, 0)
-              private_key = elem(mining_node_keypair2, 1)
+              send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp1})
+              send(cross_validator_pid, {:add_cross_validation_stamp, cross_stamp1})
 
               cross_stamp2 = %CrossValidationStamp{
-                node_public_key: public_key,
+                node_mining_key: elem(mining_node_keypair2, 0),
+                node_public_key: elem(storage_node_keypair2, 0),
                 inconsistencies: [],
                 signature:
                   CrossValidationStamp.get_row_data_to_sign(tx.validation_stamp, [])
-                  |> Crypto.sign(private_key)
+                  |> Crypto.sign(elem(mining_node_keypair2, 1))
               }
 
-              public_key = elem(storage_node_keypair2, 0)
-              send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp2, public_key})
-              send(cross_validator_pid, {:add_cross_validation_stamp, cross_stamp2, public_key})
+              send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp2})
+              send(cross_validator_pid, {:add_cross_validation_stamp, cross_stamp2})
           after
             1000 -> :skip
           end
@@ -1127,11 +1124,12 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
             [ValidationStamp.serialize(context.validation_stamp), <<>>],
             elem(@miningpublickey1, 1)
           ),
-        node_public_key: elem(@miningpublickey1, 0),
+        node_mining_key: elem(@miningpublickey1, 0),
+        node_public_key: elem(@publickey1, 0),
         inconsistencies: []
       }
 
-      send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp, elem(@publickey1, 0)})
+      send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp})
 
       cross_stamp = %CrossValidationStamp{
         signature:
@@ -1139,11 +1137,12 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
             [ValidationStamp.serialize(context.validation_stamp), <<>>],
             elem(@miningpublickey2, 1)
           ),
-        node_public_key: elem(@miningpublickey2, 0),
+        node_mining_key: elem(@miningpublickey2, 0),
+        node_public_key: elem(@publickey2, 0),
         inconsistencies: []
       }
 
-      send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp, elem(@publickey2, 0)})
+      send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp})
 
       assert_receive :validation_error
       assert_receive :unlock_chain
@@ -1206,11 +1205,12 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
             [ValidationStamp.serialize(context.validation_stamp), <<1>>],
             elem(@miningpublickey1, 1)
           ),
-        node_public_key: elem(@miningpublickey1, 0),
+        node_mining_key: elem(@miningpublickey1, 0),
+        node_public_key: elem(@publickey1, 0),
         inconsistencies: [:signature]
       }
 
-      send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp, elem(@publickey1, 0)})
+      send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp})
 
       cross_stamp = %CrossValidationStamp{
         signature:
@@ -1218,11 +1218,12 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
             [ValidationStamp.serialize(context.validation_stamp), <<1>>],
             elem(@miningpublickey2, 1)
           ),
-        node_public_key: elem(@miningpublickey2, 0),
+        node_mining_key: elem(@miningpublickey2, 0),
+        node_public_key: elem(@publickey2, 0),
         inconsistencies: [:signature]
       }
 
-      send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp, elem(@publickey2, 0)})
+      send(coordinator_pid, {:add_cross_validation_stamp, cross_stamp})
 
       assert_receive :validation_error
       assert_receive :unlock_chain
