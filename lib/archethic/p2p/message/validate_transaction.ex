@@ -2,7 +2,7 @@ defmodule Archethic.P2P.Message.ValidateTransaction do
   @moduledoc false
 
   @enforce_keys [:transaction, :inputs]
-  defstruct [:transaction, :contract_context, :inputs]
+  defstruct [:transaction, :contract_context, :inputs, cross_validation_stamps: []]
 
   require Logger
   alias Archethic.Contracts.Contract
@@ -14,6 +14,7 @@ defmodule Archethic.P2P.Message.ValidateTransaction do
   alias Archethic.Replication
   alias Archethic.TaskSupervisor
   alias Archethic.TransactionChain.Transaction
+  alias Archethic.TransactionChain.Transaction.CrossValidationStamp
   alias Archethic.TransactionChain.Transaction.ValidationStamp
 
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.VersionedUnspentOutput
@@ -23,12 +24,18 @@ defmodule Archethic.P2P.Message.ValidateTransaction do
   @type t :: %__MODULE__{
           transaction: Transaction.t(),
           contract_context: nil | Contract.Context.t(),
-          inputs: list(VersionedUnspentOutput.t())
+          inputs: list(VersionedUnspentOutput.t()),
+          cross_validation_stamps: list(CrossValidationStamp.t())
         }
 
   @spec process(__MODULE__.t(), Crypto.key()) :: Ok.t()
   def process(
-        %__MODULE__{transaction: tx, contract_context: contract_context, inputs: inputs},
+        %__MODULE__{
+          transaction: tx,
+          contract_context: contract_context,
+          inputs: inputs,
+          cross_validation_stamps: cross_stamps
+        },
         from
       ) do
     %Transaction{
@@ -59,14 +66,14 @@ defmodule Archethic.P2P.Message.ValidateTransaction do
 
       true ->
         Task.Supervisor.start_child(TaskSupervisor, fn ->
-          do_validate_transaction(tx, contract_context, inputs, validation_nodes)
+          do_validate_transaction(tx, contract_context, inputs, validation_nodes, cross_stamps)
         end)
     end
 
     %Ok{}
   end
 
-  defp do_validate_transaction(tx, contract_context, inputs, validation_nodes) do
+  defp do_validate_transaction(tx, contract_context, inputs, validation_nodes, cross_stamps) do
     %Transaction{address: tx_address, validation_stamp: %ValidationStamp{error: stamp_error}} = tx
 
     # Since the transaction can be validated before a node finish processing this message
@@ -75,14 +82,23 @@ defmodule Archethic.P2P.Message.ValidateTransaction do
 
     message = %CrossValidationDone{
       address: tx_address,
-      cross_validation_stamp: Replication.validate_transaction(tx, contract_context, inputs)
+      cross_validation_stamp:
+        Replication.validate_transaction(tx, contract_context, inputs, cross_stamps)
     }
 
     P2P.broadcast_message(validation_nodes, message)
   end
 
   @spec serialize(t()) :: bitstring()
-  def serialize(%__MODULE__{transaction: tx, contract_context: nil, inputs: inputs}) do
+  def serialize(%__MODULE__{
+        transaction:
+          tx = %Transaction{
+            validation_stamp: %ValidationStamp{protocol_version: protocol_version}
+          },
+        contract_context: contract_context,
+        inputs: inputs,
+        cross_validation_stamps: cross_stamps
+      }) do
     inputs_bin =
       inputs
       |> Enum.map(&VersionedUnspentOutput.serialize/1)
@@ -93,23 +109,18 @@ defmodule Archethic.P2P.Message.ValidateTransaction do
       |> length()
       |> Utils.VarInt.from_value()
 
-    <<Transaction.serialize(tx)::bitstring, 0::8, inputs_size::binary, inputs_bin::bitstring>>
-  end
+    contract_context_bin =
+      if contract_context == nil,
+        do: <<0::8>>,
+        else: <<1::8, Contract.Context.serialize(contract_context)::bitstring>>
 
-  def serialize(%__MODULE__{transaction: tx, contract_context: contract_context, inputs: inputs}) do
-    inputs_bin =
-      inputs
-      |> Enum.map(&VersionedUnspentOutput.serialize/1)
-      |> :erlang.list_to_bitstring()
+    cross_stamps_bin =
+      cross_stamps
+      |> Enum.map(&CrossValidationStamp.serialize(&1, protocol_version))
+      |> :erlang.list_to_binary()
 
-    inputs_size =
-      inputs
-      |> length()
-      |> Utils.VarInt.from_value()
-
-    <<Transaction.serialize(tx)::bitstring, 1::8,
-      Contract.Context.serialize(contract_context)::bitstring, inputs_size::binary,
-      inputs_bin::bitstring>>
+    <<Transaction.serialize(tx)::bitstring, contract_context_bin::bitstring, inputs_size::binary,
+      inputs_bin::bitstring, length(cross_stamps)::8, cross_stamps_bin::bitstring>>
   end
 
   @spec deserialize(bitstring()) :: {t(), bitstring()}
@@ -124,10 +135,19 @@ defmodule Archethic.P2P.Message.ValidateTransaction do
       end
 
     {inputs_size, rest} = Utils.VarInt.get_value(rest)
-    {inputs, rest} = deserialize_versioned_unspent_output_list(rest, inputs_size, [])
+
+    {inputs, <<nb_cross_stamps::8, rest::bitstring>>} =
+      deserialize_versioned_unspent_output_list(rest, inputs_size, [])
+
+    {cross_stamps, rest} = deserialize_cross_stamps(rest, protocol_version, nb_cross_stamps, [])
 
     {
-      %__MODULE__{transaction: tx, contract_context: contract_context, inputs: inputs},
+      %__MODULE__{
+        transaction: tx,
+        contract_context: contract_context,
+        inputs: inputs,
+        cross_validation_stamps: cross_stamps
+      },
       rest
     }
   end
@@ -139,13 +159,20 @@ defmodule Archethic.P2P.Message.ValidateTransaction do
     {Enum.reverse(acc), rest}
   end
 
-  defp deserialize_versioned_unspent_output_list(
-         rest,
-         nb_unspent_outputs,
-         acc
-       ) do
+  defp deserialize_versioned_unspent_output_list(rest, nb_unspent_outputs, acc) do
     {unspent_output, rest} = VersionedUnspentOutput.deserialize(rest)
 
     deserialize_versioned_unspent_output_list(rest, nb_unspent_outputs, [unspent_output | acc])
+  end
+
+  defp deserialize_cross_stamps(rest, _, 0, _), do: {[], rest}
+
+  defp deserialize_cross_stamps(rest, _, nb_stamps, acc) when length(acc) == nb_stamps do
+    {Enum.reverse(acc), rest}
+  end
+
+  defp deserialize_cross_stamps(rest, protocol_version, nb_stamps, acc) do
+    {stamp, rest} = CrossValidationStamp.deserialize(rest, protocol_version)
+    deserialize_cross_stamps(rest, protocol_version, nb_stamps, [stamp | acc])
   end
 end
