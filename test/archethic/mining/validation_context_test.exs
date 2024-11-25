@@ -603,6 +603,7 @@ defmodule Archethic.Mining.ValidationContextTest do
       tx |> Transaction.get_movements() |> Enum.map(&{&1.to, &1.to}) |> Map.new()
 
     %ValidationContext{
+      genesis_address: Transaction.previous_address(tx),
       transaction: tx,
       previous_storage_nodes: previous_storage_nodes,
       unspent_outputs: unspent_outputs,
@@ -616,6 +617,7 @@ defmodule Archethic.Mining.ValidationContextTest do
   end
 
   defp create_validation_stamp_with_invalid_signature(%ValidationContext{
+         genesis_address: genesis_address,
          transaction: tx,
          unspent_outputs: unspent_outputs,
          validation_time: timestamp
@@ -637,6 +639,7 @@ defmodule Archethic.Mining.ValidationContextTest do
       |> LedgerValidation.to_ledger_operations()
 
     %ValidationStamp{
+      genesis_address: genesis_address,
       timestamp: timestamp,
       proof_of_work: Crypto.origin_node_public_key(),
       proof_of_integrity: TransactionChain.proof_of_integrity([tx]),
@@ -648,6 +651,7 @@ defmodule Archethic.Mining.ValidationContextTest do
   end
 
   defp create_validation_stamp_with_invalid_proof_of_work(%ValidationContext{
+         genesis_address: genesis_address,
          transaction: tx,
          unspent_outputs: unspent_outputs,
          validation_time: timestamp
@@ -669,6 +673,7 @@ defmodule Archethic.Mining.ValidationContextTest do
       |> LedgerValidation.to_ledger_operations()
 
     %ValidationStamp{
+      genesis_address: genesis_address,
       timestamp: timestamp,
       proof_of_work: <<0::8, 0::8, :crypto.strong_rand_bytes(32)::binary>>,
       proof_of_integrity: TransactionChain.proof_of_integrity([tx]),
@@ -680,6 +685,7 @@ defmodule Archethic.Mining.ValidationContextTest do
   end
 
   defp create_validation_stamp(%ValidationContext{
+         genesis_address: genesis_address,
          transaction: tx,
          unspent_outputs: unspent_outputs,
          validation_time: timestamp
@@ -701,6 +707,7 @@ defmodule Archethic.Mining.ValidationContextTest do
       |> LedgerValidation.to_ledger_operations()
 
     %ValidationStamp{
+      genesis_address: genesis_address,
       timestamp: timestamp,
       proof_of_work: Crypto.origin_node_public_key(),
       proof_of_integrity: TransactionChain.proof_of_integrity([tx]),
@@ -713,6 +720,7 @@ defmodule Archethic.Mining.ValidationContextTest do
 
   defp create_validation_stamp_with_invalid_transaction_fee(
          %ValidationContext{
+           genesis_address: genesis_address,
            transaction: tx,
            unspent_outputs: unspent_outputs,
            validation_time: timestamp
@@ -734,6 +742,7 @@ defmodule Archethic.Mining.ValidationContextTest do
       |> LedgerValidation.to_ledger_operations()
 
     %ValidationStamp{
+      genesis_address: genesis_address,
       timestamp: timestamp,
       proof_of_work: Crypto.origin_node_public_key(),
       proof_of_integrity: TransactionChain.proof_of_integrity([tx]),
@@ -745,6 +754,7 @@ defmodule Archethic.Mining.ValidationContextTest do
   end
 
   defp create_validation_stamp_with_invalid_transaction_movements(%ValidationContext{
+         genesis_address: genesis_address,
          transaction: tx,
          validation_time: timestamp,
          unspent_outputs: _unspent_outputs
@@ -761,6 +771,7 @@ defmodule Archethic.Mining.ValidationContextTest do
     }
 
     %ValidationStamp{
+      genesis_address: genesis_address,
       timestamp: timestamp,
       proof_of_work: Crypto.origin_node_public_key(),
       proof_of_integrity: TransactionChain.proof_of_integrity([tx]),
@@ -772,11 +783,13 @@ defmodule Archethic.Mining.ValidationContextTest do
   end
 
   defp create_validation_stamp_with_invalid_unspent_outputs(%ValidationContext{
+         genesis_address: genesis_address,
          transaction: tx,
          unspent_outputs: _unspent_outputs,
          validation_time: timestamp
        }) do
     %ValidationStamp{
+      genesis_address: genesis_address,
       timestamp: timestamp,
       proof_of_work: Crypto.origin_node_public_key(),
       proof_of_integrity: TransactionChain.proof_of_integrity([tx]),
@@ -800,6 +813,7 @@ defmodule Archethic.Mining.ValidationContextTest do
   end
 
   defp create_validation_stamp_with_invalid_errors(%ValidationContext{
+         genesis_address: genesis_address,
          transaction: tx,
          unspent_outputs: unspent_outputs,
          validation_time: timestamp
@@ -820,6 +834,7 @@ defmodule Archethic.Mining.ValidationContextTest do
       |> LedgerValidation.to_ledger_operations()
 
     %ValidationStamp{
+      genesis_address: genesis_address,
       timestamp: timestamp,
       proof_of_work: Crypto.origin_node_public_key(),
       proof_of_integrity: TransactionChain.proof_of_integrity([tx]),
@@ -832,6 +847,7 @@ defmodule Archethic.Mining.ValidationContextTest do
   end
 
   defp create_validation_stamp_with_invalid_consumed_inputs(%ValidationContext{
+         genesis_address: genesis_address,
          transaction: tx,
          validation_time: timestamp,
          unspent_outputs: unspent_outputs
@@ -864,6 +880,7 @@ defmodule Archethic.Mining.ValidationContextTest do
       )
 
     %ValidationStamp{
+      genesis_address: genesis_address,
       timestamp: timestamp,
       proof_of_work: Crypto.origin_node_public_key(),
       proof_of_integrity: TransactionChain.proof_of_integrity([tx]),

@@ -35,6 +35,7 @@ defmodule Archethic.Mining do
   # version 6->7 add Add consumed inputs in tx.validation_stamp.ledger_operations
   # version 7->8 movement resolved address are now the genesis address of the destination
   # version 8 -> 9: fee 1 UCO
+  # version 8 -> 9 genesis in the validation stamp
   # version 9 -> 10: no more fee
   @protocol_version 10
 
