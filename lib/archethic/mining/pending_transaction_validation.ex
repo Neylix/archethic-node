@@ -71,6 +71,13 @@ defmodule Archethic.Mining.PendingTransactionValidation do
 
   @tx_max_size Application.compile_env!(:archethic, :transaction_data_content_max_size)
 
+  @mining_timeout Application.compile_env!(:archethic, [
+                    Archethic.Mining.DistributedWorkflow,
+                    :global_timeout
+                  ])
+
+  @geo_patch_max_update_time Application.compile_env!(:archethic, :geopatch_update_time)
+
   # @prod? Mix.env() == :prod
 
   @doc """
@@ -347,7 +354,7 @@ defmodule Archethic.Mining.PendingTransactionValidation do
           },
           previous_public_key: previous_public_key
         },
-        _
+        validation_time
       ) do
     with {:ok, node_config} <- validate_node_tx_content(content),
          :ok <- validate_whitelisted_node(previous_public_key),
@@ -355,7 +362,7 @@ defmodule Archethic.Mining.PendingTransactionValidation do
          :ok <- validate_node_tx_connection(node_config, previous_public_key),
          :ok <- validate_node_tx_transfers(token_transfers),
          :ok <- vallidate_node_tx_mining_key(node_config) do
-      validate_node_tx_geopatch(node_config)
+      validate_node_tx_geopatch(node_config, validation_time)
     end
   end
 
@@ -755,8 +762,24 @@ defmodule Archethic.Mining.PendingTransactionValidation do
     end
   end
 
-  defp validate_node_tx_geopatch(%NodeConfig{ip: ip, geo_patch: geo_patch}) do
-    if geo_patch == GeoPatch.from_ip(ip), do: :ok, else: {:error, "Invalid geo patch from IP"}
+  defp validate_node_tx_geopatch(
+         %NodeConfig{ip: ip, geo_patch: geo_patch, geo_patch_update: geo_patch_update},
+         validation_time
+       ) do
+    diff = DateTime.diff(geo_patch_update, validation_time, :millisecond)
+
+    # TODO: Ensure there is no other P2P view which update the geopatch after the
+    # update time in this transaction
+    cond do
+      geo_patch != GeoPatch.from_ip(ip) ->
+        {:error, "Invalid geo patch from IP"}
+
+      diff < @mining_timeout or diff > @geo_patch_max_update_time ->
+        {:error, "Invalid geo patch update time"}
+
+      true ->
+        :ok
+    end
   end
 
   @doc """
