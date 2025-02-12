@@ -2,6 +2,9 @@ defmodule Archethic.UTXO.LoaderTest do
   use ArchethicCase
 
   alias Archethic.TransactionChain.Transaction
+  alias Archethic.TransactionChain.TransactionData.Ledger
+  alias Archethic.TransactionChain.TransactionData.UCOLedger
+  alias Archethic.TransactionChain.TransactionData.UCOLedger.Transfer, as: UCOTransfer
   alias Archethic.TransactionChain.Transaction.ValidationStamp
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
@@ -62,13 +65,17 @@ defmodule Archethic.UTXO.LoaderTest do
         timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
       }
 
+      ledger = %Ledger{
+        uco: %UCOLedger{transfers: [%UCOTransfer{to: random_address(), amount: 10_000_000}]}
+      }
+
       tx =
         %Transaction{
           validation_stamp: %ValidationStamp{
             genesis_address: genesis,
             ledger_operations: %LedgerOperations{unspent_outputs: unspent_outputs}
           }
-        } = TransactionFactory.create_valid_transaction([utxo])
+        } = TransactionFactory.create_valid_transaction([utxo], ledger: ledger)
 
       v_unspent_outputs =
         VersionedUnspentOutput.wrap_unspent_outputs(unspent_outputs, current_protocol_version())

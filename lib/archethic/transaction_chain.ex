@@ -871,6 +871,7 @@ defmodule Archethic.TransactionChain do
             |> Enum.reject(fn {_, %GenesisAddress{address: address}} ->
               address == genesis_address
             end)
+            # credo:disable-for-next-line
             |> Enum.map(fn {node_public_key, _} -> node_public_key end)
             |> P2P.broadcast_message(%ShardRepair{
               genesis_address: genesis_address,

@@ -193,7 +193,13 @@ defmodule Archethic.DB.EmbeddedTest do
     end
 
     test "should filter with the given field which is nested" do
-      tx1 = TransactionFactory.create_valid_transaction([], content: "Hello")
+      tx1 =
+        put_in(
+          TransactionFactory.create_valid_transaction([], content: "Hello"),
+          [Access.key!(:validation_stamp), Access.key!(:ledger_operations), Access.key!(:fee)],
+          10
+        )
+
       :ok = EmbeddedImpl.write_transaction(tx1)
 
       # data is a nested field
@@ -212,11 +218,17 @@ defmodule Archethic.DB.EmbeddedTest do
                  validation_stamp: [:ledger_operations]
                ])
 
-      assert fee != 0.0
+      assert fee == 10
     end
 
     test "should filter with nested fields" do
-      tx1 = TransactionFactory.create_valid_transaction()
+      tx1 =
+        put_in(
+          TransactionFactory.create_valid_transaction(),
+          [Access.key!(:validation_stamp), Access.key!(:ledger_operations), Access.key!(:fee)],
+          10
+        )
+
       :ok = EmbeddedImpl.write_transaction(tx1)
 
       assert {:ok,
@@ -230,7 +242,7 @@ defmodule Archethic.DB.EmbeddedTest do
                  validation_stamp: [:timestamp, ledger_operations: :fee]
                )
 
-      assert fee != 0.0
+      assert fee == 10
     end
   end
 

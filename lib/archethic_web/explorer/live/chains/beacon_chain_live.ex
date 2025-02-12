@@ -222,8 +222,6 @@ defmodule ArchethicWeb.Explorer.BeaconChainLive do
     |> Enum.sort_by(& &1.timestamp, {:desc, DateTime})
   end
 
-  defp list_transactions_from_summaries(nil), do: []
-
   defp list_transactions_from_aggregate(date = %DateTime{}) do
     case Archethic.fetch_summaries_aggregate(date) do
       {:ok, %SummaryAggregate{replication_attestations: attestations}} ->
@@ -235,6 +233,4 @@ defmodule ArchethicWeb.Explorer.BeaconChainLive do
         []
     end
   end
-
-  defp list_transactions_from_aggregate(nil), do: []
 end
