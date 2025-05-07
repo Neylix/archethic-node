@@ -109,7 +109,7 @@ defmodule Archethic.MixProject do
       {:crontab, "~> 1.1"},
       {:earmark, "~> 1.4"},
       {:sizeable, "~> 1.0"},
-      {:distillery, github: "archethic-foundation/distillery"},
+      {:distillery, github: "pasteque-org/distillery"},
       {:exjsonpath, "~> 0.9"},
       {:rand_compat, "~> 0.0.3"},
       {:gen_state_machine, "~> 3.0"},
