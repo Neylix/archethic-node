@@ -287,7 +287,7 @@ defmodule Archethic.Contracts do
        ) do
     next_tx =
       if next_tx != nil do
-        if next_tx.data.contract == nil do
+        if get_in(next_tx, [:data, :contract]) == nil do
           next_tx
           |> put_in([Access.key(:data, %{}), :contract], contract)
           |> Transaction.cast()
