@@ -6,25 +6,16 @@ defmodule Archethic.Utils.Regression.Playbook.SmartContract do
   use Archethic.Utils.Regression.Playbook
   use Retry
 
-  alias Archethic.Crypto
-
-  alias Archethic.TransactionChain.TransactionData
-  alias Archethic.TransactionChain.TransactionData.Ledger
-  alias Archethic.TransactionChain.TransactionData.Ownership
-  alias Archethic.TransactionChain.TransactionData.Recipient
-
-  alias Archethic.TransactionChain.TransactionData.Contract
+  alias ArchethicClient.Crypto
+  alias ArchethicClient.TransactionData
+  alias ArchethicClient.Transaction
+  alias ArchethicClient.TransactionData.Contract
 
   alias Archethic.Utils.Regression.Api
-  alias Archethic.Utils.WebSocket.Client, as: WSClient
 
   alias __MODULE__.Counter
-  alias __MODULE__.WasmCounter
-  alias __MODULE__.Legacy
-  alias __MODULE__.UcoAth
-  alias __MODULE__.DeterministicBalance
-  alias __MODULE__.Dex
   alias __MODULE__.Throw
+  alias __MODULE__.DeterministicBalance
 
   require Logger
 
@@ -34,63 +25,48 @@ defmodule Archethic.Utils.Regression.Playbook.SmartContract do
     #       true: logs + sequential execution
 
     Logger.info("Play smart contract transactions on #{inspect(nodes)} with #{inspect(opts)}")
-    port = Application.get_env(:archethic, ArchethicWeb.Endpoint)[:http][:port]
-    host = :lists.nth(:rand.uniform(length(nodes)), nodes)
 
-    endpoint = %Api{host: host, port: port, protocol: :http}
-    Logger.info("Using endpoint: #{inspect(endpoint)}")
-
-    WSClient.start_link(host: host, port: port)
-    storage_nonce_pubkey = Api.get_storage_nonce_public_key(endpoint)
+    storage_nonce_pubkey = Api.get_storage_nonce_public_key()
 
     res = [
-      {"DeterministicBalance", DeterministicBalance.play(storage_nonce_pubkey, endpoint)},
-      {"Counter", Counter.play(storage_nonce_pubkey, endpoint)},
-      {"WasmCounter", WasmCounter.play(storage_nonce_pubkey, endpoint)},
-      {"Legacy", Legacy.play(storage_nonce_pubkey, endpoint)},
-      {"Dex", Dex.play(storage_nonce_pubkey, endpoint)},
-      {"Throw", Throw.play(storage_nonce_pubkey, endpoint)},
-      {"UcoAth", UcoAth.play(storage_nonce_pubkey, endpoint)}
+      {"Counter", Counter.play(storage_nonce_pubkey)},
+      {"Throw", Throw.play(storage_nonce_pubkey)},
+      {"DeterministicBalance", DeterministicBalance.play(storage_nonce_pubkey)}
     ]
 
     Enum.each(res, fn
-      {name, :error} -> Logger.error("#{name} failed")
+      {name, :error} -> raise "#{name} failed"
       _ -> :ok
     end)
+
+    :ok
   end
 
   @doc """
   Deploy a smart contract
   """
-  @spec deploy(String.t(), TransactionData.t(), binary(), Api.t()) :: binary()
-  def deploy(seed, data, storage_nonce_pubkey, endpoint) do
+  @spec deploy(data :: TransactionData.t(), seed :: String.t(), storage_nonce_pubkey :: binary()) ::
+          binary()
+  def deploy(data, seed, storage_nonce_pubkey) do
     Logger.debug("DEPLOY: Deploying contract")
 
-    secret_key = :crypto.strong_rand_bytes(32)
-
     # add the ownerships required for smart contract
-    data = %TransactionData{
+    tx =
       data
-      | ownerships: [
-          %Ownership{
-            secret: Crypto.aes_encrypt(seed, secret_key),
-            authorized_keys: %{
-              storage_nonce_pubkey => Crypto.ec_encrypt(secret_key, storage_nonce_pubkey)
-            }
-          }
-          | data.ownerships
-        ]
-    }
+      |> TransactionData.add_ownership(seed, [storage_nonce_pubkey])
+      |> Transaction.build(:contract, seed)
 
-    # Code is supported until version 3
-    opts = if data.code != "", do: [version: 3], else: []
+    case ArchethicClient.send_transaction(tx) do
+      :ok ->
+        :ok
 
-    {:ok, address} =
-      Api.send_transaction_with_await_replication(seed, :contract, data, endpoint, opts)
+      {:error, reason} ->
+        raise "Deploy contract failed: #{inspect(reason)}"
+    end
 
-    Logger.debug("DEPLOY: Deployed at #{Base.encode16(address)}")
+    Logger.debug("DEPLOY: Deployed at #{Base.encode16(tx.address)}")
 
-    address
+    tx.address
   end
 
   @doc """
@@ -112,87 +88,48 @@ defmodule Archethic.Utils.Regression.Playbook.SmartContract do
   By passing the [wait: true] flag, it will block until the contract produces a new transaction
   """
   @spec trigger(
-          trigger_seed :: String.t(),
-          contract_address :: Crypto.prepended_hash(),
-          endpoint :: Api.t(),
+          tx :: Transaction.t(),
+          contract_address :: Crypto.address(),
           opts :: Keyword.t()
-        ) :: {:ok, tx_address :: Crypto.prepended_hash()} | {:error, reason :: term()}
-  def trigger(trigger_seed, contract_address, endpoint, opts \\ []) do
+        ) :: {:ok, tx_address :: Crypto.address()} | {:error, reason :: Exception.t() | :timeout}
+  def trigger(tx, contract_address, opts \\ []) do
     Logger.debug("TRIGGER: Sending trigger transaction")
     wait? = Keyword.get(opts, :wait, false)
 
     last_contract_address =
       if wait? do
-        contract_address
-        |> Api.get_last_transaction(endpoint)
-        |> Map.get("address")
-        |> Base.decode16!()
+        contract_address |> Api.get_last_transaction() |> Map.get("address") |> Base.decode16!()
       else
         nil
       end
 
-    # Recipient with list is supported until version 3
-    opts =
-      if opts |> Keyword.get(:recipients, []) |> Enum.any?(&is_list(&1.args)),
-        do: Keyword.update(opts, :version, 3, & &1),
-        else: opts
-
-    res =
-      Api.send_transaction_with_await_replication(
-        trigger_seed,
-        Keyword.get(opts, :type, :transfer),
-        %TransactionData{
-          content: Keyword.get(opts, :content, ""),
-          ledger: Keyword.get(opts, :ledger, %Ledger{}),
-          recipients: Keyword.get(opts, :recipients, [%Recipient{address: contract_address}])
-        },
-        endpoint,
-        opts
-      )
-
-    case res do
-      {:ok, trigger_address} ->
-        Logger.debug("TRIGGER: transaction sent at #{Base.encode16(trigger_address)}")
-
+    case ArchethicClient.send_transaction(tx) do
+      :ok ->
         if Keyword.get(opts, :wait, false) do
           # wait until the contract produces a new transaction
-          :ok = wait_until_new_transaction(last_contract_address, endpoint)
+          case wait_until_new_transaction(last_contract_address) do
+            :ok -> {:ok, tx.address}
+            :error -> {:error, :timeout}
+          end
+        else
+          {:ok, tx.address}
         end
 
       {:error, reason} ->
-        Logger.debug("TRIGGER: transaction failed with reason: #{inspect(reason)}")
+        {:error, reason}
     end
-
-    res
-  end
-
-  @doc """
-  Call the API to execute a public function
-  """
-  @spec call_function(
-          contract_address :: Crypto.prepended_hash(),
-          function_name :: String.t(),
-          args :: list(),
-          resolve_last :: boolean(),
-          endpoint :: Api.t()
-        ) :: {:ok, result :: term()} | {:error, error :: term()}
-  defdelegate call_function(contract_address, function_name, args, resolve_last, endpoint),
-    to: Api
-
-  def random_address() do
-    <<0::8, 0::8, :crypto.strong_rand_bytes(32)::binary>>
   end
 
   def random_seed() do
-    :crypto.strong_rand_bytes(10)
+    :crypto.strong_rand_bytes(32)
   end
 
-  defp wait_until_new_transaction(address, endpoint) do
+  defp wait_until_new_transaction(address) do
     address_hex = Base.encode16(address)
 
     # retry every 500ms until 20 retries
     retry with: constant_backoff(500) |> Stream.take(20) do
-      %{"address" => last_address_hex} = Api.get_last_transaction(address, endpoint)
+      %{"address" => last_address_hex} = Api.get_last_transaction(address)
 
       if last_address_hex == address_hex do
         :error
@@ -210,10 +147,10 @@ defmodule Archethic.Utils.Regression.Playbook.SmartContract do
     end
   end
 
-  def await_no_more_calls(contract_address, endpoint) do
+  def await_no_more_calls(contract_address) do
     call_utxos =
       contract_address
-      |> Api.get_unspent_outputs(endpoint)
+      |> Api.get_unspent_outputs()
       |> Enum.filter(&(Map.get(&1, "type") == "call"))
 
     case call_utxos do
@@ -226,7 +163,7 @@ defmodule Archethic.Utils.Regression.Playbook.SmartContract do
         )
 
         Process.sleep(200)
-        await_no_more_calls(contract_address, endpoint)
+        await_no_more_calls(contract_address)
     end
   end
 end

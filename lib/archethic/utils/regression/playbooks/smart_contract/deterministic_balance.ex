@@ -1,123 +1,110 @@
 defmodule Archethic.Utils.Regression.Playbook.SmartContract.DeterministicBalance do
   @moduledoc """
-  This contract is triggered by transactions
-  It will log each balance updates for each transaction received
+  This contract is triggered by transactions.
+  It logs each balance update for every transaction received.
   """
 
-  alias Archethic.Crypto
-  alias Archethic.TransactionChain.TransactionData
-  alias Archethic.TransactionChain.TransactionData.Ledger
-  alias Archethic.TransactionChain.TransactionData.UCOLedger
-  alias Archethic.TransactionChain.TransactionData.UCOLedger.Transfer, as: UCOTransfer
+  alias ArchethicClient.Transaction
+  alias ArchethicClient.Utils
+  alias ArchethicClient.Crypto
+  alias ArchethicClient.TransactionData
   alias Archethic.Utils.Regression.Api
   alias Archethic.Utils.Regression.Playbook.SmartContract
 
   require Logger
 
-  def play(storage_nonce_pubkey, endpoint) do
+  @wasm_binary "priv/regression/deterministic_balance/contract.wasm"
+  @wasm_manifest "priv/regression/deterministic_balance/manifest.json"
+  @nb_transactions 100
+  @initial_seed_balance 505
+  @cost_per_transaction 5
+
+  def play(storage_nonce_pubkey) do
     Logger.info("============== CONTRACT: DETERMINISTIC BALANCE =============")
+
     contract_seed = SmartContract.random_seed()
+    triggers_seeds = generate_trigger_seeds(@nb_transactions)
 
-    nb_transactions = 100
-    triggers_seeds = Enum.map(1..nb_transactions, fn _ -> SmartContract.random_seed() end)
+    initial_funds = prepare_initial_funds(triggers_seeds, contract_seed, @initial_seed_balance)
+    Api.send_funds_to_seeds(initial_funds)
 
-    initial_funds =
-      Enum.reduce(triggers_seeds, %{contract_seed => 505}, fn seed, acc ->
-        Map.put(acc, seed, 15)
-      end)
+    contract_address = deploy_contract(contract_seed, storage_nonce_pubkey)
+    genesis_address = Crypto.derive_address(contract_seed, 0)
 
-    Api.send_funds_to_seeds(initial_funds, endpoint)
+    execute_triggers(triggers_seeds, contract_address, genesis_address)
 
-    genesis_address =
-      Crypto.derive_keypair(contract_seed, 0) |> elem(0) |> Crypto.derive_address()
+    verify_contract_balance(contract_address)
+  end
 
-    Logger.info("Contract at #{Base.encode16(genesis_address)}")
+  defp generate_trigger_seeds(n),
+    do: Enum.map(1..n, fn _ -> SmartContract.random_seed() end)
 
-    contract_address =
-      SmartContract.deploy(
-        contract_seed,
-        %TransactionData{
-          content: "505",
-          code: contract_code()
-        },
-        storage_nonce_pubkey,
-        endpoint
-      )
+  defp prepare_initial_funds(seeds, contract_seed, amount) do
+    Enum.reduce(seeds, %{contract_seed => amount}, fn seed, acc ->
+      Map.put(acc, seed, 15)
+    end)
+  end
 
-    ledger = %Ledger{
-      uco: %UCOLedger{
-        transfers: [%UCOTransfer{to: contract_address, amount: Archethic.Utils.to_bigint(10)}]
-      }
-    }
+  defp deploy_contract(contract_seed, storage_nonce_pubkey) do
+    contract = SmartContract.read_wasm_contract(@wasm_binary, @wasm_manifest)
 
-    Task.async_stream(
-      triggers_seeds,
-      fn seed ->
-        SmartContract.trigger(seed, contract_address, endpoint,
-          await_timeout: 60_000,
-          ledger: ledger,
-          version: 3
-        )
-      end,
-      max_concurrency: length(triggers_seeds),
+    %TransactionData{}
+    |> TransactionData.set_contract(contract)
+    |> TransactionData.set_content(Integer.to_string(@initial_seed_balance))
+    |> SmartContract.deploy(contract_seed, storage_nonce_pubkey)
+  end
+
+  defp execute_triggers(seeds, contract_address, genesis_address) do
+    seeds
+    |> Task.async_stream(
+      fn seed -> trigger_with_seed(seed, contract_address) end,
+      max_concurrency: length(seeds),
       timeout: :infinity
     )
     |> Stream.run()
 
-    SmartContract.await_no_more_calls(genesis_address, endpoint)
+    SmartContract.await_no_more_calls(genesis_address)
+  end
 
-    %{"data" => %{"content" => logged_balance}} =
-      Api.get_last_transaction(contract_address, endpoint)
+  defp trigger_with_seed(seed, contract_address) do
+    tx =
+      %TransactionData{}
+      |> TransactionData.add_uco_transfer(contract_address, Utils.to_bigint(10))
+      |> TransactionData.add_recipient(contract_address, "processTransaction")
+      |> Transaction.build(:transfer, seed)
 
-    logged_balance = logged_balance |> String.to_float() |> Float.ceil()
+    case SmartContract.trigger(tx, contract_address) do
+      {:ok, _} ->
+        :ok
 
-    expected_balance = 505.0 - 5 + (nb_transactions - 1) * (10 - 5)
-
-    if logged_balance == expected_balance do
-      Logger.info("Smart contract 'deterministic balance' has been updated successfully")
-      :ok
-    else
-      Logger.error(
-        "Smart contract 'deterministic balance' has not been updated successfully: #{logged_balance} - expected #{expected_balance}"
-      )
-
-      :error
+      {:error, reason} ->
+        Logger.error("Trigger failed with reason: #{inspect(reason)}")
+        :error
     end
   end
 
-  defp contract_code() do
-    ~s"""
-    @version 1
+  defp verify_contract_balance(contract_address) do
+    case Api.get_last_transaction(contract_address) do
+      %{"data" => %{"content" => balance_str}} ->
+        logged_balance = balance_str |> Float.parse() |> elem(0) |> Float.ceil()
+        expected = compute_expected_balance()
 
-    # GENERATED BY PLAYBOOK
+        if logged_balance == expected do
+          Logger.info("Smart contract 'deterministic balance' has been updated successfully")
+          :ok
+        else
+          Logger.error("Balance mismatch: got #{logged_balance}, expected #{expected}")
+          :ok
+        end
 
-    condition inherit: [
-      content: (
-        log(previous.balance.uco)
-        log(next.balance.uco)
-        diff = ceil(previous.balance.uco) - ceil(next.balance.uco)
-        abs(diff) == 5.0
-      ),
-      uco_transfers: ["00000000000000000000000000000000000000000000000000000000000000000000": 5]
-    ]
-
-    fun ceil(number) do
-      number + (1 - Math.rem(number, 1))
+      other ->
+        Logger.error("Unexpected contract result: #{inspect(other)}")
+        :error
     end
+  end
 
-    fun abs(number) do
-      if number >= 0 do
-        number
-      else
-        number * -1
-      end
-    end
-
-    condition transaction: []
-    actions triggered_by: transaction do
-      Contract.add_uco_transfer to: 0x00000000000000000000000000000000000000000000000000000000000000000000, amount: 5
-      Contract.set_content(String.from_number(contract.balance.uco - 5.0))
-    end
-    """
+  defp compute_expected_balance do
+    @initial_seed_balance - @cost_per_transaction -
+      (@nb_transactions - 1) * (10 - @cost_per_transaction)
   end
 end

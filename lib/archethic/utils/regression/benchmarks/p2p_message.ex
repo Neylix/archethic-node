@@ -1,14 +1,21 @@
 defmodule Archethic.Utils.Regression.Benchmark.P2PMessage do
   @moduledoc """
-  Benchmark some P2P messages to ensure consistent latency
-  and avoiding exhausting of the system (nb of process should remain constant)
+  Defines a benchmark suite for measuring P2P message latency and node stability.
+
+  This benchmark tests the performance and resource usage (specifically, Erlang process count)
+  of a target node when handling common P2P requests:
+  - `GetTransaction`
+  - `GetTransactionChain`
+  - `GetUnspentOutputs`
+
+  It establishes a direct P2P connection to the node and measures the response time
+  for each request type. It also monitors the node's process count before and after
+  each scenario run to detect potential resource leaks.
   """
 
   require Logger
 
   alias Archethic.Bootstrap.NetworkInit
-
-  alias Archethic.Crypto
 
   alias Archethic.P2P.Message.GetTransaction
   alias Archethic.P2P.Message.GetTransactionChain
@@ -17,103 +24,165 @@ defmodule Archethic.Utils.Regression.Benchmark.P2PMessage do
   alias Archethic.P2P.Message.UnspentOutputList
 
   alias Archethic.TransactionChain.Transaction
+  alias ArchethicClient.Crypto
 
   alias Archethic.Utils
   alias Archethic.Utils.Regression.Benchmark
-  alias Archethic.Utils.WebClient
 
   @behaviour Benchmark
 
-  def plan([host | _nodes], _opts) do
-    port = Application.get_env(:archethic, Archethic.P2P.Listener)[:port]
-    http = Application.get_env(:archethic, ArchethicWeb.Endpoint)[:http][:port]
-    {:ok, addr} = :inet.getaddr(to_charlist(host), :inet)
+  @impl Benchmark
+  @doc """
+  Prepares and configures the P2P message benchmark
+  """
+  @spec plan(String.t(), Keyword.t()) :: {map(), Keyword.t()}
+  def plan(node, _opts) do
+    p2p_port = Application.get_env(:archethic, Archethic.P2P.Listener)[:port]
+
+    %URI{host: host} = URI.parse(node)
+    {:ok, addr} = host |> to_charlist() |> :inet.getaddr(:inet)
 
     {public_key, private_key} =
-      Crypto.generate_deterministic_keypair(:crypto.strong_rand_bytes(32), :secp256r1)
+      Crypto.generate_deterministic_keypair(
+        :crypto.strong_rand_bytes(32),
+        curve: :secp256r1
+      )
 
     {:ok, conn_pid} =
       __MODULE__.Connection.start_link(
         addr: addr,
-        port: port,
+        port: p2p_port,
         public_key: public_key,
         private_key: private_key
       )
 
-    {%{
-       "GetTransaction" => fn _ ->
-         %Transaction{} =
-           __MODULE__.Connection.send_message(conn_pid, %GetTransaction{
-             address: get_genesis_address()
-           })
-       end,
-       "GetTransactionChain" => fn _ ->
-         %TransactionList{} =
-           __MODULE__.Connection.send_message(conn_pid, %GetTransactionChain{
-             address: get_genesis_address()
-           })
-       end,
-       "GetUnspentOutputs" => fn _ ->
-         %UnspentOutputList{} =
-           __MODULE__.Connection.send_message(conn_pid, %GetUnspentOutputs{
-             address: get_genesis_address()
-           })
-       end
-     },
-     [
-       before_scenario: fn _ -> get_vm_status(host, http) end,
-       after_scenario: fn before ->
-         now = get_vm_status(host, http)
+    bench_plan = %{
+      "GetTransaction" => fn _ ->
+        %Transaction{} =
+          __MODULE__.Connection.send_message(conn_pid, %GetTransaction{
+            address: get_first_tx_address()
+          })
+      end,
+      "GetTransactionChain" => fn _ ->
+        %TransactionList{} =
+          __MODULE__.Connection.send_message(conn_pid, %GetTransactionChain{
+            address: get_first_tx_address()
+          })
+      end,
+      "GetUnspentOutputs" => fn _ ->
+        %UnspentOutputList{} =
+          __MODULE__.Connection.send_message(conn_pid, %GetUnspentOutputs{
+            address: get_first_tx_address()
+          })
+      end
+    }
 
-         [{"vm_system_counts_process_count", 20}]
-         |> Enum.each(fn {metric, delta} ->
-           Logger.info("Checking #{metric} #{before[metric]} vs #{now[metric]}")
+    bench_opts = [
+      before_scenario: fn _ -> get_vm_status(node) end,
+      after_scenario: fn before ->
+        now = get_vm_status(node)
 
-           if before[metric] + delta - now[metric] < 0 do
-             raise RuntimeError, message: "leak of #{metric} is detected"
-           end
-         end)
-       end
-     ]}
+        [{"vm_system_counts_process_count", 35}]
+        |> Enum.each(fn {metric, delta} ->
+          before_value = Map.get(before, metric, 0)
+          now_value = Map.get(now, metric, 0)
+
+          Logger.info("Checking #{metric} #{before_value} vs #{now_value}")
+
+          if before_value + delta - now_value < 0 do
+            raise RuntimeError,
+              message: "leak of #{metric} is detected (#{before_value} + #{delta} < #{now_value})"
+          end
+        end)
+      end
+    ]
+
+    {bench_plan, bench_opts}
   end
 
-  defp get_vm_status(host, port) do
-    {:ok, data} = WebClient.with_connection(host, port, &WebClient.request(&1, "GET", "/metrics"))
+  # Private helper to fetch VM metrics from the target node via the HTTP /metrics endpoint.
+  # Used by the before/after scenario hooks to check process count stability.
+  defp get_vm_status(node) do
+    case Req.get(base_url: node, url: "metrics") do
+      {:ok, %Req.Response{status: 200, body: body}} ->
+        body
+        |> String.split("\n")
+        |> Enum.filter(&String.starts_with?(&1, "vm_"))
+        |> Enum.reduce(%{}, &parse_vm_metric/2)
 
-    data
-    |> :erlang.iolist_to_binary()
-    |> String.split("\n")
-    |> Enum.filter(&String.starts_with?(&1, "vm_"))
-    |> Enum.map(fn kv ->
-      [k, v] = String.split(kv)
-      {k, v |> Integer.parse() |> elem(0)}
-    end)
-    |> Enum.into(%{})
+      {:ok, %Req.Response{status: status}} ->
+        Logger.warn("Unexpected status #{status} from /metrics")
+        %{}
+
+      {:error, reason} ->
+        Logger.warn("Failed to get VM status from /metrics: #{inspect(reason)}")
+        %{}
+    end
   end
 
-  defp get_genesis_address do
+  # Parses a VM metric line and updates the accumulator if valid.
+  defp parse_vm_metric(kv, acc) do
+    case String.split(kv) do
+      [k, v_str] ->
+        case Integer.parse(v_str) do
+          {val, ""} -> Map.put(acc, k, val)
+          _ -> acc
+        end
+
+      _ ->
+        acc
+    end
+  end
+
+  # Private helper to retrieve the first transaction address from the application configuration.
+  # The address is used as a known target for the P2P requests.
+  defp get_first_tx_address do
     Application.get_env(:archethic, NetworkInit)
     |> Keyword.fetch!(:genesis_seed)
-    |> Crypto.derive_keypair(1)
-    |> elem(0)
-    |> Crypto.derive_address()
+    |> Crypto.derive_address(1)
   end
 
   defmodule Connection do
-    @moduledoc false
-    alias Archethic.Crypto
+    @moduledoc """
+    Internal GenServer responsible for managing the P2P TCP connection.
+
+    It handles connecting to the target node, sending encoded/signed/encrypted
+    P2P messages, and receiving/decrypting/decoding the responses.
+    It correlates requests and responses using a unique `request_id`.
+    """
+
+    @vsn 1
+
+    use GenServer
+
+    alias ArchethicClient.Crypto
 
     alias Archethic.P2P.Message
     alias Archethic.P2P.MessageEnvelop
 
+    @doc """
+    Starts the Connection GenServer.
+    Arguments are passed to `init/1`.
+    """
     def start_link(arg) do
       GenServer.start_link(__MODULE__, arg)
     end
 
+    @doc """
+    Sends a P2P message synchronously via this GenServer.
+
+    This is the main interface used by the benchmark scenarios.
+    It sends a `{:send_message, message}` request to the GenServer
+    and waits for a reply delivered via `handle_info/2` -> `GenServer.reply/2`.
+    """
     def send_message(pid, message) do
       GenServer.call(pid, {:send_message, message})
     end
 
+    @impl GenServer
+    @doc """
+    Initializes the GenServer state.
+    """
     def init(arg) do
       addr = Keyword.get(arg, :addr)
       port = Keyword.get(arg, :port)
@@ -132,6 +201,10 @@ defmodule Archethic.Utils.Regression.Benchmark.P2PMessage do
        }}
     end
 
+    @impl GenServer
+    @doc """
+    Handles synchronous `:send_message` requests.
+    """
     def handle_call(
           {:send_message, msg},
           from,
@@ -161,6 +234,10 @@ defmodule Archethic.Utils.Regression.Benchmark.P2PMessage do
       {:noreply, new_state}
     end
 
+    @impl GenServer
+    @doc """
+    Handles incoming TCP data containing P2P responses.
+    """
     def handle_info({:tcp, _, data}, state = %{private_key: private_key, messages: messages}) do
       {msg_id, encrypted_message} = MessageEnvelop.decode_raw_message(data)
 

@@ -65,12 +65,11 @@ defmodule Archethic.MixProject do
       {:cors_plug, "~> 3.0"},
       {:mint, "~> 1.0"},
       {:ecto, "~> 3.9"},
-      {:websockex, "~> 0.4"},
       {:plug_attack, "~> 0.4.3"},
 
       # Dev
       {:benchee, "~> 1.1"},
-      {:benchee_html, "~> 1.0"},
+      {:benchee_html, "~> 1.0", only: :dev},
       {:ex_doc, "~> 0.29", runtime: false},
       {:git_hooks, "~> 0.7", runtime: false},
       {:credo, "~> 1.6", runtime: false},
@@ -138,7 +137,10 @@ defmodule Archethic.MixProject do
       {:nimble_csv, "~> 1.1", only: :test, runtime: false},
 
       # WASM
-      {:wasmex, "~> 0.9"}
+      {:wasmex, "~> 0.9"},
+
+      # Archethic Client
+      {:archethic_client, github: "pasteque-org/libelixir", only: [:dev, :test]}
     ]
   end
 

@@ -6,7 +6,10 @@
     "functions": {
       "inc": {
         "type": "action",
-        "triggerType": "transaction"
+        "triggerType": "transaction",
+        "input": {
+          "value": "u32"
+        }
       }
     }
   }

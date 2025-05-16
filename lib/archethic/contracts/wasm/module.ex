@@ -19,20 +19,25 @@ defmodule Archethic.Contracts.WasmModule do
           spec: WasmSpec.t() | nil
         }
 
+  @type balance() :: %{
+          uco: pos_integer(),
+          tokens:
+            list(%{
+              token_address: String.t(),
+              token_id: pos_integer(),
+              amount: pos_integer()
+            })
+        }
   @type execution_opts :: [
           now: DateTime.t(),
           state: map(),
+          next_state: map(),
           transaction: map(),
           contract: map(),
-          balance: %{
-            uco: pos_integer(),
-            tokens:
-              list(%{
-                token_address: String.t(),
-                token_id: pos_integer(),
-                amount: pos_integer()
-              })
-          },
+          balance: balance(),
+          next_balance: balance(),
+          next_state: map(),
+          next_transaction: map(),
           encrypted_seed: {encrypted_seed :: binary(), encrypted_key :: binary()}
         ]
 
@@ -166,15 +171,18 @@ defmodule Archethic.Contracts.WasmModule do
 
   @spec execute(module :: t(), functionName :: binary(), opts :: execution_opts()) ::
           {:ok, ReadResult.t() | UpdateResult.t()} | {:error, any()}
-  def execute(%__MODULE__{module: module, store: store}, function_name, opts \\ [])
+  def execute(%__MODULE__{spec: spec, module: module, store: store}, function_name, opts \\ [])
       when is_binary(function_name) do
     input =
       %{
         state: Keyword.get(opts, :state, %{}),
+        nextState: Keyword.get(opts, :next_state, %{}),
         transaction: opts |> Keyword.get(:transaction) |> cast_transaction(),
         arguments: Keyword.get(opts, :arguments),
         balance: Keyword.get(opts, :balance, %{uco: 0, tokens: []}),
-        contract: opts |> Keyword.get(:contract) |> cast_transaction()
+        nextBalance: Keyword.get(opts, :next_balance, %{uco: 0, tokens: []}),
+        contract: opts |> Keyword.get(:contract) |> cast_transaction(),
+        nextTransaction: opts |> Keyword.get(:next_transaction) |> cast_transaction()
       }
       |> Jason.encode!()
 
@@ -184,8 +192,14 @@ defmodule Archethic.Contracts.WasmModule do
     with {:ok, instance_pid} <-
            Wasmex.start_link(%{module: module, store: store, imports: imports(io_mem_pid)}),
          {:ok, _} <- Wasmex.call_function(instance_pid, function_name, []) do
+      function_spec =
+        case WasmSpec.get_function_spec(spec, function_name) do
+          {:ok, function_spec} -> function_spec
+          _ -> nil
+        end
+
       output = WasmMemory.get_output(io_mem_pid)
-      cast_output(output)
+      cast_output(output, function_spec)
     else
       {:error, _} = e ->
         case WasmMemory.get_error(io_mem_pid) do
@@ -226,11 +240,11 @@ defmodule Archethic.Contracts.WasmModule do
     }
   end
 
-  defp cast_output(nil), do: {:ok, WasmResult.cast(nil)}
+  defp cast_output(nil, function_spec), do: {:ok, WasmResult.cast(nil, function_spec)}
 
-  defp cast_output(output) do
+  defp cast_output(output, function_spec) do
     with {:ok, json} <- Jason.decode(output) do
-      {:ok, WasmResult.cast(json)}
+      {:ok, WasmResult.cast(json, function_spec)}
     end
   end
 

@@ -3,19 +3,14 @@ defmodule Mix.Tasks.Archethic.Proposal.Validator do
 
   @moduledoc """
     The Archethic Code Proposal Validator mix task wrapper
-
     ## Command line options
-
     * `--help` - show this help
     * `--phase=1` - launch phase 1
     * `--phase=2` - launch phase 2
-
   ## Example
-
   ```sh
   mix archethic.validate localhost
   ```
-
   """
   use Mix.Task
 

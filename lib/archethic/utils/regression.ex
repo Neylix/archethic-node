@@ -6,101 +6,137 @@ defmodule Archethic.Utils.Regression do
 
   alias Archethic.Utils
 
-  alias Archethic.Utils.Regression.Playbook.SmartContract
   alias Archethic.Utils.Regression.Playbook.UCO
-
-  alias Archethic.Utils.WebClient
-  alias Archethic.Utils.Regression.Benchmark.LegacySmartContractTrigger
+  alias Archethic.Utils.Regression.Playbook.SmartContract
   alias Archethic.Utils.Regression.Benchmark.WasmSmartContractTrigger
   alias Archethic.Utils.Regression.Benchmark.EndToEndValidation
   alias Archethic.Utils.Regression.Benchmark.P2PMessage
 
   @playbooks [UCO, SmartContract]
   @benchmarks [
-    LegacySmartContractTrigger,
-    WasmSmartContractTrigger,
     P2PMessage,
+    WasmSmartContractTrigger,
     EndToEndValidation
   ]
 
-  def run_playbooks(nodes, opts \\ []) do
-    Logger.debug("Running playbooks on #{inspect(nodes)} with #{inspect(opts)}")
+  def run_playbooks(node, opts \\ []) do
+    Logger.debug("Running playbooks on #{inspect(node)} with #{inspect(opts)}")
 
     Enum.each(@playbooks, fn playbook ->
-      playbook.play!(nodes, opts)
+      playbook.play!(node, opts)
       Process.sleep(100)
     end)
   end
 
-  def run_benchmarks(nodes, opts \\ []) do
-    Logger.debug("Running benchmarks on #{inspect(nodes)} with #{inspect(opts)}")
+  def run_benchmarks(node, opts \\ []) do
+    Logger.debug("Running benchmarks on #{inspect(node)} with #{inspect(opts)}")
+
     tag = Time.utc_now() |> Time.truncate(:second) |> Time.to_string()
 
-    run_benchmark = fn benchmark ->
-      Logger.info("Running benchmark #{benchmark}")
-      save = Utils.mut_dir("#{benchmark}.benchee")
-      save_opts = [title: benchmark, save: [path: save, tag: tag], load: save]
-      {bench_plan, bench_opts} = benchmark.plan(nodes, opts)
-      Benchee.run(bench_plan, Keyword.merge(save_opts, bench_opts))
-    end
+    benchmarks_to_run = get_benchmarks_to_run(opts)
 
-    Enum.each(@benchmarks, run_benchmark)
+    if Enum.empty?(benchmarks_to_run),
+      do: Logger.warn("No benchmarks to run"),
+      else: Enum.each(benchmarks_to_run, &run_benchmark(&1, node, opts, tag))
+  end
+
+  # Helper function to determine which benchmarks to run
+  defp get_benchmarks_to_run(opts) do
+    case Keyword.get(opts, :only, []) do
+      [] -> @benchmarks
+      benchmark_names -> filter_benchmarks_by_names(benchmark_names)
+    end
+  end
+
+  # Helper function to filter benchmarks by name
+  defp filter_benchmarks_by_names(benchmark_names) do
+    benchmark_map =
+      Map.new(@benchmarks, fn benchmark -> {benchmark_name(benchmark), benchmark} end)
+
+    Enum.reduce(benchmark_names, [], fn name, acc ->
+      case Map.get(benchmark_map, name) do
+        nil ->
+          Logger.warn("Unknown benchmark: #{name}")
+          acc
+
+        benchmark ->
+          [benchmark | acc]
+      end
+    end)
+    |> Enum.reverse()
+  end
+
+  # Helper function to run a single benchmark
+  defp run_benchmark(benchmark, node, opts, tag) do
+    Logger.info("Running benchmark #{benchmark}")
+    save = Utils.mut_dir("#{benchmark}.benchee")
+    save_opts = [title: benchmark, save: [path: save, tag: tag], load: save]
+    {bench_plan, bench_opts} = benchmark.plan(node, opts)
+
+    Benchee.run(bench_plan, Keyword.merge(save_opts, bench_opts))
+  end
+
+  # Helper to get a standardized benchmark name
+  defp benchmark_name(benchmark) when is_atom(benchmark) do
+    benchmark |> Atom.to_string() |> String.split(".") |> List.last()
   end
 
   def get_metrics(host, port, range) do
     Logger.debug("Collecting metrics for last #{range} seconds")
 
-    WebClient.with_connection(host, port, fn conn ->
-      with {:ok, conn, %{"status" => "success", "data" => metrics}} <-
-             WebClient.json(conn, "/api/v1/label/__name__/values"),
-           {:ok, conn, data} <- collect_metrics(conn, metrics, range) do
-        {:ok, conn, data}
-      else
-        {:error, conn, error} -> {:error, conn, error}
-      end
-    end)
+    base_url = "http://#{host}:#{port}"
+
+    with {:ok, %Req.Response{body: %{"status" => "success", "data" => metrics}}} <-
+           Req.get(url: "#{base_url}/api/v1/label/__name__/values"),
+         {:ok, data} <- collect_metrics(base_url, metrics, range) do
+      {:ok, data}
+    else
+      {:ok, %Req.Response{body: body}} ->
+        {:error, body}
+
+      {:error, reason} ->
+        {:error, reason}
+    end
   end
 
   defp query_metric(metric, range, resolution \\ 5),
     do: "/api/v1/query?query=#{metric}[#{range}s:#{resolution}s]"
 
-  defp collect_metrics(conn, metrics, range, acc \\ [])
-  defp collect_metrics(conn, [], _, acc), do: {:ok, conn, acc}
+  defp collect_metrics(base_url, metrics, range, acc \\ [])
+  defp collect_metrics(_base_url, [], _range, acc), do: {:ok, acc}
 
-  defp collect_metrics(conn, [m | metrics], range, acc) do
-    case WebClient.json(conn, query_metric(m, range)) do
-      {:ok, conn, %{"status" => "success", "data" => %{"result" => data}}} ->
-        collect_metrics(conn, metrics, range, [data | acc])
+  defp collect_metrics(base_url, [m | metrics], range, acc) do
+    url = "#{base_url}#{query_metric(m, range)}"
 
-      {:error, conn, error} ->
-        {:error, conn, error}
+    case Req.get(url: url) do
+      {:ok, %Req.Response{body: %{"status" => "success", "data" => %{"result" => data}}}} ->
+        collect_metrics(base_url, metrics, range, [data | acc])
+
+      {:ok, %Req.Response{body: body}} ->
+        {:error, body}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
   @node_up_timeout 5 * 60 * 1000
 
   def nodes_up?(nodes) do
-    Logger.debug("Ensure #{inspect(nodes)} are up and ready")
-
     nodes
     |> Task.async_stream(&node_up?/1, ordered: false, timeout: @node_up_timeout)
     |> Enum.into([])
-    |> Enum.all?(&(&1 == {:ok, :ok}))
+    |> Enum.all?(&(&1 == {:ok, true}))
   end
 
   def node_up?(node, start \\ System.monotonic_time(:millisecond), timeout \\ 5 * 60_000)
 
   def node_up?(node, start, timeout) do
-    port =
-      if System.get_env("ARCHETHIC_NETWORK_TYPE") == "testnet" do
-        40_000
-      else
-        Application.get_env(:archethic, ArchethicWeb.Endpoint)[:http][:port]
-      end
+    Logger.debug("Ensure #{inspect(node)} are up and ready")
 
-    case WebClient.with_connection(node, port, &WebClient.request(&1, "GET", "/up")) do
-      {:ok, ["up"]} ->
-        :ok
+    case Req.get(base_url: node, url: "up") do
+      {:ok, %Req.Response{body: "up"}} ->
+        true
 
       {:ok, _} ->
         Process.sleep(250)
@@ -112,7 +148,7 @@ defmodule Archethic.Utils.Regression do
         if System.monotonic_time(:millisecond) - start < timeout do
           node_up?(node, start, timeout)
         else
-          {:error, :timeout}
+          false
         end
     end
   end

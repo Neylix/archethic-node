@@ -1,45 +1,48 @@
 defmodule Archethic.Utils.Regression.Playbook.SmartContract.Throw do
   @moduledoc false
 
-  alias Archethic.TransactionChain.TransactionData
-  alias Archethic.TransactionChain.TransactionData.Recipient
+  alias ArchethicClient.Transaction
+  alias ArchethicClient.TransactionData
   alias Archethic.Utils.Regression.Api
   alias Archethic.Utils.Regression.Playbook.SmartContract
 
+  @wasm_binary "priv/regression/hello_world/contract.wasm"
+  @wasm_manifest "priv/regression/hello_world/manifest.json"
+
   require Logger
 
-  def play(storage_nonce_pubkey, endpoint) do
+  def play(storage_nonce_pubkey) do
     Logger.info("============== CONTRACT: THROW ==============")
     contract_seed = SmartContract.random_seed()
     trigger_seed = SmartContract.random_seed()
 
-    Api.send_funds_to_seeds(%{contract_seed => 10, trigger_seed => 10}, endpoint)
+    Api.send_funds_to_seeds(%{contract_seed => 10, trigger_seed => 10})
+
+    contract = SmartContract.read_wasm_contract(@wasm_binary, @wasm_manifest)
 
     contract_address =
-      SmartContract.deploy(
-        contract_seed,
-        %TransactionData{code: contract_code()},
-        storage_nonce_pubkey,
-        endpoint
-      )
+      %TransactionData{}
+      |> TransactionData.set_contract(contract)
+      |> SmartContract.deploy(contract_seed, storage_nonce_pubkey)
 
-    with :ok <- trigger_valid_tx(trigger_seed, contract_address, endpoint),
-         :ok <- trigger_invalid_tx(trigger_seed, contract_address, endpoint),
-         :ok <- call_valid_function(contract_address, endpoint) do
-      call_invalid_function(contract_address, endpoint)
+    with :ok <- trigger_valid_tx(trigger_seed, contract_address),
+         :ok <- trigger_invalid_tx(trigger_seed, contract_address),
+         :ok <- call_valid_function(contract_address) do
+      call_invalid_function(contract_address)
     end
   end
 
-  defp trigger_valid_tx(trigger_seed, contract_address, endpoint) do
-    case SmartContract.trigger(trigger_seed, contract_address, endpoint,
-           recipients: [
-             %Recipient{address: contract_address, action: "action", args: ["Hello"]}
-           ],
-           wait: true,
-           version: 3
-         ) do
+  defp trigger_valid_tx(trigger_seed, contract_address) do
+    tx =
+      %TransactionData{}
+      |> TransactionData.add_recipient(contract_address, "processTransaction", %{
+        "param" => "Hello"
+      })
+      |> Transaction.build(:transfer, trigger_seed)
+
+    case SmartContract.trigger(tx, contract_address, wait: true) do
       {:ok, _} ->
-        last_tx = Api.get_last_transaction(contract_address, endpoint)
+        last_tx = Api.get_last_transaction(contract_address)
 
         case last_tx["data"]["content"] do
           "World" ->
@@ -58,47 +61,56 @@ defmodule Archethic.Utils.Regression.Playbook.SmartContract.Throw do
     end
   end
 
-  defp trigger_invalid_tx(trigger_seed, contract_address, endpoint) do
-    case SmartContract.trigger(trigger_seed, contract_address, endpoint,
-           recipients: [
-             %Recipient{address: contract_address, action: "action", args: ["Invalid"]}
-           ],
-           version: 3
-         ) do
-      {:ok, _} ->
+  defp trigger_invalid_tx(trigger_seed, contract_address) do
+    tx =
+      %TransactionData{}
+      |> TransactionData.add_recipient(contract_address, "processTransaction", %{
+        "param" => "invalid"
+      })
+      |> Transaction.build(:transfer, trigger_seed)
+
+    case SmartContract.trigger(tx, contract_address) do
+      {:ok, _tx_address} ->
         Logger.error(
-          "Trigger tx on smart contract throw successed while it should be refused by condition"
+          "Trigger tx on smart contract throw succeeded while it should be refused by condition"
         )
 
         :error
 
+      {:error, :timeout} ->
+        Logger.error("Trigger tx on smart contract throw timed out")
+        :error
+
       {:error, error} ->
-        if match?(
-             %{
-               "code" => -31003,
-               "data" => %{
-                 "data" => %{
-                   "code" => 1,
-                   "data" => "Invalid",
-                   "message" => "Param should be \"Hello\""
-                 },
-                 "message" => "Param should be \"Hello\" - L10"
-               },
-               "message" => "Invalid recipients execution"
-             },
-             error
-           ) do
+        if trigger_invalid_tx_expected_validation_error?(error) do
           Logger.info("Trigger tx on smart contract throw has been refused as expected")
+          :ok
         else
           Logger.error(
             "Trigger tx on smart contract throw has been refused with invalid reason: #{inspect(error)}"
           )
+
+          :error
         end
     end
   end
 
-  defp call_valid_function(contract_address, endpoint) do
-    case SmartContract.call_function(contract_address, "public", ["Hello"], false, endpoint) do
+  defp trigger_invalid_tx_expected_validation_error?(%ArchethicClient.ValidationError{
+         code: -31003,
+         message: "Invalid recipients execution",
+         data: %{"message" => msg}
+       })
+       when is_binary(msg),
+       do: String.contains?(msg, "Expected \"Hello\"")
+
+  defp trigger_invalid_tx_expected_validation_error?(_), do: false
+
+  defp call_valid_function(contract_address) do
+    case ArchethicClient.call_contract_function(
+           Base.encode16(contract_address),
+           "getPublicValue",
+           %{"param" => "Hello"}
+         ) do
       {:ok, "World"} ->
         Logger.info("Call valid function returned expected result")
         :ok
@@ -109,55 +121,34 @@ defmodule Archethic.Utils.Regression.Playbook.SmartContract.Throw do
     end
   end
 
-  defp call_invalid_function(contract_address, endpoint) do
-    expected_result = %{
-      "code" => 254,
-      "message" => "Function execution returned an error",
-      "data" => %{
-        "code" => 2,
-        "message" => "Param should be \"Hello\"",
-        "data" => "Holla"
-      }
-    }
+  defp call_invalid_function(contract_address) do
+    case ArchethicClient.call_contract_function(
+           Base.encode16(contract_address),
+           "getPublicValue",
+           %{"param" => "Holla"}
+         ) do
+      {:error, error} ->
+        if call_invalid_function_expected_validation_error?(error) do
+          Logger.info("Call invalid function returned expected result")
+          :ok
+        else
+          Logger.error("Call invalid function returned unexpected error: #{inspect(error)}")
+          :error
+        end
 
-    case SmartContract.call_function(contract_address, "public", ["Holla"], false, endpoint) do
-      {:error, ^expected_result} ->
-        Logger.info("Call invalid function returned expected result")
-        :ok
-
-      {_, res} ->
-        Logger.error("Call invalid function returned unexpected response: #{inspect(res)}")
+      {:ok, res} ->
+        Logger.error("Call invalid function unexpectedly succeeded with result: #{inspect(res)}")
         :error
     end
   end
 
-  defp contract_code() do
-    ~s"""
-    @version 1
-
-    # GENERATED BY PLAYBOOK
-
-    condition triggered_by: transaction, on: action(param), as: [
-      content: (
-        if param == "Hello" do
-          true
-        else
-          throw code: 1, message: "Param should be \\"Hello\\"", data: param
-        end
-      )
-    ]
-
-    actions triggered_by: transaction, on: action(_param) do
-      Contract.set_content("World")
-    end
-
-    export fun public(param) do
-      if param == "Hello" do
-        "World"
-      else
-        throw code: 2, message: "Param should be \\"Hello\\"", data: param
-      end
-    end
-    """
+  defp call_invalid_function_expected_validation_error?(%ArchethicClient.RPCError{
+         code: 202,
+         message: "There was an error while executing the function",
+         data: data
+       }) do
+    String.contains?(data, "Expected \\\"Hello\\\"")
   end
+
+  defp call_invalid_function_expected_validation_error?(_), do: false
 end

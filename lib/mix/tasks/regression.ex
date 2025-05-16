@@ -11,11 +11,13 @@ defmodule Mix.Tasks.Archethic.Regression do
     * `--help` - show this help
     * `--bench` - run benchmark "#{@bench}"
     * `--playbook` - run all playbooks, default "#{@validate}"
+    * `--only BENCHMARK_NAME` - run only the specified benchmark(s), can be specified multiple times
 
   ## Example
 
   ```sh
   mix archethic.regression --bench localhost
+  mix archethic.regression --bench "https://rpc-endpoint.net"
   ```
 
   """
@@ -23,37 +25,48 @@ defmodule Mix.Tasks.Archethic.Regression do
   use Mix.Task
 
   alias Archethic.Utils.Regression
-  alias Mix.Tasks.Utils
 
   @impl Mix.Task
   def run(args) do
     Application.ensure_all_started(:telemetry)
+    Application.ensure_all_started(:req)
+    Application.ensure_all_started(:archethic_client)
 
     case OptionParser.parse!(args,
            strict: [
              help: :boolean,
              bench: :boolean,
-             playbook: :boolean
+             playbook: :boolean,
+             only: [:string, :keep]
            ]
          ) do
       {_, []} ->
         Mix.shell().cmd("mix help #{Mix.Task.task_name(__MODULE__)}")
 
-      {parsed, nodes} ->
+      {parsed, [node | _]} ->
         if parsed[:help] do
           Mix.shell().cmd("mix help #{Mix.Task.task_name(__MODULE__)}")
         else
-          true = Regression.nodes_up?(nodes)
+          node = if node == "localhost", do: "http://localhost:4000", else: node
 
-          :ok =
-            Utils.apply_function_if_key_exists(parsed, :bench, &Regression.run_benchmarks/1, [
-              nodes
-            ])
+          true = Regression.node_up?(node)
 
-          :ok =
-            Utils.apply_function_if_key_exists(parsed, :playbook, &Regression.run_playbooks/1, [
-              nodes
-            ])
+          Application.put_env(:archethic_client, :base_url, node, persistent: false)
+
+          # Extract benchmark names to run
+          benchmark_opts = [only: Keyword.get_values(parsed, :only)]
+
+          # Run benchmarks if requested
+          if parsed[:bench] do
+            Regression.run_benchmarks(node, benchmark_opts)
+          end
+
+          # Run playbooks if requested
+          if parsed[:playbook] do
+            Regression.run_playbooks(node)
+          end
+
+          :ok
         end
     end
   end
