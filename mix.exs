@@ -68,7 +68,7 @@ defmodule Archethic.MixProject do
       {:plug_attack, "~> 0.4.3"},
 
       # Dev
-      {:benchee, "~> 1.1"},
+      {:benchee, "~> 1.4", only: [:dev, :test]},
       {:benchee_html, "~> 1.0", only: :dev},
       {:ex_doc, "~> 0.29", runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
