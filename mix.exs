@@ -76,7 +76,7 @@ defmodule Archethic.MixProject do
       {:dialyxir, "~> 1.2", runtime: false},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
       {:dart_sass, "~> 0.5", runtime: Mix.env() == :dev},
-      {:doctest_formatter, "~> 0.2.1", runtime: false},
+      {:doctest_formatter, "~> 0.4", only: [:dev, :test], runtime: false},
       {:gnuplot, "~> 1.22", only: :test, runtime: false},
 
       # Security
