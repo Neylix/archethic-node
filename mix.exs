@@ -116,7 +116,7 @@ defmodule Archethic.MixProject do
 
       # Crypto
       {:easy_ssl, "~> 1.3"},
-      {:castore, "~> 1.0", override: true},
+      {:castore, "~> 1.0"},
       {:plug_crypto, "~> 2.1", override: true},
       {:ex_keccak, "~> 0.7"},
       {:ex_secp256k1, "~> 0.7"},
