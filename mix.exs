@@ -85,7 +85,7 @@ defmodule Archethic.MixProject do
       {:sobelow, "~> 0.14", only: :dev, runtime: false},
 
       # Test
-      {:mox, "~> 1.0", only: [:test]},
+      {:mox, "~> 1.2", only: [:test]},
       {:mock, "~> 0.3.7", only: [:test]},
       {:stream_data, "~> 1.2", only: [:test], runtime: false},
 
