@@ -99,9 +99,9 @@ defmodule Archethic.MixProject do
 
       # Monitoring
       {:observer_cli, "~> 1.5"},
-      {:telemetry_metrics, "~> 0.6"},
-      {:telemetry_metrics_prometheus_core, "~> 1.1"},
-      {:telemetry_poller, "~> 1.0"},
+      {:telemetry_metrics, "~> 1.1"},
+      {:telemetry_metrics_prometheus_core, "~> 1.2"},
+      {:telemetry_poller, "~> 1.2"},
       {:phoenix_live_dashboard, "~> 0.7"},
 
       # Utils
