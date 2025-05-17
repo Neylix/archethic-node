@@ -137,7 +137,7 @@ defmodule Archethic.MixProject do
       {:nimble_csv, "~> 1.1", only: :test, runtime: false},
 
       # WASM
-      {:wasmex, "~> 0.9"},
+      {:wasmex, "~> 0.11"},
 
       # Archethic Client
       {:archethic_client, github: "pasteque-org/libelixir", only: [:dev, :test]}
