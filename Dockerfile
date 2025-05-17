@@ -66,7 +66,7 @@ RUN git config user.name aebot &&\
   git remote add origin https://github.com/archethic-foundation/archethic-node
 
 # build release
-RUN mix assets.saas
+RUN mix assets.sass
 RUN mix assets.deploy
 RUN MIX_ENV=${MIX_ENV} mix distillery.release
 # Install

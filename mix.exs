@@ -75,7 +75,7 @@ defmodule Archethic.MixProject do
       {:elixir_make, "~> 0.9", runtime: false},
       {:dialyxir, "~> 1.2", runtime: false},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
-      {:dart_sass, "~> 0.5", runtime: Mix.env() == :dev},
+      {:dart_sass, "~> 0.7", runtime: Mix.env() == :dev},
       {:doctest_formatter, "~> 0.4", only: [:dev, :test], runtime: false},
       {:gnuplot, "~> 1.22", only: :test, runtime: false},
 
@@ -182,7 +182,7 @@ defmodule Archethic.MixProject do
       "run.dry": ["cmd iex -S mix run --no-start"],
       # Make sure the plts folder is created
       dialyzer: ["cmd mkdir -p priv/plts", "dialyzer"],
-      "assets.saas": ["sass default --no-source-map --style=compressed"],
+      "assets.sass": ["sass default --no-source-map --style=compressed"],
       "assets.deploy": [
         "esbuild default --minify",
         "phx.digest"
