@@ -92,10 +92,6 @@ defmodule Archethic.MixProject do
       {:ranch, "~> 2.2"},
       {:mmdb2_decoder, "~> 3.0"},
 
-      # Net
-      {:inet_ext, "~> 1.0"},
-      {:inet_cidr, "~> 1.1", hex: :erl_cidr, override: true},
-
       # Monitoring
       {:observer_cli, "~> 1.8"},
       {:telemetry_metrics, "~> 1.1"},
