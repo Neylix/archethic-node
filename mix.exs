@@ -86,7 +86,7 @@ defmodule Archethic.MixProject do
 
       # Test
       {:mox, "~> 1.2", only: [:test]},
-      {:mock, "~> 0.3.7", only: [:test]},
+      {:mock, "~> 0.3", only: [:test]},
       {:stream_data, "~> 1.2", only: [:test], runtime: false},
 
       # P2P
