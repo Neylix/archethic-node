@@ -58,7 +58,7 @@ defmodule Archethic.MixProject do
       {:phoenix_live_view, "~> 0.18"},
       {:phoenix_pubsub, "~> 2.1"},
       {:jason, "~> 1.0"},
-      {:plug_cowboy, "~> 2.3"},
+      {:plug_cowboy, "~> 2.7"},
       {:absinthe, "1.7.0"},
       {:absinthe_plug, "~> 1.5"},
       {:absinthe_phoenix, "~> 2.0"},
@@ -90,7 +90,7 @@ defmodule Archethic.MixProject do
       {:stream_data, "~> 1.2", only: [:test], runtime: false},
 
       # P2P
-      {:ranch, "~> 2.2", override: true},
+      {:ranch, "~> 2.2"},
       {:mmdb2_decoder, "~> 3.0"},
 
       # Net
