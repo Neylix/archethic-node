@@ -71,7 +71,7 @@ defmodule Archethic.MixProject do
       {:benchee, "~> 1.1"},
       {:benchee_html, "~> 1.0", only: :dev},
       {:ex_doc, "~> 0.29", runtime: false},
-      {:credo, "~> 1.6", runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:elixir_make, "~> 0.9", runtime: false},
       {:dialyxir, "~> 1.2", runtime: false},
       {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
