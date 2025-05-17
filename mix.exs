@@ -98,7 +98,7 @@ defmodule Archethic.MixProject do
       {:inet_cidr, "~> 1.1", hex: :erl_cidr, override: true},
 
       # Monitoring
-      {:observer_cli, "~> 1.5"},
+      {:observer_cli, "~> 1.8"},
       {:telemetry_metrics, "~> 1.1"},
       {:telemetry_metrics_prometheus_core, "~> 1.2"},
       {:telemetry_poller, "~> 1.2"},
