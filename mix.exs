@@ -90,7 +90,7 @@ defmodule Archethic.MixProject do
       {:stream_data, "~> 1.2", only: [:test], runtime: false},
 
       # P2P
-      {:ranch, "~> 2.1", override: true},
+      {:ranch, "~> 2.2", override: true},
       {:mmdb2_decoder, "~> 3.0"},
 
       # Net
