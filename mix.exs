@@ -74,7 +74,7 @@ defmodule Archethic.MixProject do
       {:credo, "~> 1.6", runtime: false},
       {:elixir_make, "~> 0.6", runtime: false},
       {:dialyxir, "~> 1.2", runtime: false},
-      {:esbuild, "~> 0.2", runtime: Mix.env() == :dev},
+      {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
       {:dart_sass, "~> 0.5", runtime: Mix.env() == :dev},
       {:doctest_formatter, "~> 0.2.1", runtime: false},
       {:gnuplot, "~> 1.22", only: :test, runtime: false},

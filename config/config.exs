@@ -173,7 +173,7 @@ config :archethic, ArchethicWeb.AEWeb.WebHostingController,
   file_cache_bytes: 5 * 1024 * 1024 * 1024
 
 config :esbuild,
-  version: "0.12.18",
+  version: "0.25.4",
   default: [
     args: ~w(js/app.js --bundle --target=es2018 --outdir=../priv/static/js),
     cd: Path.expand("../assets", __DIR__),
