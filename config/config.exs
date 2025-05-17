@@ -187,11 +187,6 @@ config :dart_sass,
     cd: Path.expand("../assets", __DIR__)
   ]
 
-config :ex_cldr,
-  default_locale: "en",
-  default_backend: Archethic.Cldr,
-  json_library: Jason
-
 config :ex_json_schema, :remote_schema_resolver, {Archethic.Utils, :local_schema_resolver!}
 
 # Import environment specific config. This must remain at the bottom

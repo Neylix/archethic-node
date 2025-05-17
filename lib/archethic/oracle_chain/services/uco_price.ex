@@ -12,8 +12,6 @@ defmodule Archethic.OracleChain.Services.UCOPrice do
 
   @behaviour Impl
 
-  @precision_digits 8
-
   @pairs ["usd", "eur"]
 
   @impl Impl
@@ -37,15 +35,8 @@ defmodule Archethic.OracleChain.Services.UCOPrice do
       |> ProviderCacheSupervisor.get_values()
       |> Enum.reduce(%{}, &agregate_providers_data/2)
       |> Enum.reduce(%{}, fn {currency, values}, acc ->
-        price =
-          values
-          |> Utils.median()
-          |> Archethic.Cldr.Number.to_string!(
-            currency: currency,
-            currency_symbol: "",
-            fractional_digits: @precision_digits
-          )
-          |> String.to_float()
+        # Truncate price to 8 decimals
+        price = values |> Utils.median() |> Utils.to_bigint() |> Utils.from_bigint()
 
         Map.put(acc, currency, price)
       end)

@@ -110,8 +110,6 @@ defmodule Archethic.MixProject do
       {:knigge, "~> 1.4"},
       {:ex_json_schema, "~> 0.11"},
       {:floki, "~> 0.37"},
-      {:ex_cldr, "~> 2.7"},
-      {:ex_cldr_numbers, "~> 2.29"},
       {:git_diff, "~> 0.6.4"},
       {:decimal, "~> 2.0"},
       {:ex_abi, "0.6.1"},
