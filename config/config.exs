@@ -1,24 +1,5 @@
 import Config
 
-config :git_hooks,
-  auto_install: true,
-  verbose: true,
-  hooks: [
-    pre_push: [
-      tasks: [
-        {:cmd, "mix clean"},
-        {:cmd, "mix format --check-formatted"},
-        {:cmd, "mix compile --warnings-as-errors"},
-        {:cmd, "mix credo"},
-        {:cmd, "mix sobelow"},
-        {:cmd, "mix knigge.verify"},
-        {:cmd, "mix test --trace"},
-        {:cmd, "mix dialyzer"},
-        {:cmd, "mix check.updates"}
-      ]
-    ]
-  ]
-
 # Configures Elixir's Logger
 config :logger,
   utc_log: true,
