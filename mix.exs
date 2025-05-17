@@ -82,7 +82,7 @@ defmodule Archethic.MixProject do
       {:gnuplot, "~> 1.22", only: :test, runtime: false},
 
       # Security
-      {:sobelow, "~> 0.11", runtime: false},
+      {:sobelow, "~> 0.14", only: :dev, runtime: false},
 
       # Test
       {:mox, "~> 1.0", only: [:test]},
