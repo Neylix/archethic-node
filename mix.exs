@@ -108,7 +108,7 @@ defmodule Archethic.MixProject do
       {:gen_state_machine, "~> 3.0"},
       {:retry, "~> 0.17"},
       {:knigge, "~> 1.4"},
-      {:ex_json_schema, "~> 0.9", override: true},
+      {:ex_json_schema, "~> 0.11"},
       {:floki, "~> 0.37"},
       {:ex_cldr, "~> 2.7"},
       {:ex_cldr_numbers, "~> 2.29"},
