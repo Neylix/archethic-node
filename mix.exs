@@ -115,7 +115,6 @@ defmodule Archethic.MixProject do
       {:retry, "~> 0.17"},
       {:knigge, "~> 1.4"},
       {:ex_json_schema, "~> 0.9", override: true},
-      {:pathex, "~> 2.4"},
       {:floki, "~> 0.33"},
       {:ex_cldr, "~> 2.7"},
       {:ex_cldr_numbers, "~> 2.29"},
