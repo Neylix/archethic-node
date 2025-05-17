@@ -112,7 +112,7 @@ defmodule Archethic.MixProject do
       {:floki, "~> 0.37"},
       {:git_diff, "~> 0.6.4"},
       {:decimal, "~> 2.0"},
-      {:ex_abi, "0.6.1"},
+      {:ex_abi, "~> 0.8"},
 
       # Crypto
       {:easy_ssl, "~> 1.3"},
