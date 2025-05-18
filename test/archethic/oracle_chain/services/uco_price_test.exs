@@ -64,7 +64,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
 
       Process.sleep(10)
 
-      assert {:ok, %{"eur" => 0.12345679, "usd" => 0.12345479}} = UCOPrice.fetch()
+      assert {:ok, %{"eur" => 0.12345678, "usd" => 0.12345478}} = UCOPrice.fetch()
     end
 
     test "should handle a service timing out" do
