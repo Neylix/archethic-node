@@ -123,8 +123,8 @@ defmodule Archethic.MixProject do
       {:bls_ex, "~> 0.1"},
 
       # Numbering
-      {:nx, "~> 0.5"},
-      {:exla, "~> 0.5"},
+      {:nx, "~> 0.9"},
+      {:exla, "~> 0.9"},
       {:nimble_csv, "~> 1.1", only: :test, runtime: false},
 
       # WASM
