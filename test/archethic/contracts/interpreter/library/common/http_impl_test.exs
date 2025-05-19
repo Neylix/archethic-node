@@ -99,6 +99,19 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImplTest do
                )
     end
 
+    test "should return json resp body as string" do
+      params = %{"method" => "string", "value" => %{"key" => "value to return"}}
+      headers = %{"Content-Type" => "application/json"}
+
+      assert %{"status" => 200, "body" => ~s({"key":"value to return"})} =
+               HttpImpl.request(
+                 "https://127.0.0.1:8081/api",
+                 "POST",
+                 headers,
+                 Jason.encode!(params)
+               )
+    end
+
     test "should return a 200 with error string if headers not set for application/json" do
       params = %{"method" => "string", "value" => "something that will be returned"}
 
