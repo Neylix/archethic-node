@@ -1,4 +1,4 @@
-FROM elixir:1.14.1-alpine AS archethic-ci
+FROM elixir:1.18.3-otp-27-alpine AS archethic-ci
 
 ARG with_tests=1
 ARG MIX_ENV=prod
@@ -78,7 +78,7 @@ CMD /opt/app/bin/archethic_node foreground
 
 FROM archethic-ci as build
 
-FROM elixir:1.14.1-alpine
+FROM elixir:1.18.3-otp-27-alpine
 
 ARG USER_ID
 ARG GROUP_ID
