@@ -22,15 +22,6 @@ defmodule Archethic.Mining.LedgerValidationTest do
   end
 
   describe "mint_token_utxos/4" do
-    test "should raise if not in filtered_inputs state" do
-      tx = TransactionFactory.create_valid_transaction([])
-
-      assert_raise FunctionClauseError, fn ->
-        %LedgerValidation{}
-        |> LedgerValidation.mint_token_utxos(tx, DateTime.utc_now())
-      end
-    end
-
     test "should update state to utxos_minted" do
       tx = TransactionFactory.create_valid_transaction([])
 
@@ -371,12 +362,6 @@ defmodule Archethic.Mining.LedgerValidationTest do
   describe "validate_sufficient_funds/2" do
     setup do
       %{tx: TransactionFactory.create_valid_transaction()}
-    end
-
-    test "should raise if not in minted_utxos state" do
-      assert_raise FunctionClauseError, fn ->
-        %LedgerValidation{} |> LedgerValidation.validate_sufficient_funds([])
-      end
     end
 
     test "should update state to sufficient_funds_validated", %{tx: tx} do
@@ -1496,12 +1481,6 @@ defmodule Archethic.Mining.LedgerValidationTest do
       %{tx: TransactionFactory.create_valid_transaction()}
     end
 
-    test "should raise if not in inputs_consumed state" do
-      assert_raise FunctionClauseError, fn ->
-        %LedgerValidation{} |> LedgerValidation.build_resolved_movements(%{}, :transfer)
-      end
-    end
-
     test "should update state to movements_resolved", %{tx: tx} do
       now = DateTime.utc_now()
 
@@ -1561,12 +1540,6 @@ defmodule Archethic.Mining.LedgerValidationTest do
   describe "to_ledger_operations/1" do
     setup do
       %{tx: TransactionFactory.create_valid_transaction()}
-    end
-
-    test "should raise if not in inputs_consumed state" do
-      assert_raise FunctionClauseError, fn ->
-        %LedgerValidation{} |> LedgerValidation.to_ledger_operations()
-      end
     end
 
     test "should return LegderOperations struct", %{tx: tx} do

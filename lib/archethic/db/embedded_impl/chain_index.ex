@@ -61,7 +61,7 @@ defmodule Archethic.DB.EmbeddedImpl.ChainIndex do
 
   defp scan_summary_table(filename) do
     filename
-    |> File.stream!([], @batch_read_size)
+    |> File.stream!(@batch_read_size)
     |> Enum.reduce(<<>>, fn content, acc ->
       do_scan_summary_table(<<acc::bitstring, content::bitstring>>)
     end)
@@ -254,7 +254,7 @@ defmodule Archethic.DB.EmbeddedImpl.ChainIndex do
 
     db_path
     |> index_summary_path(subset)
-    |> File.stream!([], @batch_read_size)
+    |> File.stream!(@batch_read_size)
     |> Enum.reduce_while(<<>>, fn content, acc ->
       case do_search_tx_entry(<<acc::bitstring, content::bitstring>>, search_address) do
         rest when is_binary(rest) -> {:cont, rest}

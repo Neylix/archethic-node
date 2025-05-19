@@ -106,7 +106,7 @@ defmodule Archethic.SharedSecrets.NodeRenewal do
   @doc """
   Decode the transaction content from the node renewal transaction
   """
-  @spec decode_transaction_content(binary()) :: {:ok, Crypto.prepended_hash()} | :error
+  @spec decode_transaction_content(binary()) :: {:ok, Crypto.prepended_hash()}
   def decode_transaction_content(content = <<1::16, _::bitstring>>) do
     # Content without version
     {daily_nonce_public_key, _rest} = Utils.deserialize_public_key(content)

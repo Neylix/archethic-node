@@ -44,9 +44,6 @@ defmodule ArchethicWeb.AEWeb.WebHostingController.Resources do
 
       {:error, :is_a_directory} ->
         {:error, {:is_a_directory, reference_transaction}}
-
-      error ->
-        error
     end
   end
 

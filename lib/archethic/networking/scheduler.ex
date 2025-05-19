@@ -124,7 +124,6 @@ defmodule Archethic.Networking.Scheduler do
       Archethic.send_new_transaction(tx, forward?: true)
       handle_new_ip(tx)
     else
-      :error -> Logger.warning("Cannot open port")
       false -> Logger.debug("Skip node update: Same IP - no need to send a new node transaction")
       {:error, _} -> Logger.warning("Cannot fetch IP")
     end

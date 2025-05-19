@@ -53,7 +53,6 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArcheth
             end
           else
             {:ok, %Req.Response{status: status}} -> {:error, status}
-            :error -> {:error, "invalid content"}
             {:error, _} = e -> e
           end
         end

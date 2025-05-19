@@ -131,7 +131,6 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImpl do
         res
       else
         {:error, reason} -> {:error, reason, request}
-        {:error, _, _} -> {:error, :request_failure, request}
       end
     end)
   end

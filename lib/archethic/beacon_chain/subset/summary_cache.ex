@@ -112,7 +112,7 @@ defmodule Archethic.BeaconChain.Subset.SummaryCache do
 
     if File.exists?(backup_file_path) do
       backup_file_path
-      |> File.stream!([], @batch_read_size)
+      |> File.stream!(@batch_read_size)
       |> Stream.transform(<<>>, fn content, rest ->
         deserialize(<<rest::bitstring, content::bitstring>>)
       end)

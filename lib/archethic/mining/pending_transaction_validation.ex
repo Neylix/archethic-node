@@ -431,9 +431,6 @@ defmodule Archethic.Mining.PendingTransactionValidation do
          true <- sorted_authorized_keys == sorted_node_renewal_authorized_keys do
       :ok
     else
-      :error ->
-        {:error, "Invalid node shared secrets transaction content"}
-
       false ->
         {:error, "Invalid node shared secrets transaction authorized nodes"}
 
@@ -524,9 +521,6 @@ defmodule Archethic.Mining.PendingTransactionValidation do
          :ok <- ExJsonSchema.Validator.validate(@did_schema, json_did) do
       :ok
     else
-      :error ->
-        {:error, "Invalid Keychain transaction"}
-
       {:error, reason} ->
         Logger.debug("Invalid keychain DID #{inspect(reason)}")
         {:error, "Invalid Keychain transaction"}
