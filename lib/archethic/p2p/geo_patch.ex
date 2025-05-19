@@ -16,11 +16,8 @@ defmodule Archethic.P2P.GeoPatch do
 
   def from_ip(ip) when is_tuple(ip) do
     case GeoIP.get_coordinates(ip) do
-      {0.0, 0.0} ->
-        compute_random_patch()
-
-      {lat, lon} ->
-        compute_patch(lat, lon)
+      {+0.0, +0.0} -> compute_random_patch()
+      {lat, lon} -> compute_patch(lat, lon)
     end
   end
 

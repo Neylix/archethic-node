@@ -36,7 +36,7 @@ defmodule Archethic.Utils.Regression do
     benchmarks_to_run = get_benchmarks_to_run(opts)
 
     if Enum.empty?(benchmarks_to_run),
-      do: Logger.warn("No benchmarks to run"),
+      do: Logger.warning("No benchmarks to run"),
       else: Enum.each(benchmarks_to_run, &run_benchmark(&1, node, opts, tag))
   end
 
@@ -56,7 +56,7 @@ defmodule Archethic.Utils.Regression do
     Enum.reduce(benchmark_names, [], fn name, acc ->
       case Map.get(benchmark_map, name) do
         nil ->
-          Logger.warn("Unknown benchmark: #{name}")
+          Logger.warning("Unknown benchmark: #{name}")
           acc
 
         benchmark ->

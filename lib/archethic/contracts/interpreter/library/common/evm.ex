@@ -24,7 +24,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.Evm do
   def abi_decode(signature, encoded_result) do
     encoded_result =
       if String.starts_with?(encoded_result, "0x"),
-        do: String.slice(encoded_result, 2..-1),
+        do: String.slice(encoded_result, 2..-1//-1),
         else: encoded_result
 
     encoded_result = Base.decode16!(encoded_result, case: :mixed)
@@ -62,7 +62,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.Evm do
   end
 
   defp decode_hex(value) when is_binary(value) do
-    value = if String.starts_with?(value, "0x"), do: String.slice(value, 2..-1), else: value
+    value = if String.starts_with?(value, "0x"), do: String.slice(value, 2..-1//-1), else: value
     UtilsInterpreter.maybe_decode_hex(value)
   end
 

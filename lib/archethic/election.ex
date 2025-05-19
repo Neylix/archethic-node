@@ -538,7 +538,7 @@ defmodule Archethic.Election do
         %Node{first_public_key: "key5", geo_patch: "D34"}
       ]
   """
-  def next_authorized_nodes(0.0, _candidates, previous_authorized_nodes) do
+  def next_authorized_nodes(+0.0, _candidates, previous_authorized_nodes) do
     # If the TPS is null then we don't add new validation nodes
     previous_authorized_nodes
   end

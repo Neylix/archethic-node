@@ -24,11 +24,8 @@ defmodule ArchethicWeb.Explorer.WorldMapLive do
     P2P.available_nodes()
     |> Enum.map(fn node ->
       case GeoIP.get_coordinates(node.ip) do
-        {0.0, 0.0} ->
-          %Node{geo_patch: "021", authorized?: node.authorized?}
-
-        _ ->
-          node
+        {+0.0, +0.0} -> %Node{geo_patch: "021", authorized?: node.authorized?}
+        _ -> node
       end
     end)
     |> Enum.frequencies_by(fn node -> {node.geo_patch, node.authorized?} end)

@@ -111,11 +111,11 @@ defmodule Archethic.Utils.Regression.Benchmark.P2PMessage do
         |> Enum.reduce(%{}, &parse_vm_metric/2)
 
       {:ok, %Req.Response{status: status}} ->
-        Logger.warn("Unexpected status #{status} from /metrics")
+        Logger.warning("Unexpected status #{status} from /metrics")
         %{}
 
       {:error, reason} ->
-        Logger.warn("Failed to get VM status from /metrics: #{inspect(reason)}")
+        Logger.warning("Failed to get VM status from /metrics: #{inspect(reason)}")
         %{}
     end
   end
