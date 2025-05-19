@@ -108,7 +108,7 @@ defmodule Archethic.MixProject do
       {:exjsonpath, "~> 0.9"},
       {:rand_compat, "~> 0.0.3"},
       {:gen_state_machine, "~> 3.0"},
-      {:retry, "~> 0.17"},
+      {:retry, "~> 0.19"},
       {:knigge, "~> 1.4"},
       {:ex_json_schema, "~> 0.11"},
       {:floki, "~> 0.37"},
