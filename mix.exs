@@ -53,10 +53,12 @@ defmodule Archethic.MixProject do
   defp deps do
     [
       # Web
-      {:phoenix, "~> 1.6"},
-      {:phoenix_html, "~> 3.0"},
-      {:phoenix_live_view, "~> 0.18"},
+      {:phoenix, "~> 1.7"},
+      {:phoenix_html, "~> 4.2"},
+      {:phoenix_live_view, "~> 1.0"},
       {:phoenix_pubsub, "~> 2.1"},
+      {:phoenix_view, "~> 2.0"},
+      {:phoenix_html_helpers, "~> 1.0"},
       {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.7"},
       {:absinthe, "~> 1.7"},
@@ -96,7 +98,7 @@ defmodule Archethic.MixProject do
       {:telemetry_metrics, "~> 1.1"},
       {:telemetry_metrics_prometheus_core, "~> 1.2"},
       {:telemetry_poller, "~> 1.2"},
-      {:phoenix_live_dashboard, "~> 0.7"},
+      {:phoenix_live_dashboard, "~> 0.8"},
 
       # Utils
       {:crontab, "~> 1.1"},

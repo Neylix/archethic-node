@@ -1,7 +1,7 @@
 defmodule ArchethicWeb.WebUtils do
   @moduledoc false
 
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
   alias Archethic.TransactionChain.Transaction
   alias Archethic.TransactionChain.TransactionData
 

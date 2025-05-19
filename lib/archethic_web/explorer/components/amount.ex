@@ -4,7 +4,7 @@ defmodule ArchethicWeb.Explorer.Components.Amount do
   alias ArchethicWeb.ExplorerRouter.Helpers, as: Routes
 
   use Phoenix.Component
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   import ArchethicWeb.WebUtils
 

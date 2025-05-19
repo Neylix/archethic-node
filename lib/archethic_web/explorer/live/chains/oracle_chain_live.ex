@@ -53,7 +53,7 @@ defmodule ArchethicWeb.Explorer.OracleChainLive do
       {number, ""} when number > 0 ->
         if number > length(dates) do
           {:noreply,
-           push_redirect(socket, to: Routes.live_path(socket, __MODULE__, %{"page" => 1}))}
+           push_navigate(socket, to: Routes.live_path(socket, __MODULE__, %{"page" => 1}))}
         else
           transactions =
             dates

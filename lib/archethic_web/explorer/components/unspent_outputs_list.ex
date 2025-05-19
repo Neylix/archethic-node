@@ -4,7 +4,7 @@ defmodule ArchethicWeb.Explorer.Components.UnspentOutputList do
   alias ArchethicWeb.ExplorerRouter.Helpers, as: Routes
 
   use Phoenix.Component
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   alias ArchethicWeb.Explorer.Components.Amount
 

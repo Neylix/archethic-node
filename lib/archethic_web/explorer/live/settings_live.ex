@@ -59,7 +59,7 @@ defmodule ArchethicWeb.Explorer.SettingsLive do
   end
 
   def handle_params(_params, _uri, socket) do
-    {:noreply, push_redirect(socket, to: "/", replace: true)}
+    {:noreply, push_navigate(socket, to: "/", replace: true)}
   end
 
   def handle_event(

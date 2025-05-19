@@ -77,7 +77,7 @@ defmodule ArchethicWeb.Explorer.BeaconChainLive do
 
       _ ->
         {:noreply,
-         push_redirect(socket, to: Routes.live_path(socket, __MODULE__, %{"page" => 1}))}
+         push_navigate(socket, to: Routes.live_path(socket, __MODULE__, %{"page" => 1}))}
     end
   end
 
@@ -186,7 +186,7 @@ defmodule ArchethicWeb.Explorer.BeaconChainLive do
       {:noreply, new_assign}
     else
       {:noreply,
-       push_redirect(socket, to: Routes.live_path(socket, __MODULE__, %{"page" => page + 1}))}
+       push_navigate(socket, to: Routes.live_path(socket, __MODULE__, %{"page" => page + 1}))}
     end
   end
 

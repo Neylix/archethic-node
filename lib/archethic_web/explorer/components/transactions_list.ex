@@ -10,7 +10,7 @@ defmodule ArchethicWeb.Explorer.Components.TransactionsList do
   alias ArchethicWeb.Explorer.Components.Amount
 
   use Phoenix.Component
-  use Phoenix.HTML
+  use PhoenixHTMLHelpers
 
   import ArchethicWeb.Explorer.ExplorerView
   import ArchethicWeb.WebUtils

@@ -18,7 +18,7 @@ defmodule ArchethicWeb.Explorer do
         namespace: ArchethicWeb.Explorer
 
       # Import convenience functions from controllers
-      import Phoenix.Controller, only: [get_flash: 1, get_flash: 2, view_module: 1]
+      import Phoenix.Controller, only: [view_module: 1]
 
       # Include shared imports and aliases for views
       unquote(view_helpers())
@@ -45,7 +45,9 @@ defmodule ArchethicWeb.Explorer do
   defp view_helpers do
     quote do
       # Use all HTML functionality (forms, tags, etc)
-      use Phoenix.HTML
+      import Phoenix.HTML
+      import Phoenix.HTML.Form
+      use PhoenixHTMLHelpers
 
       # Import LiveView helpers (live_render, live_component, live_patch, etc)
       import Phoenix.LiveView.Helpers
