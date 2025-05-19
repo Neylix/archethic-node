@@ -89,7 +89,7 @@ defmodule Migration_1_6_5 do
 
     node_config = %NodeConfig{
       node_config
-      | geo_patch_update: DateTime.utc_now() |> DateTime.add(geo_patch_update_date, :millisecond),
+      | geo_patch_update: DateTime.utc_now() |> DateTime.add(geo_patch_update_date),
         origin_certificate: Crypto.get_key_certificate(origin_public_key)
     }
 

@@ -132,7 +132,7 @@ defmodule ArchethicWeb.Explorer.SettingsLive do
       NodeConfig.from_node(node)
       | origin_certificate: Crypto.get_key_certificate(origin_public_key),
         reward_address: next_reward_address,
-        geo_patch_update: DateTime.add(DateTime.utc_now(), @geopatch_update_time, :millisecond)
+        geo_patch_update: DateTime.add(DateTime.utc_now(), @geopatch_update_time)
     }
 
     genesis_address = Crypto.derive_address(first_public_key)
@@ -165,7 +165,7 @@ defmodule ArchethicWeb.Explorer.SettingsLive do
     node_config = %NodeConfig{
       NodeConfig.from_node(node)
       | origin_certificate: Crypto.get_key_certificate(origin_public_key),
-        geo_patch_update: DateTime.add(DateTime.utc_now(), @geopatch_update_time, :millisecond)
+        geo_patch_update: DateTime.add(DateTime.utc_now(), @geopatch_update_time)
     }
 
     {:ok, %Transaction{data: %TransactionData{code: code}}} =

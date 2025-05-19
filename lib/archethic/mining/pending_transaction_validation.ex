@@ -729,7 +729,7 @@ defmodule Archethic.Mining.PendingTransactionValidation do
          %NodeConfig{ip: ip, geo_patch: geo_patch, geo_patch_update: geo_patch_update},
          validation_time
        ) do
-    diff = DateTime.diff(geo_patch_update, validation_time, :millisecond)
+    diff = DateTime.diff(geo_patch_update, validation_time)
 
     # TODO: Ensure there is no other P2P view which update the geopatch after the
     # update time in this transaction
@@ -737,7 +737,7 @@ defmodule Archethic.Mining.PendingTransactionValidation do
       geo_patch != GeoPatch.from_ip(ip) ->
         {:error, "Invalid geo patch from IP"}
 
-      diff < @mining_timeout or diff > @geo_patch_max_update_time ->
+      diff < div(@mining_timeout, 1000) or diff > @geo_patch_max_update_time ->
         {:error, "Invalid geo patch update time"}
 
       true ->

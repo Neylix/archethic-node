@@ -616,10 +616,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
         origin_certificate: certificate,
         mining_public_key: Crypto.generate_random_keypair(:bls) |> elem(0),
         geo_patch: "F1B",
-        geo_patch_update:
-          DateTime.utc_now()
-          |> DateTime.add(@geo_patch_max_update_time, :millisecond)
-          |> DateTime.truncate(:second)
+        geo_patch_update: DateTime.utc_now() |> DateTime.add(@geo_patch_max_update_time)
       }
 
       content = Node.encode_transaction_content(node_config)
@@ -660,10 +657,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
         origin_certificate: certificate,
         mining_public_key: Crypto.generate_random_keypair(:bls) |> elem(0),
         geo_patch: "FFF",
-        geo_patch_update:
-          DateTime.utc_now()
-          |> DateTime.add(@geo_patch_max_update_time, :millisecond)
-          |> DateTime.truncate(:second)
+        geo_patch_update: DateTime.utc_now() |> DateTime.add(@geo_patch_max_update_time)
       }
 
       content = Node.encode_transaction_content(node_config)
@@ -705,10 +699,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
         origin_certificate: certificate,
         mining_public_key: Crypto.generate_random_keypair(:bls) |> elem(0),
         geo_patch: "BBB",
-        geo_patch_update:
-          DateTime.utc_now()
-          |> DateTime.add(@geo_patch_max_update_time, :millisecond)
-          |> DateTime.truncate(:second)
+        geo_patch_update: DateTime.utc_now() |> DateTime.add(@geo_patch_max_update_time)
       }
 
       content = Node.encode_transaction_content(node_config)

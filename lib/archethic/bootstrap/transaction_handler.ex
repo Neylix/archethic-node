@@ -73,7 +73,7 @@ defmodule Archethic.Bootstrap.TransactionHandler do
   def create_node_transaction(node_config, date \\ DateTime.utc_now()) do
     node_config = %NodeConfig{
       node_config
-      | geo_patch_update: DateTime.add(date, @geopatch_update_time, :millisecond)
+      | geo_patch_update: DateTime.add(date, @geopatch_update_time)
     }
 
     Transaction.new(:node, %TransactionData{

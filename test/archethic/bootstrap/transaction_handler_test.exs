@@ -36,7 +36,7 @@ defmodule Archethic.Bootstrap.TransactionHandlerTest do
       mining_public_key: <<3::8, 2::8, :crypto.strong_rand_bytes(48)::binary>>,
       geo_patch: "AAA",
       geo_patch_update:
-        DateTime.add(now, @geo_patch_max_update_time, :millisecond) |> DateTime.truncate(:second)
+        now |> DateTime.add(@geo_patch_max_update_time) |> DateTime.truncate(:second)
     }
 
     assert %Transaction{data: %TransactionData{content: content}} =

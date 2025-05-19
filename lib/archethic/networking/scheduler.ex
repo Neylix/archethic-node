@@ -110,7 +110,7 @@ defmodule Archethic.Networking.Scheduler do
         NodeConfig.from_node(node)
         | origin_certificate: Crypto.get_key_certificate(origin_public_key),
           geo_patch: GeoPatch.from_ip(ip),
-          geo_patch_update: DateTime.add(DateTime.utc_now(), @geopatch_update_time, :millisecond),
+          geo_patch_update: DateTime.utc_now() |> DateTime.add(@geopatch_update_time),
           port: p2p_port,
           http_port: web_port
       }

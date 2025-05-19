@@ -285,4 +285,4 @@ config :archethic, :throttle,
   ]
 
 # Apply geopatch in 10 min (needs to be over global timeout)
-config :archethic, :geopatch_update_time, 600_000
+config :archethic, :geopatch_update_time, 600
