@@ -1125,7 +1125,7 @@ defmodule Archethic.Contracts.InterpreterTest do
 
       incoming_tx = TransactionFactory.create_valid_transaction()
 
-      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      now = DateTime.utc_now(:second)
 
       assert {
                :ok,

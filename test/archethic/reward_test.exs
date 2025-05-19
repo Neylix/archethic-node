@@ -52,7 +52,7 @@ defmodule Archethic.RewardTest do
 
     reward_amount2 = reward_amount - 10
 
-    timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+    timestamp = DateTime.utc_now(:millisecond)
 
     unspent_outputs1 = %UnspentOutput{
       from: random_address(),

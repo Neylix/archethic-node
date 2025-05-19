@@ -12,6 +12,7 @@ defmodule Archethic.MixProject do
       aliases: aliases(),
       elixir: "~> 1.14",
       start_permanent: Mix.env() == :prod,
+      start_concurrently: true,
       deps: deps(),
       compilers: [:elixir_make] ++ Mix.compilers(),
       elixirc_paths: elixirc_paths(Mix.env()),

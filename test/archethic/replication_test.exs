@@ -55,7 +55,7 @@ defmodule Archethic.ReplicationTest do
         from: "@Alice2",
         amount: 1_000_000_000,
         type: :UCO,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
     ]
 
@@ -92,7 +92,7 @@ defmodule Archethic.ReplicationTest do
         from: "@Alice2",
         amount: 1_000_000_000,
         type: :UCO,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
     ]
 
@@ -165,7 +165,7 @@ defmodule Archethic.ReplicationTest do
         from: "@Alice2",
         amount: 1_000_000_000,
         type: :UCO,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
     ]
 

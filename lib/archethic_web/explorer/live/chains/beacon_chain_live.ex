@@ -109,7 +109,7 @@ defmodule ArchethicWeb.Explorer.BeaconChainLive do
     summary_aggregate_creation_date = SelfRepair.next_repair_time(date)
 
     func =
-      if DateTime.compare(now, summary_aggregate_creation_date) == :gt,
+      if DateTime.after?(now, summary_aggregate_creation_date),
         do: &list_transactions_from_aggregate/1,
         else: &list_transactions_from_summaries/1
 

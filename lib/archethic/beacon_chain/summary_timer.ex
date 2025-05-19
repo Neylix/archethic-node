@@ -77,7 +77,7 @@ defmodule Archethic.BeaconChain.SummaryTimer do
     |> Stream.take_while(fn datetime ->
       datetime
       |> DateTime.from_naive!("Etc/UTC")
-      |> DateTime.compare(date_from) == :gt
+      |> DateTime.after?(date_from)
     end)
     |> Stream.map(&DateTime.from_naive!(&1, "Etc/UTC"))
     |> Enum.to_list()
@@ -107,11 +107,9 @@ defmodule Archethic.BeaconChain.SummaryTimer do
     cron_interval
     |> CronParser.parse!(true)
     |> CronScheduler.get_next_run_dates(date_from |> DateTime.to_naive())
-    |> Stream.reject(&(DateTime.compare(DateTime.from_naive!(&1, "Etc/UTC"), date_from) == :eq))
+    |> Stream.reject(&(DateTime.from_naive!(&1, "Etc/UTC") |> DateTime.compare(date_from) == :eq))
     |> Stream.take_while(fn datetime ->
-      datetime
-      |> DateTime.from_naive!("Etc/UTC")
-      |> DateTime.compare(date_to) == :lt
+      datetime |> DateTime.from_naive!("Etc/UTC") |> DateTime.before?(date_to)
     end)
     |> Stream.map(&DateTime.from_naive!(&1, "Etc/UTC"))
   end

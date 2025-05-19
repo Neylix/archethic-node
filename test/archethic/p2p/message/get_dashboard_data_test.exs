@@ -16,7 +16,7 @@ defmodule Archethic.P2P.Message.GetDashboardDataTest do
   end
 
   test "encode decode since=datetime" do
-    msg = %GetDashboardData{since: DateTime.utc_now() |> DateTime.truncate(:second)}
+    msg = %GetDashboardData{since: DateTime.utc_now(:second)}
 
     assert {^msg, <<>>} =
              msg

@@ -50,8 +50,8 @@ defmodule Archethic.UtilsTest do
       datetime = Utils.get_current_time_for_interval("* * * * *", false)
 
       assert %DateTime{second: 0, microsecond: {0, 0}} = datetime
-      assert DateTime.compare(datetime, now) == :lt
-      assert DateTime.compare(datetime, now_minus_1) == :gt
+      assert DateTime.before?(datetime, now)
+      assert DateTime.after?(datetime, now_minus_1)
     end
 
     test "should return a value truncated to the minute (*/5 minute)" do
@@ -61,8 +61,8 @@ defmodule Archethic.UtilsTest do
 
       assert %DateTime{minute: minute, second: 0, microsecond: {0, 0}} = datetime
       assert 0 == rem(minute, 5)
-      assert DateTime.compare(datetime, now) == :lt
-      assert DateTime.compare(datetime, now_minus_1) == :gt
+      assert DateTime.before?(datetime, now)
+      assert DateTime.after?(datetime, now_minus_1)
     end
 
     test "should return a value truncated to the second (* second)" do
@@ -71,8 +71,8 @@ defmodule Archethic.UtilsTest do
       datetime = Utils.get_current_time_for_interval("* * * * *", true)
 
       assert %DateTime{microsecond: {0, 0}} = datetime
-      assert DateTime.compare(datetime, now) == :lt
-      assert DateTime.compare(datetime, now_minus_1) == :gt
+      assert DateTime.before?(datetime, now)
+      assert DateTime.after?(datetime, now_minus_1)
     end
 
     test "should return a value truncated to the second (*/2 second)" do
@@ -82,8 +82,8 @@ defmodule Archethic.UtilsTest do
 
       assert %DateTime{second: second, microsecond: {0, 0}} = datetime
       assert 0 == rem(second, 2)
-      assert DateTime.compare(datetime, now) == :lt
-      assert DateTime.compare(datetime, now_minus_1) == :gt
+      assert DateTime.before?(datetime, now)
+      assert DateTime.after?(datetime, now_minus_1)
     end
   end
 end

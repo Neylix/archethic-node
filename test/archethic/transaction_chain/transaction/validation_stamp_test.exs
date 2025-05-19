@@ -76,7 +76,7 @@ defmodule Archethic.TransactionChain.Transaction.ValidationStampTest do
     gen all(
           from <- StreamData.binary(length: 33),
           amount <- StreamData.positive_integer(),
-          timestamp <- StreamData.constant(DateTime.utc_now() |> DateTime.truncate(:millisecond)),
+          timestamp <- StreamData.constant(DateTime.utc_now(:millisecond)),
           type <-
             StreamData.one_of([
               StreamData.constant(:UCO),

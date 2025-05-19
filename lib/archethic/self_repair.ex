@@ -56,15 +56,11 @@ defmodule Archethic.SelfRepair do
         # we run bootstrap_sync again until the last beacon summary is loaded
         last_sync_date = last_sync_date()
 
-        case DateTime.utc_now()
-             |> BeaconChain.previous_summary_time()
-             |> DateTime.compare(last_sync_date) do
-          :gt ->
-            bootstrap_sync(download_nodes)
-
-          _ ->
-            :ok
-        end
+        if DateTime.utc_now()
+           |> BeaconChain.previous_summary_time()
+           |> DateTime.after?(last_sync_date),
+           do: bootstrap_sync(download_nodes),
+           else: :ok
 
       :error ->
         Logger.error(
@@ -157,7 +153,7 @@ defmodule Archethic.SelfRepair do
       |> BeaconChain.next_summary_date(summary_cron_interval)
       |> Scheduler.next_repair_time(repair_cron_interval)
 
-    DateTime.compare(ref_date, next_repair_date) != :lt
+    not DateTime.before?(ref_date, next_repair_date)
   end
 
   @doc """

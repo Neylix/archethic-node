@@ -216,7 +216,7 @@ defmodule Archethic.Replication.TransactionContextTest do
       from: random_address(),
       amount: 19_300_000,
       type: :UCO,
-      timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      timestamp: DateTime.utc_now(:millisecond)
     }
 
     genesis_address = random_address()

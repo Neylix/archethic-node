@@ -101,7 +101,7 @@ defmodule Archethic.SelfRepair.Sync do
   def load_missed_transactions(last_sync_date, download_nodes) do
     last_summary_time = BeaconChain.previous_summary_time(DateTime.utc_now())
 
-    if DateTime.compare(last_summary_time, last_sync_date) == :gt do
+    if DateTime.after?(last_summary_time, last_sync_date) do
       Logger.info(
         "Fetch missed transactions from last sync date: #{DateTime.to_string(last_sync_date)}"
       )
@@ -140,10 +140,7 @@ defmodule Archethic.SelfRepair.Sync do
       last_sync_date
       |> BeaconChain.next_summary_dates()
       # Take only the previous summaries before the last one
-      |> Stream.take_while(fn date ->
-        DateTime.compare(date, last_summary_time) ==
-          :lt
-      end)
+      |> Stream.take_while(&DateTime.before?(&1, last_summary_time))
 
     # Fetch the beacon summaries aggregate
     Task.Supervisor.async_stream(

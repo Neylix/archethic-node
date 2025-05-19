@@ -47,7 +47,7 @@ defmodule Archethic.P2P.NodeTest do
         origin_certificate: :crypto.strong_rand_bytes(64),
         mining_public_key: <<3::8, 2::8, :crypto.strong_rand_bytes(48)::binary>>,
         geo_patch: "AAA",
-        geo_patch_update: DateTime.utc_now() |> DateTime.truncate(:second)
+        geo_patch_update: DateTime.utc_now(:second)
       }
 
       assert {:ok, node_config} ==

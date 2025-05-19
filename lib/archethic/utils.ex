@@ -1071,7 +1071,7 @@ defmodule Archethic.Utils do
     interval
     |> CronParser.parse!(true)
     |> CronScheduler.get_next_run_dates(start_of_month_datetime)
-    |> Stream.take_while(&(NaiveDateTime.compare(&1, end_of_month_datetime) in [:lt]))
+    |> Stream.take_while(&NaiveDateTime.before?(&1, end_of_month_datetime))
     |> Enum.count()
   end
 

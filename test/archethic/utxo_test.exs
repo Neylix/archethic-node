@@ -487,7 +487,7 @@ defmodule Archethic.UTXOTest do
         from: "@Bob0",
         type: :UCO,
         amount: 100_000_000,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       })
 
       assert [%UnspentOutput{from: "@Bob0"}] =
@@ -501,7 +501,7 @@ defmodule Archethic.UTXOTest do
             from: "@Bob#{i}",
             type: :UCO,
             amount: 100_000_000,
-            timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+            timestamp: DateTime.utc_now(:millisecond)
           }
 
           MemoryLedger.add_chain_utxo("@Alice0", utxo)

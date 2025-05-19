@@ -222,7 +222,7 @@ defmodule Archethic.Mining.DistributedWorkflow do
       transaction_type: tx.type
     )
 
-    validation_time = ref_timestamp |> DateTime.truncate(:millisecond)
+    validation_time = DateTime.truncate(ref_timestamp, :millisecond)
 
     authorized_nodes = P2P.authorized_and_available_nodes(validation_time)
 

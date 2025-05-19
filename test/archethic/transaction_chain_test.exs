@@ -287,7 +287,7 @@ defmodule Archethic.TransactionChainTest do
       nodes = P2P.authorized_and_available_nodes()
 
       acceptance_resolver = fn %LastTransactionAddress{timestamp: remote_last_address_timestamp} ->
-        DateTime.compare(now, remote_last_address_timestamp) == :lt
+        DateTime.before?(now, remote_last_address_timestamp)
       end
 
       assert {:error, :acceptance_failed} =
@@ -330,7 +330,7 @@ defmodule Archethic.TransactionChainTest do
       nodes = P2P.authorized_and_available_nodes()
 
       acceptance_resolver = fn %LastTransactionAddress{timestamp: remote_last_address_timestamp} ->
-        DateTime.compare(now, remote_last_address_timestamp) == :lt
+        DateTime.before?(now, remote_last_address_timestamp)
       end
 
       assert {:ok, ^latest_address} =
@@ -762,7 +762,7 @@ defmodule Archethic.TransactionChainTest do
     end
 
     test "should request other with unresolved paging date", %{nodes: nodes} do
-      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      now = DateTime.utc_now(:second)
 
       address = random_address()
 
@@ -914,7 +914,7 @@ defmodule Archethic.TransactionChainTest do
 
       Enum.each(nodes, &P2P.add_and_connect_node/1)
 
-      timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      timestamp = DateTime.utc_now(:millisecond)
 
       utxo = %UnspentOutput{from: "Alice2", amount: 10, type: :UCO, timestamp: timestamp}
 
@@ -952,7 +952,7 @@ defmodule Archethic.TransactionChainTest do
       ]
 
       Enum.each(nodes, &P2P.add_and_connect_node/1)
-      timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      timestamp = DateTime.utc_now(:millisecond)
       old_timestamp = DateTime.add(timestamp, -1, :minute)
 
       user_address = random_address()
@@ -1396,7 +1396,7 @@ defmodule Archethic.TransactionChainTest do
 
       date = DateTime.truncate(date2, :second)
 
-      assert DateTime.compare(date, date2) == :lt
+      assert DateTime.before?(date, date2)
 
       assert {:ok, address1} ==
                TransactionChain.resolve_paging_state(address3, date, :asc)

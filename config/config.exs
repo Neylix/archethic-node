@@ -6,7 +6,7 @@ config :logger,
   handle_otp_reports: true,
   handle_sasl_reports: false
 
-config :logger, :console,
+config :logger, :default_formatter,
   format: "$date $time $metadata[$level] $message\n",
   metadata: [
     :request_id,

@@ -82,7 +82,7 @@ defmodule Archethic.DB.EmbeddedImpl.StatsInfo do
         state = %{last_update: last_update, filepath: filepath, nb_transactions: prev_nb_tx}
       ) do
     new_state =
-      if DateTime.compare(date, last_update) == :gt do
+      if DateTime.after?(date, last_update) do
         new_nb_transactions = prev_nb_tx + nb_transactions
 
         File.write!(

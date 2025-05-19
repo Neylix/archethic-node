@@ -408,7 +408,7 @@ defmodule Archethic.Mining.SmartContractValidationTest do
     end
 
     test "should return true when the transaction have been triggered by interval and timestamp matches" do
-      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      now = DateTime.utc_now(:second)
 
       code = """
       @version 1
@@ -440,7 +440,7 @@ defmodule Archethic.Mining.SmartContractValidationTest do
     end
 
     test "should return false when the transaction have been triggered by interval but timestamp doesn't match" do
-      yesterday = DateTime.utc_now() |> DateTime.add(-1, :day) |> DateTime.truncate(:second)
+      yesterday = DateTime.utc_now(:second) |> DateTime.add(-1, :day)
 
       code = """
       @version 1
@@ -472,7 +472,7 @@ defmodule Archethic.Mining.SmartContractValidationTest do
     end
 
     test "should return true when the resulting transaction is the same as next_transaction" do
-      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      now = DateTime.utc_now(:second)
 
       code = """
       @version 1
@@ -504,7 +504,7 @@ defmodule Archethic.Mining.SmartContractValidationTest do
     end
 
     test "should return false when the resulting transaction is not the same as next_transaction" do
-      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      now = DateTime.utc_now(:second)
 
       code = """
       @version 1
@@ -536,7 +536,7 @@ defmodule Archethic.Mining.SmartContractValidationTest do
     end
 
     test "should return encoded_state if execution is valid" do
-      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      now = DateTime.utc_now(:second)
 
       code = """
       @version 1
@@ -572,7 +572,7 @@ defmodule Archethic.Mining.SmartContractValidationTest do
     end
 
     test "should return false if the context status is failure" do
-      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      now = DateTime.utc_now(:second)
 
       code = """
       @version 1
@@ -608,7 +608,7 @@ defmodule Archethic.Mining.SmartContractValidationTest do
     end
 
     test "should return false if the context status is no_output" do
-      now = DateTime.utc_now() |> DateTime.truncate(:second)
+      now = DateTime.utc_now(:second)
 
       code = """
       @version 1

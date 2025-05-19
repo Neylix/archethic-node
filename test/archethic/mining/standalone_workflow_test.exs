@@ -47,7 +47,7 @@ defmodule Archethic.Mining.StandaloneWorkflowTest do
         from: "@Alice2",
         amount: 1_000_000_000,
         type: :UCO,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
     ]
 
@@ -64,7 +64,7 @@ defmodule Archethic.Mining.StandaloneWorkflowTest do
             type: :UCO,
             amount: 1_000_000_000,
             from: random_address(),
-            timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+            timestamp: DateTime.utc_now(:millisecond)
           }
         ],
         type: :data,

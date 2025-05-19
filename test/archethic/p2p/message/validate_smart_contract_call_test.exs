@@ -36,7 +36,7 @@ defmodule Archethic.P2P.Message.ValidateSmartContractCallTest do
       msg = %ValidateSmartContractCall{
         recipient: %Recipient{address: random_address()},
         transaction: Archethic.TransactionFactory.create_valid_transaction(),
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
 
       assert {^msg, <<>>} =
@@ -49,7 +49,7 @@ defmodule Archethic.P2P.Message.ValidateSmartContractCallTest do
       msg = %ValidateSmartContractCall{
         recipient: %Recipient{address: random_address(), action: "do_it", args: %{}},
         transaction: Archethic.TransactionFactory.create_valid_transaction(),
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
 
       assert {^msg, <<>>} =

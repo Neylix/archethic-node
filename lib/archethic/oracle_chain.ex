@@ -136,7 +136,7 @@ defmodule Archethic.OracleChain do
     |> Stream.take_while(fn datetime ->
       datetime
       |> DateTime.from_naive!("Etc/UTC")
-      |> DateTime.compare(date_from) == :gt
+      |> DateTime.after?(date_from)
     end)
     |> Stream.map(&DateTime.from_naive!(&1, "Etc/UTC"))
   end

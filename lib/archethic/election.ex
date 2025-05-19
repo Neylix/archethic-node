@@ -813,8 +813,8 @@ defmodule Archethic.Election do
     filtered_nodes =
       Enum.filter(
         nodes_list,
-        &(DateTime.compare(&1.availability_update, previous_summary_time) == :lt and
-            DateTime.compare(&1.authorization_date, previous_summary_time) == :lt)
+        &(DateTime.before?(&1.availability_update, previous_summary_time) and
+            DateTime.before?(&1.authorization_date, previous_summary_time))
       )
 
     case filtered_nodes do

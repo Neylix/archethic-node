@@ -1154,7 +1154,7 @@ defmodule Archethic.DB.EmbeddedTest do
       genesis_address = Transaction.previous_address(tx1)
 
       EmbeddedImpl.write_transaction(tx1)
-      now = DateTime.utc_now() |> DateTime.add(-1) |> DateTime.truncate(:millisecond)
+      now = DateTime.utc_now(:millisecond) |> DateTime.add(-1)
       EmbeddedImpl.add_last_transaction_address(genesis_address, tx2.address, now)
 
       assert {tx2.address, now} == EmbeddedImpl.get_last_chain_address(tx1.address)

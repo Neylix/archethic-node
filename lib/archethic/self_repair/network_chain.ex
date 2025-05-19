@@ -142,7 +142,7 @@ defmodule Archethic.SelfRepair.NetworkChain do
 
     case last_transaction do
       {:ok, %Transaction{validation_stamp: %ValidationStamp{timestamp: validation_timestamp}}} ->
-        DateTime.compare(validation_timestamp, last_schedule_date) != :lt
+        not DateTime.before?(validation_timestamp, last_schedule_date)
 
       _ ->
         false
@@ -156,8 +156,7 @@ defmodule Archethic.SelfRepair.NetworkChain do
 
     case TransactionChain.fetch_last_address(genesis_address, nodes,
            consistency_level: 8,
-           acceptance_resolver:
-             &(DateTime.compare(&1.timestamp, local_last_address_timestamp) == :gt)
+           acceptance_resolver: &DateTime.after?(&1.timestamp, local_last_address_timestamp)
          ) do
       {:ok, remote_last_address} -> {:error, remote_last_address}
       {:error, :acceptance_failed} -> :ok

@@ -33,7 +33,7 @@ defmodule Archethic.P2P.Message.AddMiningContextTest do
         amount: 1,
         type: {:token, random_address(), 0},
         from: random_address(),
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
       |> UnspentOutput.hash()
 
@@ -42,7 +42,7 @@ defmodule Archethic.P2P.Message.AddMiningContextTest do
         amount: 2,
         type: {:token, random_address(), 0},
         from: random_address(),
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
       |> UnspentOutput.hash()
 

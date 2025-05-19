@@ -144,7 +144,7 @@ defmodule Archethic.Bootstrap.NetworkInitTest do
         amount: 1_000_000_000_000,
         from: tx.address,
         type: :UCO,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
     ]
 

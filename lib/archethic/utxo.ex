@@ -112,11 +112,11 @@ defmodule Archethic.UTXO do
   defp utxo_consumed?(genesis_address, utxo = %UnspentOutput{timestamp: utxo_timestamp}) do
     {_, last_timestamp} = TransactionChain.get_last_address(genesis_address)
 
-    if DateTime.compare(last_timestamp, utxo_timestamp) == :gt do
+    if DateTime.after?(last_timestamp, utxo_timestamp) do
       genesis_address
       |> TransactionChain.list_chain_addresses()
       |> Stream.filter(fn {_, timestamp} ->
-        DateTime.compare(timestamp, utxo_timestamp) == :gt
+        DateTime.after?(timestamp, utxo_timestamp)
       end)
       |> Stream.map(fn {address, _} -> get_tx_consumed_inputs(address) end)
       |> Enum.any?(fn

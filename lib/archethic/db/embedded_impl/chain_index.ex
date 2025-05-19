@@ -381,7 +381,7 @@ defmodule Archethic.DB.EmbeddedImpl.ChainIndex do
 
         {:ok, fd} ->
           with {:ok, <<timestamp::64>>} <- :file.read(fd, 8),
-               :lt <- DateTime.from_unix!(timestamp, :millisecond) |> DateTime.compare(until),
+               true <- DateTime.from_unix!(timestamp, :millisecond) |> DateTime.before?(until),
                {:ok, <<curve_id::8, origin_id::8>>} <- :file.read(fd, 2),
                key_size <- Crypto.key_size(curve_id),
                {:ok, key} <- :file.read(fd, key_size) do
@@ -389,14 +389,14 @@ defmodule Archethic.DB.EmbeddedImpl.ChainIndex do
             # return tuple of address and timestamp
             {[{pub_key, DateTime.from_unix!(timestamp, :millisecond)}], {:ok, fd}}
           else
-            e when e in [:eof, :eq, :gt] ->
-              :file.close(fd)
+            _ ->
+              File.close(fd)
               {:halt, {:ok, fd}}
           end
       end,
       fn
         nil -> public_key
-        {:ok, fd} -> :file.close(fd)
+        {:ok, fd} -> File.close(fd)
       end
     )
   end

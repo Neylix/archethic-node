@@ -67,10 +67,9 @@ defmodule ArchethicWeb.DashboardMetrics do
 
   def handle_call({:get_since, since}, _from, state = %__MODULE__{buckets: buckets}) do
     filtered_buckets =
-      Enum.filter(buckets, fn {datetime, _} ->
-        DateTime.compare(datetime, since) != :lt
-      end)
-      |> Enum.into(%{})
+      buckets
+      |> Enum.filter(fn {datetime, _} -> not DateTime.before?(datetime, since) end)
+      |> Map.new()
 
     {:reply, filtered_buckets, state}
   end

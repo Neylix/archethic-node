@@ -392,7 +392,7 @@ defmodule Archethic.BeaconChain do
   end
 
   defp get_next_summary_elected_subsets_by_nodes(datetime) do
-    next_summary_date = next_summary_date(DateTime.truncate(datetime, :millisecond))
+    next_summary_date = datetime |> DateTime.truncate(:millisecond) |> next_summary_date()
     authorized_nodes = P2P.authorized_and_available_nodes(next_summary_date, true)
 
     list_subsets()

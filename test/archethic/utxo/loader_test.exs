@@ -34,7 +34,7 @@ defmodule Archethic.UTXO.LoaderTest do
         from: random_address(),
         type: :UCO,
         amount: 100_000_000,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
 
       me = self()
@@ -57,7 +57,7 @@ defmodule Archethic.UTXO.LoaderTest do
         from: random_address(),
         type: :UCO,
         amount: 100_000_000,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
 
       ledger = %Ledger{
@@ -89,7 +89,7 @@ defmodule Archethic.UTXO.LoaderTest do
             from: random_address(),
             type: :UCO,
             amount: 100_000_000,
-            timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+            timestamp: DateTime.utc_now(:millisecond)
           }
         end)
 
@@ -99,7 +99,7 @@ defmodule Archethic.UTXO.LoaderTest do
             from: random_address(),
             type: {:token, random_address(), 0},
             amount: 100_000_000,
-            timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+            timestamp: DateTime.utc_now(:millisecond)
           }
         end)
 

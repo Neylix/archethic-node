@@ -93,17 +93,20 @@ defmodule ArchethicWeb.Explorer.ExplorerView do
         content
       else
         transaction_stringified =
-          Enum.map_join(transaction_attestations, "\n", fn %ReplicationAttestation{
-                                                             transaction_summary:
-                                                               %TransactionSummary{
-                                                                 address: address,
-                                                                 timestamp: timestamp,
-                                                                 type: type
-                                                               },
-                                                             confirmations: confirmations
-                                                           } ->
-            "#{DateTime.to_string(DateTime.truncate(timestamp, :second))} - #{Base.encode16(address)} - #{type} - (#{length(confirmations)} confirmations)"
-          end)
+          Enum.map_join(
+            transaction_attestations,
+            "\n",
+            fn %ReplicationAttestation{
+                 transaction_summary: %TransactionSummary{
+                   address: address,
+                   timestamp: timestamp,
+                   type: type
+                 },
+                 confirmations: confirmations
+               } ->
+              "#{DateTime.truncate(timestamp, :second)} - #{Base.encode16(address)} - #{type} - (#{length(confirmations)} confirmations)"
+            end
+          )
 
         content ++ ["\n", "Transactions:\n", transaction_stringified]
       end
@@ -113,12 +116,13 @@ defmodule ArchethicWeb.Explorer.ExplorerView do
         content
       else
         end_of_sync_stringified =
-          Enum.map_join(end_of_sync, ",", fn %EndOfNodeSync{
-                                               public_key: node_public_key,
-                                               timestamp: timestamp
-                                             } ->
-            "- #{DateTime.to_string(DateTime.truncate(timestamp, :second))} - #{Base.encode16(node_public_key)}"
-          end)
+          Enum.map_join(
+            end_of_sync,
+            ",",
+            fn %EndOfNodeSync{public_key: node_public_key, timestamp: timestamp} ->
+              "- #{DateTime.truncate(timestamp, :second)} - #{Base.encode16(node_public_key)}"
+            end
+          )
 
         content ++ ["\n", "New node synchronizations: \n", end_of_sync_stringified]
       end
@@ -169,17 +173,20 @@ defmodule ArchethicWeb.Explorer.ExplorerView do
         content
       else
         transaction_stringified =
-          Enum.map_join(transaction_attestations, "\n", fn %ReplicationAttestation{
-                                                             transaction_summary:
-                                                               %TransactionSummary{
-                                                                 address: address,
-                                                                 timestamp: timestamp,
-                                                                 type: type
-                                                               },
-                                                             confirmations: confirmations
-                                                           } ->
-            "- #{DateTime.to_string(DateTime.truncate(timestamp, :second))} - #{Base.encode16(address)} - #{type} - (#{length(confirmations)} confirmations)"
-          end)
+          Enum.map_join(
+            transaction_attestations,
+            "\n",
+            fn %ReplicationAttestation{
+                 transaction_summary: %TransactionSummary{
+                   address: address,
+                   timestamp: timestamp,
+                   type: type
+                 },
+                 confirmations: confirmations
+               } ->
+              "- #{DateTime.truncate(timestamp, :second)} - #{Base.encode16(address)} - #{type} - (#{length(confirmations)} confirmations)"
+            end
+          )
 
         content ++ ["\n", "Transactions:\n", transaction_stringified]
       end

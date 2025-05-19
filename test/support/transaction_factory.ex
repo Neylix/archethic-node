@@ -62,7 +62,7 @@ defmodule Archethic.TransactionFactory do
             type: :UCO,
             amount: 1_000_000_000,
             from: random_address(),
-            timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+            timestamp: DateTime.utc_now(:millisecond)
           }
         ],
         opts \\ []
@@ -246,7 +246,7 @@ defmodule Archethic.TransactionFactory do
             type: :UCO,
             amount: 1_000_000_000,
             from: random_address(),
-            timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+            timestamp: DateTime.utc_now(:millisecond)
           }
         ],
         opts \\ []
@@ -270,7 +270,7 @@ defmodule Archethic.TransactionFactory do
   def create_transaction_with_invalid_proof_of_work(inputs \\ []) do
     tx = Transaction.new(:transfer, %TransactionData{}, "seed", 0)
 
-    timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+    timestamp = DateTime.utc_now(:millisecond)
 
     protocol_version = current_protocol_version()
 
@@ -360,7 +360,7 @@ defmodule Archethic.TransactionFactory do
 
   def create_transaction_with_invalid_fee(inputs \\ []) do
     tx = Transaction.new(:data, %TransactionData{content: "content"}, "seed", 0)
-    timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+    timestamp = DateTime.utc_now(:millisecond)
 
     protocol_version = current_protocol_version()
 
@@ -402,7 +402,7 @@ defmodule Archethic.TransactionFactory do
 
   def create_transaction_with_invalid_transaction_movements(inputs \\ []) do
     tx = Transaction.new(:transfer, %TransactionData{}, "seed", 0)
-    timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+    timestamp = DateTime.utc_now(:millisecond)
 
     protocol_version = current_protocol_version()
 

@@ -41,7 +41,7 @@ defmodule Archethic.P2P.Message.GetUnspentOutputsTest do
 
   describe "process/2" do
     setup do
-      last_chain_sync_date = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      last_chain_sync_date = DateTime.utc_now(:millisecond)
 
       MockDB
       |> stub(:get_last_chain_address, fn _ -> {random_address(), last_chain_sync_date} end)
@@ -51,7 +51,7 @@ defmodule Archethic.P2P.Message.GetUnspentOutputsTest do
 
     test "should get last chain address and return it's timestamp" do
       address = random_address()
-      last_chain_sync_date = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      last_chain_sync_date = DateTime.utc_now(:millisecond)
 
       MockDB
       |> expect(:get_last_chain_address, fn _ -> {random_address(), last_chain_sync_date} end)

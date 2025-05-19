@@ -149,10 +149,11 @@ defmodule Archethic.Replication.TransactionPool do
     new_state =
       state
       |> Map.update!(:transactions, fn transactions ->
-        Enum.reject(transactions, fn
-          {_, {_, expire_at, _}} -> DateTime.compare(DateTime.utc_now(), expire_at) in [:gt, :eq]
+        transactions
+        |> Enum.reject(fn
+          {_, {_, expire_at, _}} -> not DateTime.before?(DateTime.utc_now(), expire_at)
         end)
-        |> Enum.into(%{})
+        |> Map.new()
       end)
       |> Map.put(:clean_ref, clean_ref)
 

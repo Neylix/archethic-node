@@ -148,7 +148,7 @@ defmodule Archethic.Bootstrap.NetworkInit do
       |> Transaction.get_movements()
       |> Enum.reduce(0, &(&2 + &1.amount))
 
-    timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+    timestamp = DateTime.utc_now(:millisecond)
 
     inputs = [
       %UnspentOutput{
@@ -188,7 +188,7 @@ defmodule Archethic.Bootstrap.NetworkInit do
 
   @spec self_validation(Transaction.t(), list(UnspentOutput.t())) :: Transaction.t()
   def self_validation(tx = %Transaction{address: address, type: tx_type}, unspent_outputs \\ []) do
-    timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+    timestamp = DateTime.utc_now(:millisecond)
     fee = Mining.get_transaction_fee(tx, nil, 0.07, timestamp, nil)
     movements = Transaction.get_movements(tx)
     resolved_addresses = Enum.map(movements, &{&1.to, &1.to}) |> Map.new()

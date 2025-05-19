@@ -43,7 +43,7 @@ defmodule Archethic.Mining.ValidationContextTest do
 
   describe "aggregate_mining_context/7" do
     test "should do the intersection of utxos" do
-      now = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      now = DateTime.utc_now(:millisecond)
 
       utxos_coordinator = [
         %UnspentOutput{from: "@Alice1", amount: 1, type: :UCO, timestamp: now},
@@ -91,7 +91,7 @@ defmodule Archethic.Mining.ValidationContextTest do
 
   describe "create_validation_stamp/1" do
     test "should return the correct movements even if there are multiple to the same address" do
-      timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      timestamp = DateTime.utc_now(:millisecond)
       transfer_address = random_address()
       resolved_address = random_address()
 
@@ -127,7 +127,7 @@ defmodule Archethic.Mining.ValidationContextTest do
     end
 
     test "should handle the MUCO correctly" do
-      timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      timestamp = DateTime.utc_now(:millisecond)
       transfer_address = random_address()
       muco_addr1 = random_address()
       muco_addr2 = random_address()
@@ -196,7 +196,7 @@ defmodule Archethic.Mining.ValidationContextTest do
 
   describe "cross_validate/1" do
     test "should validate with a valid validation stamp" do
-      timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      timestamp = DateTime.utc_now(:millisecond)
       validation_context = create_context(timestamp)
 
       SharedSecrets.add_origin_public_key(:software, Crypto.origin_node_public_key())
@@ -289,7 +289,7 @@ defmodule Archethic.Mining.ValidationContextTest do
     end
 
     test "should get inconsistency when the proof of work is invalid" do
-      timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      timestamp = DateTime.utc_now(:millisecond)
       validation_context = create_context(timestamp)
 
       SharedSecrets.add_origin_public_key(:software, Crypto.origin_node_public_key())
@@ -305,7 +305,7 @@ defmodule Archethic.Mining.ValidationContextTest do
     end
 
     test "should get inconsistency when the proof of work is not in authorized keys" do
-      timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      timestamp = DateTime.utc_now(:millisecond)
       validation_context = create_context(timestamp)
 
       assert %ValidationContext{
@@ -391,7 +391,7 @@ defmodule Archethic.Mining.ValidationContextTest do
     # end
 
     test "should get inconsistency when the transaction movements are invalid" do
-      timestamp = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      timestamp = DateTime.utc_now(:millisecond)
       validation_context = create_context(timestamp)
 
       SharedSecrets.add_origin_public_key(:software, Crypto.origin_node_public_key())
@@ -872,7 +872,7 @@ defmodule Archethic.Mining.ValidationContextTest do
 
   defp create_proof_context(
          cross_seed,
-         validation_time \\ DateTime.utc_now() |> DateTime.truncate(:millisecond)
+         validation_time \\ DateTime.utc_now(:millisecond)
        ) do
     {node_pub, _} = Crypto.derive_keypair(cross_seed, 0)
     {mining_pub, _} = Crypto.generate_deterministic_keypair(cross_seed, :bls)
@@ -918,7 +918,7 @@ defmodule Archethic.Mining.ValidationContextTest do
   end
 
   defp create_context(
-         validation_time \\ DateTime.utc_now() |> DateTime.truncate(:millisecond),
+         validation_time \\ DateTime.utc_now(:millisecond),
          opts \\ []
        ) do
     welcome_node =

@@ -144,7 +144,7 @@ defmodule Archethic.P2P do
           %Node{last_update_date: previous_update_date} = Map.get(acc, public_key, new_node)
 
         node =
-          if DateTime.compare(update_date, previous_update_date) == :gt,
+          if DateTime.after?(update_date, previous_update_date),
             do: new_node,
             else: previous_node
 
@@ -291,8 +291,8 @@ defmodule Archethic.P2P do
       MemTable.authorized_nodes()
       |> Enum.filter(fn %Node{authorization_date: authorization_date} ->
         if before?,
-          do: DateTime.compare(authorization_date, date) == :lt,
-          else: DateTime.compare(authorization_date, date) != :gt
+          do: DateTime.before?(authorization_date, date),
+          else: not DateTime.after?(authorization_date, date)
       end)
 
     case nodes do
@@ -320,13 +320,13 @@ defmodule Archethic.P2P do
       |> Enum.filter(fn
         %Node{available?: true, availability_update: availability_update} ->
           if before?,
-            do: DateTime.compare(date, availability_update) == :gt,
-            else: DateTime.compare(date, availability_update) != :lt
+            do: DateTime.after?(date, availability_update),
+            else: not DateTime.before?(date, availability_update)
 
         %Node{available?: false, availability_update: availability_update} ->
           if before?,
-            do: DateTime.compare(date, availability_update) != :gt,
-            else: DateTime.compare(date, availability_update) == :lt
+            do: not DateTime.after?(date, availability_update),
+            else: DateTime.before?(date, availability_update)
       end)
 
     case nodes do

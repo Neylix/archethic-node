@@ -236,8 +236,8 @@ defmodule Archethic.BeaconChain.Subset do
     previous_summary =
       slot_time |> SummaryTimer.previous_summary() |> SummaryTimer.previous_summary()
 
-    DateTime.compare(timestamp, previous_summary) in [:eq, :gt] and
-      DateTime.compare(timestamp, next_summary) == :lt
+    not DateTime.before?(timestamp, previous_summary) and
+      DateTime.before?(timestamp, next_summary)
   end
 
   defp forward_attestation?(slot_time, subset, node_public_key) do
@@ -398,7 +398,7 @@ defmodule Archethic.BeaconChain.Subset do
   end
 
   defp summary_time?(time) do
-    SummaryTimer.match_interval?(DateTime.truncate(time, :millisecond))
+    time |> DateTime.truncate(:millisecond) |> SummaryTimer.match_interval?()
   end
 
   defp beacon_slot_node?(slot, node_public_key),

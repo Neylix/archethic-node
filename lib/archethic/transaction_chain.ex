@@ -580,16 +580,16 @@ defmodule Archethic.TransactionChain do
           else
             case order do
               :asc ->
-                DateTime.compare(
+                DateTime.before?(
                   List.first(&1.transactions).validation_stamp.timestamp,
                   List.first(&2.transactions).validation_stamp.timestamp
-                ) == :lt
+                )
 
               :desc ->
-                DateTime.compare(
+                DateTime.after?(
                   List.first(&1.transactions).validation_stamp.timestamp,
                   List.first(&2.transactions).validation_stamp.timestamp
-                ) == :gt
+                )
             end
           end
         end
@@ -1051,7 +1051,7 @@ defmodule Archethic.TransactionChain do
     |> Enum.reduce_while(
       %{res: {:error, :not_exists}, previous_address: nil},
       fn {address, date}, acc = %{previous_address: previous_address} ->
-        if DateTime.compare(date, from) != :lt,
+        if not DateTime.before?(date, from),
           do: {:halt, Map.put(acc, :res, {:ok, previous_address})},
           else: {:cont, Map.put(acc, :previous_address, address)}
       end
@@ -1063,11 +1063,11 @@ defmodule Archethic.TransactionChain do
     chain_addresses = list_chain_addresses(genesis_address)
     {_, first_date} = Enum.at(chain_addresses, 0)
 
-    if first_date |> DateTime.truncate(:second) |> DateTime.compare(from) == :gt do
+    if first_date |> DateTime.truncate(:second) |> DateTime.after?(from) do
       {:error, :not_exists}
     else
       Enum.find_value(chain_addresses, {:ok, nil}, fn {address, date} ->
-        if date |> DateTime.truncate(:second) |> DateTime.compare(from) == :gt,
+        if date |> DateTime.truncate(:second) |> DateTime.after?(from),
           do: {:ok, address},
           else: nil
       end)
@@ -1473,7 +1473,7 @@ defmodule Archethic.TransactionChain do
           genesis_address
           |> list_chain_addresses()
           |> Enum.filter(fn {_address, timestamp} ->
-            DateTime.compare(timestamp, address_timestamp) == :gt
+            DateTime.after?(timestamp, address_timestamp)
           end)
 
         if limit > 0 do

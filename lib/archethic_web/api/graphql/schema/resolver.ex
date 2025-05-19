@@ -188,10 +188,7 @@ defmodule ArchethicWeb.API.GraphQL.Schema.Resolver do
             |> Archethic.list_transactions_summaries_from_current_slot()
             |> create_empty_beacon_summary_aggregate(next_current_date_summary_time)
           else
-            {
-              :error,
-              "No data found at this date !"
-            }
+            {:error, "No data found at this date !"}
           end
 
         :eq ->
@@ -241,9 +238,7 @@ defmodule ArchethicWeb.API.GraphQL.Schema.Resolver do
         |> Enum.map(fn {subset, subset_map} ->
           list_nodes =
             P2PSampling.list_nodes_to_sample(subset)
-            |> Enum.reject(
-              &(DateTime.compare(&1.enrollment_date, next_datetime_summary_time) == :gt)
-            )
+            |> Enum.reject(&DateTime.after?(&1.enrollment_date, next_datetime_summary_time))
 
           transform_subset_map_to_node_maps(subset_map, list_nodes)
         end)

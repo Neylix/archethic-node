@@ -127,12 +127,7 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
         content: Node.encode_transaction_content(node_config)
       })
 
-    stub(MockGeoIP, :get_coordinates, fn ip ->
-      case ip do
-        {80, 10, 20, 102} ->
-          {38.345170, -0.481490}
-      end
-    end)
+    stub(MockGeoIP, :get_coordinates, fn {80, 10, 20, 102} -> {38.345170, -0.481490} end)
 
     {:ok,
      %{
@@ -1320,7 +1315,7 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
 
   defp create_context(
          tx,
-         validation_time \\ DateTime.utc_now() |> DateTime.truncate(:millisecond)
+         validation_time \\ DateTime.utc_now(:millisecond)
        ) do
     {pub1, _} = Crypto.generate_deterministic_keypair("seed")
 

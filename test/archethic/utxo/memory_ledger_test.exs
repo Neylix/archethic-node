@@ -100,7 +100,7 @@ defmodule Archethic.UTXO.MemoryLedgerTest do
     test "should add new unspent output into the genesis's ledger" do
       MemoryLedger.add_chain_utxo("@Alice0", %UnspentOutput{
         from: random_address(),
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond),
+        timestamp: DateTime.utc_now(:millisecond),
         type: :UCO,
         amount: 100_000_000
       })
@@ -112,7 +112,7 @@ defmodule Archethic.UTXO.MemoryLedgerTest do
       for i <- 1..6 do
         utxo = %UnspentOutput{
           from: random_address(),
-          timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond),
+          timestamp: DateTime.utc_now(:millisecond),
           type: :UCO,
           amount: 100_000_000
         }
@@ -149,7 +149,7 @@ defmodule Archethic.UTXO.MemoryLedgerTest do
         from: random_address(),
         type: :UCO,
         amount: 100_000_000,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
 
       address = random_address()
@@ -168,14 +168,14 @@ defmodule Archethic.UTXO.MemoryLedgerTest do
         from: random_address(),
         type: :UCO,
         amount: 100_000_000,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
 
       utxo2 = %UnspentOutput{
         from: random_address(),
         type: :UCO,
         amount: 200_000_000,
-        timestamp: DateTime.utc_now() |> DateTime.truncate(:millisecond)
+        timestamp: DateTime.utc_now(:millisecond)
       }
 
       address = random_address()

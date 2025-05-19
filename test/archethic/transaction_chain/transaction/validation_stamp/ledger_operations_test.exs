@@ -19,7 +19,7 @@ defmodule Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperation
 
   describe "serialization" do
     test "should be able to serialize and deserialize" do
-      now = DateTime.utc_now() |> DateTime.truncate(:millisecond)
+      now = DateTime.utc_now(:millisecond)
 
       ops = %LedgerOperations{
         fee: 10_000_000,
