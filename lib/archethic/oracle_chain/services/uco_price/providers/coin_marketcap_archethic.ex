@@ -9,37 +9,28 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArcheth
   @impl Impl
   @spec fetch(list(binary())) :: {:ok, %{required(String.t()) => any()}} | {:error, any()}
   def fetch(pairs) when is_list(pairs) do
-    query = 'https://coinmarketcap.com/currencies/archethic/'
-
-    httpc_options = [
-      ssl: [
-        verify: :verify_peer,
-        cacertfile: CAStore.file_path(),
-        depth: 3,
-        customize_hostname_check: [
-          match_fun: :public_key.pkix_verify_hostname_match_fun(:https)
-        ]
-      ],
-      connect_timeout: 1000,
-      timeout: 2000
-    ]
+    req =
+      Req.new(
+        url: "https://coinmarketcap.com/currencies/archethic/",
+        connect_options: [timeout: 1000],
+        receive_timeout: 2000,
+        headers: %{
+          "user-agent" =>
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36",
+          "accept" => "text/html",
+          "accept-language" => "en-US,en;q=0.9,es;q=0.8",
+          "upgrade-insecure-requests" => "1"
+        }
+      )
 
     returned_prices =
       Task.Supervisor.async_stream_nolink(
         Archethic.task_supervisors(),
         pairs,
         fn pair ->
-          headers = [
-            {'user-agent',
-             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36'},
-            {'accept', 'text/html'},
-            {'accept-language', 'en-US,en;q=0.9,es;q=0.8'},
-            {'upgrade-insecure-requests', '1'},
-            {'Cookie', 'currency=#{pair}'}
-          ]
+          req = Req.merge(req, headers: %{"Cookie" => "currency=#{pair}"})
 
-          with {:ok, {{_, 200, 'OK'}, _headers, body}} <-
-                 :httpc.request(:get, {query, headers}, httpc_options, []),
+          with {:ok, %Req.Response{status: 200, body: body}} <- Req.get(req),
                {:ok, document} <- Floki.parse_document(body) do
             price =
               extract_methods()
@@ -61,14 +52,9 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArcheth
               {:error, :not_a_number}
             end
           else
-            {:ok, {{_, _, status}, _, _}} ->
-              {:error, status}
-
-            :error ->
-              {:error, "invalid content"}
-
-            {:error, _} = e ->
-              e
+            {:ok, %Req.Response{status: status}} -> {:error, status}
+            :error -> {:error, "invalid content"}
+            {:error, _} = e -> e
           end
         end
       )

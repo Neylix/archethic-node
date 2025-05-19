@@ -66,6 +66,7 @@ defmodule Archethic.MixProject do
       {:mint, "~> 1.0"},
       {:ecto, "~> 3.12"},
       {:plug_attack, "~> 0.4.3"},
+      {:req, "~> 0.5"},
 
       # Dev
       {:benchee, "~> 1.4", only: [:dev, :test]},
@@ -115,7 +116,6 @@ defmodule Archethic.MixProject do
       {:ex_abi, "~> 0.8"},
 
       # Crypto
-      {:castore, "~> 1.0"},
       {:plug_crypto, "~> 2.1", override: true},
       {:ex_keccak, "~> 0.7"},
       {:ex_secp256k1, "~> 0.7"},
