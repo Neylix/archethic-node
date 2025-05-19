@@ -72,7 +72,7 @@ defmodule Archethic.MixProject do
       # Dev
       {:benchee, "~> 1.4", only: [:dev, :test]},
       {:benchee_html, "~> 1.0", only: :dev},
-      {:ex_doc, "~> 0.29", runtime: false},
+      {:ex_doc, "~> 0.38", runtime: false},
       {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
       {:elixir_make, "~> 0.9", runtime: false},
       {:dialyxir, "~> 1.2", runtime: false},
