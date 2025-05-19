@@ -425,7 +425,7 @@ defmodule Archethic.Mining.ValidationContext do
     ...>     %Node{first_public_key: "key7"}
     ...>   ]
     ...> }
-    ...> 
+    ...>
     ...> ValidationContext.cross_validation_node?(context, "key3")
     ...> true
     ...> ValidationContext.cross_validation_node?(context, "key7")

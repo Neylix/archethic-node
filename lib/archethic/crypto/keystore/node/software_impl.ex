@@ -149,7 +149,7 @@ defmodule Archethic.Crypto.NodeKeystore.SoftwareImpl do
     node_seed = Origin.retrieve_node_seed()
     :ets.insert(@keystore_table, {:node_seed, node_seed})
 
-    unless File.exists?(Utils.mut_dir("crypto")) do
+    if !File.exists?(Utils.mut_dir("crypto")) do
       File.mkdir_p!(Utils.mut_dir("crypto"))
     end
 

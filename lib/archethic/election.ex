@@ -438,12 +438,12 @@ defmodule Archethic.Election do
       ...>   %Node{first_public_key: "key2", geo_patch: "B34", authorized?: true, available?: true},
       ...>   %Node{first_public_key: "key4", geo_patch: "F34", authorized?: true, available?: true}
       ...> ]
-      ...> 
+      ...>
       ...> candidate_nodes = [
       ...>   %Node{first_public_key: "key3", geo_patch: "A34"},
       ...>   %Node{first_public_key: "key5", geo_patch: "D34"}
       ...> ]
-      ...> 
+      ...>
       ...> Election.next_authorized_nodes(0.0, candidate_nodes, previous_authorized_nodes)
       [
         %Node{first_public_key: "key1", geo_patch: "AAA", authorized?: true, available?: true},
@@ -458,12 +458,12 @@ defmodule Archethic.Election do
       ...>   %Node{first_public_key: "key2", geo_patch: "B34", authorized?: true, available?: true},
       ...>   %Node{first_public_key: "key4", geo_patch: "F34", authorized?: true, available?: true}
       ...> ]
-      ...> 
+      ...>
       ...> candidate_nodes = [
       ...>   %Node{first_public_key: "key3", geo_patch: "A34"},
       ...>   %Node{first_public_key: "key5", geo_patch: "D34"}
       ...> ]
-      ...> 
+      ...>
       ...> Election.next_authorized_nodes(0.0243, candidate_nodes, previous_authorized_nodes)
       [
         %Node{first_public_key: "key1", geo_patch: "AAA", authorized?: true, available?: true},
@@ -480,12 +480,12 @@ defmodule Archethic.Election do
       ...>   %Node{first_public_key: "key2", geo_patch: "B34", authorized?: true, available?: true},
       ...>   %Node{first_public_key: "key4", geo_patch: "F34", authorized?: true, available?: true}
       ...> ]
-      ...> 
+      ...>
       ...> candidate_nodes = [
       ...>   %Node{first_public_key: "key3", geo_patch: "A34"},
       ...>   %Node{first_public_key: "key5", geo_patch: "D34"}
       ...> ]
-      ...> 
+      ...>
       ...> Election.next_authorized_nodes(100.0, candidate_nodes, previous_authorized_nodes)
       [
         %Node{first_public_key: "key1", geo_patch: "AAA", authorized?: true, available?: true},
@@ -500,12 +500,12 @@ defmodule Archethic.Election do
      ...>   %Node{first_public_key: "key2", geo_patch: "B34", authorized?: true, available?: true},
      ...>   %Node{first_public_key: "key4", geo_patch: "F34", authorized?: true, available?: true}
      ...> ]
-     ...> 
+     ...>
      ...> candidate_nodes = [
      ...>   %Node{first_public_key: "key3", geo_patch: "A34"},
      ...>   %Node{first_public_key: "key5", geo_patch: "D34"}
      ...> ]
-     ...> 
+     ...>
      ...> Election.next_authorized_nodes(100.0, candidate_nodes, previous_authorized_nodes)
      [
        %Node{first_public_key: "key1", geo_patch: "AAA", authorized?: true, available?: false},
@@ -523,12 +523,12 @@ defmodule Archethic.Election do
       ...>   %Node{first_public_key: "key2", geo_patch: "B34", authorized?: true, available?: true},
       ...>   %Node{first_public_key: "key4", geo_patch: "F34", authorized?: true, available?: true}
       ...> ]
-      ...> 
+      ...>
       ...> candidate_nodes = [
       ...>   %Node{first_public_key: "key3", geo_patch: "A34"},
       ...>   %Node{first_public_key: "key5", geo_patch: "D34"}
       ...> ]
-      ...> 
+      ...>
       ...> Election.next_authorized_nodes(1000.0, candidate_nodes, previous_authorized_nodes)
       [
         %Node{first_public_key: "key1", geo_patch: "AAA", authorized?: true, available?: true},

@@ -35,7 +35,10 @@ defmodule Archethic.P2P.Message.StartMining do
   require Logger
 
   @ref_timestamp_drift :archethic
-                       |> Application.compile_env!([Archethic.Mining, :start_mining_message_drift])
+                       |> Application.compile_env!([
+                         Archethic.Mining,
+                         :start_mining_message_drift
+                       ])
 
   @type t :: %__MODULE__{
           transaction: Transaction.t(),

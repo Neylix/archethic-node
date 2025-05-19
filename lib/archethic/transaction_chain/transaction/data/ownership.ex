@@ -288,7 +288,7 @@ defmodule Archethic.TransactionChain.TransactionData.Ownership do
       iex> secret = random_secret()
       ...> {pub, _} = Crypto.derive_keypair(:crypto.strong_rand_bytes(32), 0, :ed25519)
       ...> authorized_keys = %{pub => random_encrypted_key(pub)}
-      ...> 
+      ...>
       ...> %Ownership{secret: secret, authorized_keys: authorized_keys}
       ...> |> Ownership.validate_format()
       :ok
@@ -296,7 +296,7 @@ defmodule Archethic.TransactionChain.TransactionData.Ownership do
       iex> secret = random_secret()
       ...> {pub, _} = Crypto.derive_keypair(:crypto.strong_rand_bytes(32), 0, :secp256k1)
       ...> authorized_keys = %{pub => random_encrypted_key(pub)}
-      ...> 
+      ...>
       ...> %Ownership{secret: secret, authorized_keys: authorized_keys}
       ...> |> Ownership.validate_format()
       :ok
@@ -304,14 +304,14 @@ defmodule Archethic.TransactionChain.TransactionData.Ownership do
       iex> secret = ""
       ...> {pub, _} = Crypto.derive_keypair(:crypto.strong_rand_bytes(32), 0, :ed25519)
       ...> authorized_keys = %{pub => :crypto.strong_rand_bytes(80)}
-      ...> 
+      ...>
       ...> %Ownership{secret: secret, authorized_keys: authorized_keys}
       ...> |> Ownership.validate_format()
       {:error, :empty_secret}
 
       iex> secret = random_secret()
       ...> authorized_keys = %{}
-      ...> 
+      ...>
       ...> %Ownership{secret: secret, authorized_keys: authorized_keys}
       ...> |> Ownership.validate_format()
       {:error, :empty_authorized_keys}
@@ -319,14 +319,14 @@ defmodule Archethic.TransactionChain.TransactionData.Ownership do
       iex> secret = random_secret()
       ...> {pub, _} = Crypto.derive_keypair(:crypto.strong_rand_bytes(32), 0, :ed25519)
       ...> authorized_keys = %{pub => :crypto.strong_rand_bytes(55)}
-      ...> 
+      ...>
       ...> %Ownership{secret: secret, authorized_keys: authorized_keys}
       ...> |> Ownership.validate_format()
       {:error, :invalid_encrypted_key}
 
       iex> secret = random_secret()
       ...> authorized_keys = %{:crypto.strong_rand_bytes(20) => :crypto.strong_rand_bytes(80)}
-      ...> 
+      ...>
       ...> %Ownership{secret: secret, authorized_keys: authorized_keys}
       ...> |> Ownership.validate_format()
       {:error, :invalid_public_key}

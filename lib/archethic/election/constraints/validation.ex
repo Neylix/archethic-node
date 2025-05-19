@@ -21,7 +21,7 @@ defmodule Archethic.Election.ValidationConstraints do
   number of overboking nodes
   """
   @type t :: %__MODULE__{
-          min_geo_patch: (() -> non_neg_integer()),
+          min_geo_patch: (-> non_neg_integer()),
           validation_numbers: (pos_integer() -> {non_neg_integer(), non_neg_integer()})
         }
 

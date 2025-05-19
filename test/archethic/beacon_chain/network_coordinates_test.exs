@@ -225,7 +225,7 @@ defmodule Archethic.BeaconChain.NetworkCoordinatesTest do
     Gnuplot.plot(
       [
         # [:plot, "-", :with, :points, :using, '1:2']
-        [:plot, "-", :using, '1:2:3', :with, :labels, :offset, '1,-1']
+        [:plot, "-", :using, ~c"1:2:3", :with, :labels, :offset, ~c"1,-1"]
       ],
       [gnuplot_coordinates]
     )

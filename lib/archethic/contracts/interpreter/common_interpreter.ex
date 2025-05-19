@@ -270,9 +270,9 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
     end
 
     if code == nil, do: throw({:error, node, "Throw must have a code"})
-    unless is_integer(code), do: throw({:error, node, "Throw code must be an integer"})
+    if not is_integer(code), do: throw({:error, node, "Throw code must be an integer"})
     if message == nil, do: throw({:error, node, "Throw must have a message"})
-    unless is_binary(message), do: throw({:error, node, "Throw message must be a string"})
+    if not is_binary(message), do: throw({:error, node, "Throw message must be a string"})
 
     {node, acc}
   end
@@ -330,7 +330,7 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
     function = String.to_existing_atom(function_name)
 
     # check the type of the args
-    unless module.check_types(function, args) do
+    if !module.check_types(function, args) do
       throw({:error, node, "invalid function arguments"})
     end
 

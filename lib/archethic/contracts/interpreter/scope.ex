@@ -104,7 +104,7 @@ defmodule Archethic.Contracts.Interpreter.Scope do
 
     create_context()
 
-    unless Enum.empty?(args_names) do
+    if !Enum.empty?(args_names) do
       create()
 
       args_names

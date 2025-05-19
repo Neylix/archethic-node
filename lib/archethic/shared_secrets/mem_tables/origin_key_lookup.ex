@@ -21,7 +21,7 @@ defmodule Archethic.SharedSecrets.MemTables.OriginKeyLookup do
   ## Examples
 
       iex> {:ok, _} = OriginKeyLookup.start_link()
-      ...> 
+      ...>
       ...> {:ets.info(:archethic_origin_keys)[:type],
       ...>  :ets.info(:archethic_origin_key_by_type)[:type]}
       {:set, :bag}

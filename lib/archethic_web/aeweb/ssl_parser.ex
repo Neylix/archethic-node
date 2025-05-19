@@ -181,7 +181,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
 
   defp to_generalized_time({:utcTime, time}) do
     year = time |> Enum.take(2) |> List.to_integer()
-    prefix = if year >= 50, do: '19', else: '20'
+    prefix = if year >= 50, do: ~c"19", else: ~c"20"
     prefix ++ time
   end
 
@@ -190,11 +190,11 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
 
     date =
       case rest |> Enum.chunk_every(2) do
-        [month, day, hour, minute, second, 'Z'] ->
+        [month, day, hour, minute, second, ~c"Z"] ->
           [year, month, day, hour, minute, second]
 
-        [month, day, hour, minute, 'Z'] ->
-          [year, month, day, hour, minute, '00']
+        [month, day, hour, minute, ~c"Z"] ->
+          [year, month, day, hour, minute, ~c"00"]
 
         _ ->
           Logger.error("Unhandled ASN1 time structure - #{asn1_time}}")
@@ -473,7 +473,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
       charlist = [char | charlist]
 
       case char in 65..90 do
-        true -> List.insert_at(charlist, 1, ' ')
+        true -> List.insert_at(charlist, 1, ~c" ")
         false -> charlist
       end
     end)

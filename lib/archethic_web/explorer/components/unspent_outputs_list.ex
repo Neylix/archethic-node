@@ -21,19 +21,19 @@ defmodule ArchethicWeb.Explorer.Components.UnspentOutputList do
         <li class="columns">
           <div class="column is-narrow">
             <span class="ae-label">From</span>
-            <%= link(short_address(utxo.from),
+            {link(short_address(utxo.from),
               to:
                 Routes.live_path(
                   @socket,
                   ArchethicWeb.Explorer.TransactionDetailsLive,
                   Base.encode16(utxo.from)
                 )
-            ) %>
+            )}
           </div>
 
           <div class="column is-narrow">
             <span class="ae-label">At</span>
-            <%= format_date(utxo.timestamp) %>
+            {format_date(utxo.timestamp)}
           </div>
 
           <div class="column is-narrow">

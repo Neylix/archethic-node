@@ -22,18 +22,18 @@ defmodule ArchethicWeb.Explorer.Components.InputsList do
         <li class="columns">
           <div class="column is-narrow">
             <span class="ae-label">From</span>
-            <%= link(short_address(input.from),
+            {link(short_address(input.from),
               to:
                 Routes.live_path(
                   @socket,
                   ArchethicWeb.Explorer.TransactionDetailsLive,
                   Base.encode16(input.from)
                 )
-            ) %>
+            )}
           </div>
 
           <div class="column is-narrow">
-            <span class="ae-label">At</span><%= format_date(input.timestamp) %>
+            <span class="ae-label">At</span>{format_date(input.timestamp)}
           </div>
 
           <div class="column is-narrow">

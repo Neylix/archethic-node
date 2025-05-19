@@ -11,14 +11,14 @@ defmodule Archethic.Utils.JobConductor do
       ...>   :persistent_term.put("e_#{x}", System.system_time())
       ...>   :done
       ...> end
-      ...> 
+      ...>
       ...> {:ok, _} = JobConductor.start_link(name: JobConductor)
-      ...> 
+      ...>
       ...> spawn(fn -> JobConductor.conduct(f, [1]) end)
       ...> spawn(fn -> JobConductor.conduct(f, [2]) end)
       ...> # let spawned calls some time to spawn
       ...> Process.sleep(5)
-      ...> 
+      ...>
       ...> JobConductor.conduct(f, [3])
       {:ok, :done}
       iex> e1 = :persistent_term.get("e_1")
@@ -46,7 +46,7 @@ defmodule Archethic.Utils.JobConductor do
   ## Example
 
       iex> {:ok, c} = JobConductor.start_link([])
-      ...> 
+      ...>
       ...> JobConductor.conduct(fn -> :done end, [], c)
       {:ok, :done}
       iex> JobConductor.conduct(fn -> raise "exception" end, [], c)

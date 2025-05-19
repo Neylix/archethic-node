@@ -946,13 +946,13 @@ defmodule ArchethicWeb.API.GraphQL.SchemaTest do
       ip = {98, 6, 2, 5}
 
       assert [
-               %{ip: '101.10.10.1', port: 4_005},
-               %{ip: '100.10.10.1', port: 4_005},
+               %{ip: ~c"101.10.10.1", port: 4_005},
+               %{ip: ~c"100.10.10.1", port: 4_005},
                %{
-                 ip: '147.190.18.11',
+                 ip: ~c"147.190.18.11",
                  port: 40_004
                },
-               %{ip: '99.10.10.1', port: 40_004}
+               %{ip: ~c"99.10.10.1", port: 40_004}
              ] = Resolver.nearest_endpoints(ip)
 
       conn = Map.put(conn, :remote_ip, ip)

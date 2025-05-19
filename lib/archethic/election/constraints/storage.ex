@@ -16,8 +16,8 @@ defmodule Archethic.Election.StorageConstraints do
   @default_min_geo_patch 4
   @default_min_geo_patch_avg_availability 0.8
 
-  @type min_geo_patch_fun() :: (() -> non_neg_integer())
-  @type min_geo_patch_avg_availability_fun() :: (() -> float())
+  @type min_geo_patch_fun() :: (-> non_neg_integer())
+  @type min_geo_patch_avg_availability_fun() :: (-> float())
   @type number_replicas_fun() :: (pos_integer() -> non_neg_integer())
 
   @typedoc """

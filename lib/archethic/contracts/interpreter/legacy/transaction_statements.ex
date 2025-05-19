@@ -184,7 +184,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
   ## Examples
 
       iex> public_key = "000178321F76C48F2885A2EE209B2FB28A9FD2C8F1EBABBB6209F47D24BA10B73ED5"
-      ...> 
+      ...>
       ...> %Transaction{
       ...>   data: %TransactionData{ownerships: [%Ownership{authorized_keys: authorized_keys}]}
       ...> } =
@@ -195,7 +195,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
       ...>        public_key => random_encrypted_key(Base.decode16!(public_key))
       ...>      }}
       ...>   ])
-      ...> 
+      ...>
       ...> Map.keys(authorized_keys)
       [
         <<0, 1, 120, 50, 31, 118, 196, 143, 40, 133, 162, 238, 32, 155, 47, 178, 138, 159, 210, 200,
@@ -273,7 +273,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
 
     iex> address1 = <<0::8, 0::8, :crypto.strong_rand_bytes(32)::binary>>
     ...> address2 = <<0::8, 0::8, :crypto.strong_rand_bytes(32)::binary>>
-    ...> 
+    ...>
     ...> TransactionStatements.add_recipients(
     ...>   %Transaction{data: %TransactionData{recipients: []}},
     ...>   [address1, address2]
@@ -301,7 +301,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
     ...> {pub_key2, _} = Archethic.Crypto.generate_deterministic_keypair("seed2")
     ...> secret1 = random_secret()
     ...> secret2 = random_secret()
-    ...> 
+    ...>
     ...> %Transaction{
     ...>   data: %TransactionData{
     ...>     ownerships: [
@@ -345,7 +345,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
       ...> address2 = <<0::8, 0::8, :crypto.strong_rand_bytes(32)::binary>>
       ...> address3 = <<0::8, 0::8, :crypto.strong_rand_bytes(32)::binary>>
       ...> address4 = <<0::8, 0::8, :crypto.strong_rand_bytes(32)::binary>>
-      ...> 
+      ...>
       ...> %Transaction{
       ...>   data: %TransactionData{
       ...>     ledger: %Ledger{
@@ -395,7 +395,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
 
     iex> address1 = <<0::8, 0::8, :crypto.strong_rand_bytes(32)::binary>>
     ...> address2 = <<0::8, 0::8, :crypto.strong_rand_bytes(32)::binary>>
-    ...> 
+    ...>
     ...> %Transaction{
     ...>   data: %TransactionData{
     ...>     ledger: %Ledger{

@@ -1220,7 +1220,7 @@ defmodule Archethic.TransactionChain do
       ...>       227, 167, 161, 155, 143, 43, 50, 6, 7, 97, 130, 134, 174, 7, 235, 183, 88, 165,
       ...>       197, 25, 219, 84, 232, 135, 42, 112, 58, 181, 13>>
       ...> }
-      ...> 
+      ...>
       ...> TransactionChain.proof_of_integrity([tx])
       tx
       |> Transaction.to_pending()
@@ -1249,7 +1249,7 @@ defmodule Archethic.TransactionChain do
       ...>       227, 167, 161, 155, 143, 43, 50, 6, 7, 97, 130, 134, 174, 7, 235, 183, 88, 165,
       ...>       197, 25, 219, 84, 232, 135, 42, 112, 58, 181, 13>>
       ...> }
-      ...> 
+      ...>
       ...> tx1 = %Transaction{
       ...>   address:
       ...>     <<0, 0, 109, 140, 2, 60, 50, 109, 201, 126, 206, 164, 10, 86, 225, 58, 136, 241, 118,
@@ -1275,7 +1275,7 @@ defmodule Archethic.TransactionChain do
       ...>         167, 167, 195, 8, 59, 230, 229, 246, 12, 191, 68, 203, 99, 11, 176>>
       ...>   }
       ...> }
-      ...> 
+      ...>
       ...> TransactionChain.proof_of_integrity([tx2, tx1])
       [
         TransactionChain.proof_of_integrity([tx2]),
@@ -1326,7 +1326,7 @@ defmodule Archethic.TransactionChain do
       ...>       227, 167, 161, 155, 143, 43, 50, 6, 7, 97, 130, 134, 174, 7, 235, 183, 88, 165,
       ...>       197, 25, 219, 84, 232, 135, 42, 112, 58, 181, 13>>
       ...> }
-      ...> 
+      ...>
       ...> tx1 = %Transaction{
       ...>   address:
       ...>     <<0, 0, 109, 140, 2, 60, 50, 109, 201, 126, 206, 164, 10, 86, 225, 58, 136, 241, 118,
@@ -1347,7 +1347,7 @@ defmodule Archethic.TransactionChain do
       ...>       227, 167, 161, 155, 143, 43, 50, 6, 7, 97, 130, 134, 174, 7, 235, 183, 88, 165,
       ...>       197, 25, 219, 84, 232, 135, 42, 112, 58, 181, 13>>
       ...> }
-      ...> 
+      ...>
       ...> tx1 = %{
       ...>   tx1
       ...>   | validation_stamp: %ValidationStamp{
@@ -1355,7 +1355,7 @@ defmodule Archethic.TransactionChain do
       ...>       timestamp: ~U[2022-09-10 10:00:00Z]
       ...>     }
       ...> }
-      ...> 
+      ...>
       ...> tx2 = %{
       ...>   tx2
       ...>   | validation_stamp: %ValidationStamp{
@@ -1363,7 +1363,7 @@ defmodule Archethic.TransactionChain do
       ...>       timestamp: ~U[2022-12-10 10:00:00Z]
       ...>     }
       ...> }
-      ...> 
+      ...>
       ...> TransactionChain.valid?([tx2, tx1])
       true
   """

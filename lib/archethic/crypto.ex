@@ -548,13 +548,13 @@ defmodule Archethic.Crypto do
 
   Returns false when the signature is invalid
       iex> {pub, _} = Crypto.generate_deterministic_keypair("myseed")
-      ...> 
+      ...>
       ...> sig =
       ...>   <<1, 48, 69, 2, 33, 0, 185, 231, 7, 86, 207, 253, 8, 230, 199, 94, 251, 33, 42, 172,
       ...>     95, 93, 7, 209, 175, 69, 216, 121, 239, 24, 17, 21, 41, 129, 255, 49, 153, 116, 2,
       ...>     32, 85, 1, 212, 69, 182, 98, 174, 213, 79, 154, 69, 84, 149, 126, 169, 44, 98, 64,
       ...>     21, 211, 20, 235, 165, 97, 61, 8, 239, 194, 196, 177, 46, 199>>
-      ...> 
+      ...>
       ...> Crypto.verify?(sig, "myfakedata", pub)
       false
   """
@@ -665,7 +665,7 @@ defmodule Archethic.Crypto do
       ...>     143, 78, 201, 109, 157, 196, 108, 109, 155, 91, 239, 118, 23, 100, 161, 195, 39, 117,
       ...>     148, 223, 182, 23, 1, 197, 205, 93, 239, 19, 27, 248, 168, 107, 40, 0, 68, 224, 177,
       ...>     110, 180, 24>>
-      ...> 
+      ...>
       ...> {_pub, pv} = Crypto.generate_deterministic_keypair("myseed")
       ...> Archethic.Crypto.ec_decrypt!(cipher, pv)
       "myfakedata"
@@ -677,7 +677,7 @@ defmodule Archethic.Crypto do
       ...>     143, 78, 201, 109, 157, 196, 108, 109, 155, 91, 239, 118, 23, 100, 161, 195, 39, 117,
       ...>     148, 223, 182, 23, 1, 197, 205, 93, 239, 19, 27, 248, 168, 107, 40, 0, 68, 224, 177,
       ...>     110, 180, 24>>
-      ...> 
+      ...>
       ...> {_, pv} = Crypto.generate_deterministic_keypair("otherseed")
       ...> Crypto.ec_decrypt!(cipher, pv)
       ** (RuntimeError) Decryption failed
@@ -703,7 +703,7 @@ defmodule Archethic.Crypto do
       ...>     143, 78, 201, 109, 157, 196, 108, 109, 155, 91, 239, 118, 23, 100, 161, 195, 39, 117,
       ...>     148, 223, 182, 23, 1, 197, 205, 93, 239, 19, 27, 248, 168, 107, 40, 0, 68, 224, 177,
       ...>     110, 180, 24>>
-      ...> 
+      ...>
       ...> {_pub, pv} = Crypto.generate_deterministic_keypair("myseed")
       ...> {:ok, "myfakedata"} = Crypto.ec_decrypt(cipher, pv)
 
@@ -714,7 +714,7 @@ defmodule Archethic.Crypto do
       ...>     143, 78, 201, 109, 157, 196, 108, 109, 155, 91, 239, 118, 23, 100, 161, 195, 39, 117,
       ...>     148, 223, 182, 23, 1, 197, 205, 93, 239, 19, 27, 248, 168, 107, 40, 0, 68, 224, 177,
       ...>     110, 180, 24>>
-      ...> 
+      ...>
       ...> {_, pv} = Crypto.generate_deterministic_keypair("otherseed")
       ...> Crypto.ec_decrypt(cipher, pv)
       {:error, :decryption_failed}
@@ -875,7 +875,7 @@ defmodule Archethic.Crypto do
       iex> key =
       ...>   <<234, 210, 202, 129, 91, 76, 68, 14, 17, 212, 197, 49, 66, 168, 52, 111, 176, 182,
       ...>     227, 156, 5, 32, 24, 105, 41, 152, 67, 191, 187, 209, 101, 36>>
-      ...> 
+      ...>
       ...> ciphertext = Crypto.aes_encrypt("sensitive data", key)
       ...> Crypto.aes_decrypt(ciphertext, key)
       {:ok, "sensitive data"}
@@ -918,7 +918,7 @@ defmodule Archethic.Crypto do
       iex> key =
       ...>   <<234, 210, 202, 129, 91, 76, 68, 14, 17, 212, 197, 49, 66, 168, 52, 111, 176, 182,
       ...>     227, 156, 5, 32, 24, 105, 41, 152, 67, 191, 187, 209, 101, 36>>
-      ...> 
+      ...>
       ...> ciphertext = Crypto.aes_encrypt("sensitive data", key)
       ...> Crypto.aes_decrypt!(ciphertext, key)
       "sensitive data"

@@ -50,21 +50,20 @@ defmodule Archethic.P2P.GeoPatch do
 
     third_digit = precision_index_patch(lat_precision, lon_precision)
 
-    [first_digit, second_digit, third_digit]
-    |> Enum.join("")
+    "#{first_digit}#{second_digit}#{third_digit}"
   end
 
   defp main_index_patch(index) do
-    {'8', '9', 'A', 'B', 'C', 'D', 'E', 'F', '0', '1', '2', '3', '4', '5', '6', '7'}
+    {"8", "9", "A", "B", "C", "D", "E", "F", "0", "1", "2", "3", "4", "5", "6", "7"}
     |> elem(index)
   end
 
   defp precision_index_patch(index1, index2) do
     {
-      {'0', '1', '2', '3'},
-      {'4', '5', '6', '7'},
-      {'8', '9', 'A', 'B'},
-      {'C', 'D', 'E', 'F'}
+      {"0", "1", "2", "3"},
+      {"4", "5", "6", "7"},
+      {"8", "9", "A", "B"},
+      {"C", "D", "E", "F"}
     }
     |> elem(index1)
     |> elem(index2)

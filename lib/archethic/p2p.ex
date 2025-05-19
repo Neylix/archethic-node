@@ -187,7 +187,7 @@ defmodule Archethic.P2P do
           availability_update :: DateTime.t()
         ) :: :ok
   def set_node_globally_available(first_public_key, availability_update) do
-    unless available_node?(first_public_key) do
+    if !available_node?(first_public_key) do
       MemTable.set_node_available(first_public_key, availability_update)
     end
   end
@@ -466,7 +466,7 @@ defmodule Archethic.P2P do
      ...>   %Node{network_patch: "F50"},
      ...>   %Node{network_patch: "3A2"}
      ...> ]
-     ...> 
+     ...>
      ...> P2P.sort_by_nearest_nodes(list_nodes, "12F")
      [
        %Node{network_patch: "3A2"},
@@ -479,7 +479,7 @@ defmodule Archethic.P2P do
      ...>   %Node{network_patch: "F50"},
      ...>   %Node{network_patch: "3A2"}
      ...> ]
-     ...> 
+     ...>
      ...> P2P.sort_by_nearest_nodes(list_nodes, "C3A")
      [
        %Node{network_patch: "F50"},
@@ -583,7 +583,7 @@ defmodule Archethic.P2P do
       ...>   %Node{first_public_key: "key2"},
       ...>   %Node{first_public_key: "key3"}
       ...> ]
-      ...> 
+      ...>
       ...> subset = [%Node{first_public_key: "key2"}]
       ...> P2P.bitstring_from_node_subsets(node_list, subset)
       <<0::1, 1::1, 0::1>>
@@ -593,7 +593,7 @@ defmodule Archethic.P2P do
       ...>   %Node{first_public_key: "key2"},
       ...>   %Node{first_public_key: "key3"}
       ...> ]
-      ...> 
+      ...>
       ...> subset = [%Node{first_public_key: "key2"}, %Node{first_public_key: "key3"}]
       ...> P2P.bitstring_from_node_subsets(node_list, subset)
       <<0::1, 1::1, 1::1>>

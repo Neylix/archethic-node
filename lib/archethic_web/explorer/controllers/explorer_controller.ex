@@ -16,7 +16,10 @@ defmodule ArchethicWeb.Explorer.ExplorerController do
          {:ok, tx} <- Archethic.search_transaction(address) do
       previous_address = Transaction.previous_address(tx)
 
-      render(conn, "transaction_details.html", transaction: tx, previous_address: previous_address)
+      render(conn, "transaction_details.html",
+        transaction: tx,
+        previous_address: previous_address
+      )
     else
       _reason ->
         render(conn, "404.html")

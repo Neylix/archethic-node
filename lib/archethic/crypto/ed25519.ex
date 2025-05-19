@@ -51,7 +51,7 @@ defmodule Archethic.Crypto.Ed25519 do
   ## Examples
       iex> ed25519_key =
       ...>   Base.decode16!("F6FA87586DB70F6FDE9BEEE377E2E68F4678D71231969976266155172B1F6C0F")
-      ...> 
+      ...>
       ...> Ed25519.convert_to_x25519_private_key(ed25519_key) |> Base.encode16()
       "C8CE0F2836A8D1D294E185E8A6E20B445192831DC6DD4139090FA7D5DE0F9F67"
   """
@@ -94,7 +94,7 @@ defmodule Archethic.Crypto.Ed25519 do
   ## Examples
       iex> ed25519_pub =
       ...>   Base.decode16!("D75A980182B10AB7D54BFED3C964073A0EE172F3DAA62325AF021A68F707511A")
-      ...> 
+      ...>
       ...> Ed25519.convert_to_x25519_public_key(ed25519_pub) |> Base.encode16()
       "D85E07EC22B0AD881537C2F44D662D1A143CF830C57ACA4305D85C7A90F6B62E"
   """

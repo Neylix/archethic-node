@@ -988,7 +988,7 @@ defmodule Archethic.Mining.DistributedWorkflow do
         :replication,
         _data = %{context: context = %ValidationContext{transaction: tx}}
       ) do
-    unless Transaction.network_type?(tx.type) do
+    if !Transaction.network_type?(tx.type) do
       context
       |> ValidationContext.get_confirmed_replication_nodes()
       |> P2P.broadcast_message(%NotifyPreviousChain{address: tx.address})

@@ -32,7 +32,7 @@ defmodule Archethic.Crypto.NodeKeystore.Origin.SoftwareImpl do
 
   @impl GenServer
   def init(_arg \\ []) do
-    unless File.exists?(Utils.mut_dir("crypto")) do
+    if !File.exists?(Utils.mut_dir("crypto")) do
       File.mkdir_p!(Utils.mut_dir("crypto"))
     end
 

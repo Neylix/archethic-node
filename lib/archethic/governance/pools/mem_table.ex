@@ -29,11 +29,17 @@ defmodule Archethic.Governance.Pools.MemTable do
   ## Examples
 
       iex> {:ok, pid} = MemTable.start_link()
-      ...> 
-      ...> MemTable.put_pool_member(:technical_council, "@Alice2", weighted?: true, weight_factor: 1)
-      ...> 
-      ...> MemTable.put_pool_member(:technical_council, "@Alice2", weighted?: true, weight_factor: 1)
-      ...> 
+      ...>
+      ...> MemTable.put_pool_member(:technical_council, "@Alice2",
+      ...>   weighted?: true,
+      ...>   weight_factor: 1
+      ...> )
+      ...>
+      ...> MemTable.put_pool_member(:technical_council, "@Alice2",
+      ...>   weighted?: true,
+      ...>   weight_factor: 1
+      ...> )
+      ...>
       ...> :sys.get_state(pid)
       %{technical_council: %{"@Alice2" => 2}, ethical_council: %{}, uniris: %{}, foundation: %{}}
   """
@@ -73,13 +79,19 @@ defmodule Archethic.Governance.Pools.MemTable do
   ## Examples
 
       iex> {:ok, _pid} = MemTable.start_link()
-      ...> 
-      ...> MemTable.put_pool_member(:technical_council, "@Alice2", weighted?: true, weight_factor: 1)
-      ...> 
+      ...>
+      ...> MemTable.put_pool_member(:technical_council, "@Alice2",
+      ...>   weighted?: true,
+      ...>   weight_factor: 1
+      ...> )
+      ...>
       ...> MemTable.put_pool_member(:technical_council, "@Bob5", weighted?: true, weight_factor: 1)
-      ...> 
-      ...> MemTable.put_pool_member(:technical_council, "@Alice2", weighted?: true, weight_factor: 1)
-      ...> 
+      ...>
+      ...> MemTable.put_pool_member(:technical_council, "@Alice2",
+      ...>   weighted?: true,
+      ...>   weight_factor: 1
+      ...> )
+      ...>
       ...> MemTable.list_pool_members(:technical_council)
       [{"@Alice2", 2}, {"@Bob5", 1}]
   """

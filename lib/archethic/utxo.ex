@@ -50,7 +50,7 @@ defmodule Archethic.UTXO do
     |> Enum.each(fn {to, utxos} -> Loader.add_utxos(utxos, to) end)
 
     # Consume the transaction to update the unspent outputs from the consumed inputs
-    unless skip_consume_inputs?, do: Loader.consume_inputs(tx)
+    if !skip_consume_inputs?, do: Loader.consume_inputs(tx)
 
     Logger.info("Loaded into in memory UTXO tables",
       transaction_address: Base.encode16(tx.address),
@@ -115,7 +115,9 @@ defmodule Archethic.UTXO do
     if DateTime.compare(last_timestamp, utxo_timestamp) == :gt do
       genesis_address
       |> TransactionChain.list_chain_addresses()
-      |> Stream.filter(fn {_, timestamp} -> DateTime.compare(timestamp, utxo_timestamp) == :gt end)
+      |> Stream.filter(fn {_, timestamp} ->
+        DateTime.compare(timestamp, utxo_timestamp) == :gt
+      end)
       |> Stream.map(fn {address, _} -> get_tx_consumed_inputs(address) end)
       |> Enum.any?(fn
         {:ok, consumed_inputs} -> Enum.member?(consumed_inputs, utxo)

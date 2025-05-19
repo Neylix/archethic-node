@@ -39,7 +39,7 @@ defmodule ArchethicWeb.Explorer.TransactionChainLive do
                 address: address,
                 genesis_address: genesis_address,
                 page: 1,
-                paging_address: unless(Enum.empty?(chain_txs), do: List.last(chain_txs).address),
+                paging_address: if(!Enum.empty?(chain_txs), do: List.last(chain_txs).address),
                 chain_utxos: chain_utxos,
                 chain_txs: chain_txs,
                 chain_size: chain_size,

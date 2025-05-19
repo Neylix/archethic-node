@@ -24,8 +24,8 @@ defmodule ArchethicWeb.AEWeb.DomainTest do
   describe "lookup_dnslink_address/1" do
     test "should return correct dnslink address when present" do
       MockDNSClient
-      |> expect(:lookup, fn '_dnslink.example.com', :in, :txt, _options ->
-        [['dnslink=/archethic/some_tx_address']]
+      |> expect(:lookup, fn ~c"_dnslink.example.com", :in, :txt, _options ->
+        [[~c"dnslink=/archethic/some_tx_address"]]
       end)
 
       assert {:ok, "some_tx_address"} =
@@ -34,7 +34,7 @@ defmodule ArchethicWeb.AEWeb.DomainTest do
 
     test "should return :not_found when no dnslink is present" do
       MockDNSClient
-      |> expect(:lookup, fn '_dnslink.not_found.com', :in, :txt, _options -> [] end)
+      |> expect(:lookup, fn ~c"_dnslink.not_found.com", :in, :txt, _options -> [] end)
 
       assert {:error, :not_found} =
                ArchethicWeb.AEWeb.Domain.lookup_dnslink_address("not_found.com")
@@ -42,8 +42,8 @@ defmodule ArchethicWeb.AEWeb.DomainTest do
 
     test "should return :not_found when dnslink has invalid format" do
       MockDNSClient
-      |> expect(:lookup, fn '_dnslink.invalid.com', :in, :txt, _options ->
-        [['invalid_record']]
+      |> expect(:lookup, fn ~c"_dnslink.invalid.com", :in, :txt, _options ->
+        [[~c"invalid_record"]]
       end)
 
       assert {:error, :not_found} =

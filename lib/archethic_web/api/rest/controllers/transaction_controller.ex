@@ -286,7 +286,7 @@ defmodule ArchethicWeb.API.REST.TransactionController do
       stacktrace,
       "A contract exited with error: #{formatted_error}",
       fn
-        {:elixir_eval, _, _, [file: 'nofile', line: line]}, acc ->
+        {:elixir_eval, _, _, [file: ~c"nofile", line: line]}, acc ->
           {:halt, acc <> " (line: #{line})"}
 
         _, acc ->

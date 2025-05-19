@@ -893,7 +893,7 @@ defmodule Archethic.Contracts do
 
   defp append_line_to_error(err, stacktrace) do
     case Enum.find_value(stacktrace, fn
-           {_, _, _, [file: 'nofile', line: line]} -> line
+           {_, _, _, [file: ~c"nofile", line: line]} -> line
            _ -> false
          end) do
       line when is_integer(line) -> Exception.message(err) <> " - L#{line}"

@@ -25,7 +25,7 @@ defmodule ArchethicWeb.AEWeb.Domain do
       |> String.split(":")
       |> List.first()
 
-    case DNSClient.lookup('_dnslink.#{dns_name}', :in, :txt,
+    case DNSClient.lookup(~c"_dnslink.#{dns_name}", :in, :txt,
            # Allow local dns to test dnslink redirection
            alt_nameservers: [{{127, 0, 0, 1}, 53}]
          ) do

@@ -529,7 +529,7 @@ defmodule Archethic.Replication do
       ...>   %Node{network_patch: "E19", first_public_key: "key_v4"},
       ...>   %Node{network_patch: "22A", first_public_key: "key_v5"}
       ...> ]
-      ...> 
+      ...>
       ...> storage_nodes = [
       ...>   %Node{network_patch: "F36", first_public_key: "key_S1"},
       ...>   %Node{network_patch: "A23", first_public_key: "key_S2"},
@@ -548,7 +548,7 @@ defmodule Archethic.Replication do
       ...>   %Node{network_patch: "042", first_public_key: "key_S15"},
       ...>   %Node{network_patch: "3BC", first_public_key: "key_S16"}
       ...> ]
-      ...> 
+      ...>
       ...> Replication.generate_tree(validation_nodes, storage_nodes)
       %{
         "key_v1" => [

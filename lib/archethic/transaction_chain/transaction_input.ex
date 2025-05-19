@@ -167,7 +167,13 @@ defmodule Archethic.TransactionChain.TransactionInput do
     }
   end
 
-  def to_map(%__MODULE__{amount: _, from: from, spent?: spent?, type: :call, timestamp: timestamp}) do
+  def to_map(%__MODULE__{
+        amount: _,
+        from: from,
+        spent?: spent?,
+        type: :call,
+        timestamp: timestamp
+      }) do
     %{
       from: from,
       type: "call",

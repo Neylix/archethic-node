@@ -258,7 +258,7 @@ defmodule Archethic.Contracts.Contract.Context do
       ...>   %UnspentOutput{from: "@Alice5", type: :call},
       ...>   %UnspentOutput{from: "@Alice5", type: :call}
       ...> ]
-      ...> 
+      ...>
       ...> %Context{
       ...>   inputs: Context.filter_inputs(utxos),
       ...>   trigger: {:transaction, "@Bob3", nil},

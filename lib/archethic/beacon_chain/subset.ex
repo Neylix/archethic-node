@@ -288,7 +288,7 @@ defmodule Archethic.BeaconChain.Subset do
         else: current_slot
 
     # Avoid to store or dispatch an empty beacon's slot
-    unless Slot.empty?(current_slot) do
+    if !Slot.empty?(current_slot) do
       if summary_time?(time) do
         SummaryCache.add_slot(current_slot, node_public_key)
       else

@@ -24,7 +24,7 @@ defmodule ArchethicWeb.Explorer.Components.Amount do
 
     ~H"""
     <span class="mono" data-tooltip={@tooltip}>
-      <%= @amount %> <span class="tag is-gradient mono">UCO</span>
+      {@amount} <span class="tag is-gradient mono">UCO</span>
     </span>
     """
   end
@@ -50,7 +50,7 @@ defmodule ArchethicWeb.Explorer.Components.Amount do
 
     ~H"""
     <span class="mono">
-      <%= @amount %>
+      {@amount}
 
       <%= link(to:
           Routes.live_path(
@@ -59,7 +59,7 @@ defmodule ArchethicWeb.Explorer.Components.Amount do
             Base.encode16(@token_address)
           )
       ) do %>
-        <span class="tag is-gradient mono"><%= @token_name %></span>
+        <span class="tag is-gradient mono">{@token_name}</span>
       <% end %>
     </span>
     """

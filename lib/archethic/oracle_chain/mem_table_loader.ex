@@ -64,7 +64,7 @@ defmodule Archethic.OracleChain.MemTableLoader do
     content
     |> Jason.decode!()
     |> tap(fn data ->
-      unless from_db? do
+      if !from_db? do
         Absinthe.Subscription.publish(
           ArchethicWeb.Endpoint,
           %{
