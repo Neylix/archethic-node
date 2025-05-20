@@ -7,6 +7,7 @@ defmodule Archethic.Contracts.Wasm.Result do
           error: String.t() | nil
         }
 
+  @derive JSON.Encoder
   @derive Jason.Encoder
   defstruct [:ok, :error]
 

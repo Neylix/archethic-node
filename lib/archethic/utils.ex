@@ -1089,7 +1089,7 @@ defmodule Archethic.Utils do
         validation_stamp: %ValidationStamp{genesis_address: genesis_address}
       })
       when tx_type in [:token, :mint_rewards] do
-    case Jason.decode(content) do
+    case JSON.decode(content) do
       {:ok, map} ->
         result = %{
           genesis: genesis_address,
@@ -1153,7 +1153,7 @@ defmodule Archethic.Utils do
         properties: properties,
         decimals: decimals
       }
-      |> Jason.encode!()
+      |> JSON.encode!()
 
     :crypto.hash(:sha256, data_to_digest)
     |> Base.encode16()
@@ -1258,7 +1258,7 @@ defmodule Archethic.Utils do
   def local_schema_resolver!("file://" <> path) do
     Application.app_dir(:archethic, "priv/json-schemas/#{path}")
     |> File.read!()
-    |> Jason.decode!()
+    |> JSON.decode!()
   end
 
   def local_schema_resolver!(_), do: raise("Invalid URI for $ref")

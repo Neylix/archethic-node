@@ -18,7 +18,7 @@ defmodule ArchethicWeb.API.GraphQL.Schema.JsonType do
   @spec decode(Absinthe.Blueprint.Input.String.t()) :: {:ok, term()} | :error
   @spec decode(Absinthe.Blueprint.Input.Null.t()) :: {:ok, nil}
   defp decode(%Absinthe.Blueprint.Input.String{value: value}) do
-    case Jason.decode(value) do
+    case JSON.decode(value) do
       {:ok, result} -> {:ok, result}
       _ -> :error
     end

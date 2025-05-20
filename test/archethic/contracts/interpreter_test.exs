@@ -1405,7 +1405,7 @@ defmodule Archethic.Contracts.InterpreterTest do
           ]
         )
 
-      assert Jason.encode!(%{
+      assert JSON.encode!(%{
                uco: 1.0,
                tokens: %{
                  "#{eth_hex}#0" => 5.0e-6,

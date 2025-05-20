@@ -30,7 +30,7 @@ defmodule Archethic.OracleChain do
   """
   @spec valid_services_content?(binary()) :: boolean()
   def valid_services_content?(content) when is_binary(content) do
-    with {:ok, data} <- Jason.decode(content),
+    with {:ok, data} <- JSON.decode(content),
          true <- Services.verify_correctness?(data) do
       true
     else
@@ -50,17 +50,14 @@ defmodule Archethic.OracleChain do
   """
   @spec valid_summary?(binary(), Enumerable.t() | list(Transaction.t())) :: boolean()
   def valid_summary?(content, oracle_chain) when is_binary(content) do
-    with {:ok, data} <- Jason.decode(content),
+    with {:ok, data} <- JSON.decode(content),
          true <-
            %Summary{transactions: oracle_chain, aggregated: parse_summary_data(data)}
            |> Summary.verify?() do
       true
     else
-      {:error, _} ->
-        true
-
-      false ->
-        false
+      {:error, _} -> true
+      false -> false
     end
   end
 

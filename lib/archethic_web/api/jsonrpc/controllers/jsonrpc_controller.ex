@@ -14,7 +14,7 @@ defmodule ArchethicWeb.API.JsonRPCController do
   @jsonrpc_schema :archethic
                   |> Application.app_dir("priv/json-schemas/jsonrpc-request-2.0.json")
                   |> File.read!()
-                  |> Jason.decode!()
+                  |> JSON.decode!()
                   |> ExJsonSchema.Schema.resolve()
 
   @methods %{

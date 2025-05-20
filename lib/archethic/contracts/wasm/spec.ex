@@ -18,7 +18,7 @@ defmodule Archethic.Contracts.WasmSpec do
   @contract_schema :archethic
                    |> Application.app_dir("priv/json-schemas/schemas/object/contract.json")
                    |> File.read!()
-                   |> Jason.decode!()
+                   |> JSON.decode!()
                    |> ExJsonSchema.Schema.resolve()
 
   @doc """

@@ -133,7 +133,7 @@ defmodule Archethic.OracleChain.SchedulerTest do
                |> elem(0)
                |> Crypto.derive_address()
 
-      assert {:ok, %{"uco" => %{"usd" => 0.2}}} = Services.parse_data(Jason.decode!(content))
+      assert {:ok, %{"uco" => %{"usd" => 0.2}}} = Services.parse_data(JSON.decode!(content))
 
       Process.cancel_timer(polling_timer)
     end
@@ -174,7 +174,7 @@ defmodule Archethic.OracleChain.SchedulerTest do
            type: :oracle,
            data: %TransactionData{
              content:
-               Jason.encode!(%{
+               JSON.encode!(%{
                  "uco" => %{
                    "usd" => 0.2
                  }
@@ -235,7 +235,7 @@ defmodule Archethic.OracleChain.SchedulerTest do
             type: :oracle,
             data: %TransactionData{
               content:
-                Jason.encode!(%{
+                JSON.encode!(%{
                   "uco" => %{
                     "usd" => 0.2
                   }
@@ -268,7 +268,7 @@ defmodule Archethic.OracleChain.SchedulerTest do
                    "usd" => 0.2
                  }
                }
-             } = Jason.decode!(content)
+             } = JSON.decode!(content)
 
       send(pid, {:new_transaction, summary_address, :oracle_summary, DateTime.utc_now()})
 
@@ -279,7 +279,7 @@ defmodule Archethic.OracleChain.SchedulerTest do
                         data: %TransactionData{content: content}
                       }}
 
-      assert {:ok, %{"uco" => %{"usd" => 0.2}}} = Services.parse_data(Jason.decode!(content))
+      assert {:ok, %{"uco" => %{"usd" => 0.2}}} = Services.parse_data(JSON.decode!(content))
     end
 
     test "should reschedule after tx replication" do

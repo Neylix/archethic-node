@@ -621,7 +621,7 @@ defmodule Archethic.Contracts.WorkerTest do
         %Transaction{address: oracle_address} =
         TransactionFactory.create_valid_transaction([],
           type: :oracle,
-          content: Jason.encode!(%{"uco" => %{"eur" => 0.21}})
+          content: JSON.encode!(%{"uco" => %{"eur" => 0.21}})
         )
 
       MockDB

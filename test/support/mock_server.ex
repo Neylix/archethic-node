@@ -10,7 +10,7 @@ defmodule Archethic.MockServer do
   plug(Plug.Parsers,
     parsers: [:json],
     pass: ["application/json"],
-    json_decoder: Jason
+    json_decoder: JSON
   )
 
   plug(:dispatch)
@@ -35,7 +35,7 @@ defmodule Archethic.MockServer do
       %{"method" => "string", "value" => value} when is_map(value) ->
         conn
         |> put_resp_header("content-type", "application/json")
-        |> send_resp(200, Jason.encode!(value))
+        |> send_resp(200, JSON.encode!(value))
 
       %{"method" => "string", "value" => value} when is_binary(value) ->
         send_resp(conn, 200, value)

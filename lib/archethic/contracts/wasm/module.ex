@@ -188,7 +188,7 @@ defmodule Archethic.Contracts.WasmModule do
         contract: opts |> Keyword.get(:contract) |> cast_transaction(),
         nextTransaction: opts |> Keyword.get(:next_transaction) |> cast_transaction()
       }
-      |> Jason.encode!()
+      |> JSON.encode!()
 
     {:ok, io_mem_pid} = WasmMemory.start_link(Keyword.get(opts, :encrypted_seed))
     WasmMemory.set_input(io_mem_pid, input)
@@ -207,11 +207,8 @@ defmodule Archethic.Contracts.WasmModule do
     else
       {:error, _} = e ->
         case WasmMemory.get_error(io_mem_pid) do
-          nil ->
-            e
-
-          custom_error ->
-            {:error, Jason.decode!(custom_error)}
+          nil -> e
+          custom_error -> {:error, JSON.decode!(custom_error)}
         end
     end
   end
@@ -247,7 +244,7 @@ defmodule Archethic.Contracts.WasmModule do
   defp cast_output(nil, function_spec), do: {:ok, WasmResult.cast(nil, function_spec)}
 
   defp cast_output(output, function_spec) do
-    with {:ok, json} <- Jason.decode(output) do
+    with {:ok, json} <- JSON.decode(output) do
       {:ok, WasmResult.cast(json, function_spec)}
     end
   end

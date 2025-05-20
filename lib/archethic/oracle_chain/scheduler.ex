@@ -647,7 +647,7 @@ defmodule Archethic.OracleChain.Scheduler do
     Transaction.new_with_keys(
       :oracle,
       %TransactionData{
-        content: Jason.encode!(oracle_data),
+        content: JSON.encode!(oracle_data),
         code: ~S"""
         condition inherit: [
           # We need to ensure the type stays consistent
@@ -728,7 +728,7 @@ defmodule Archethic.OracleChain.Scheduler do
   defp get_oracle_data(address) do
     case TransactionChain.get_transaction(address, data: [:content]) do
       {:ok, %Transaction{data: %TransactionData{content: previous_content}}} ->
-        Jason.decode!(previous_content)
+        JSON.decode!(previous_content)
 
       _ ->
         %{}

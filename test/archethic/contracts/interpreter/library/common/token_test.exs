@@ -23,7 +23,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.TokenTest do
   describe "fetch_id_from_address/1" do
     test "should work" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 300_000_000,
           name: "MyToken",
           type: "non-fungible",

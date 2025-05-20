@@ -95,7 +95,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImplTest do
                  "https://127.0.0.1:8081/api",
                  "POST",
                  headers,
-                 Jason.encode!(params)
+                 JSON.encode!(params)
                )
     end
 
@@ -108,7 +108,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImplTest do
                  "https://127.0.0.1:8081/api",
                  "POST",
                  headers,
-                 Jason.encode!(params)
+                 JSON.encode!(params)
                )
     end
 
@@ -116,7 +116,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImplTest do
       params = %{"method" => "string", "value" => "something that will be returned"}
 
       assert %{"status" => 200, "body" => "error"} =
-               HttpImpl.request("https://127.0.0.1:8081/api", "POST", %{}, Jason.encode!(params))
+               HttpImpl.request("https://127.0.0.1:8081/api", "POST", %{}, JSON.encode!(params))
     end
   end
 
@@ -166,7 +166,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImplTest do
           "url" => "https://127.0.0.1:8081/api",
           "method" => "POST",
           "headers" => headers,
-          "body" => Jason.encode!(params)
+          "body" => JSON.encode!(params)
         }
       ]
 

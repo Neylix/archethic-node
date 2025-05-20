@@ -69,10 +69,10 @@ defmodule Archethic.Contracts.WasmImports do
 
     encoded_response =
       WasmMemory.read(io_mem_pid, offset, length)
-      |> Jason.decode!()
+      |> JSON.decode!()
       |> WasmIO.request(seed: contract_seed)
       |> Utils.bin2hex()
-      |> Jason.encode!()
+      |> JSON.encode!()
 
     size = byte_size(encoded_response)
     offset = WasmMemory.alloc(io_mem_pid, size)

@@ -138,7 +138,7 @@ defmodule ArchethicWeb.AEWeb.WebHostingController.Resources do
             {:ok, %Transaction{data: %TransactionData{content: tx_content}}} =
               Archethic.search_transaction(address_bin)
 
-            {:ok, decoded_content} = Jason.decode(tx_content)
+            {:ok, decoded_content} = JSON.decode(tx_content)
 
             {:ok, res_content} =
               decoded_content |> normalise_downcase_key() |> access(resource_path)

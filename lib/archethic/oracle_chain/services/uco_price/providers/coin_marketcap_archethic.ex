@@ -101,7 +101,7 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArcheth
     document
     |> Floki.find("#__NEXT_DATA__")
     |> Floki.text(js: true)
-    |> Jason.decode!()
+    |> JSON.decode!()
     |> get_in(["props", "pageProps", "info", "statistics", "price"])
   end
 

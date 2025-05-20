@@ -83,7 +83,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.CryptoTest do
                  []
                )
 
-      assert {:ok, sig} = Jason.decode(content)
+      assert {:ok, sig} = JSON.decode(content)
 
       assert %{
                "r" => "BCAA43A2972A94FE42F4989EBB826B3F9BDC841623E22C7E7F8602D06C15B99E",

@@ -171,7 +171,7 @@ defmodule ArchethicWeb.API.GraphQL.SchemaTest do
 
       ownership = Ownership.new(transaction_seed, aes_key, [storage_nonce_public_key])
 
-      content = Jason.encode!(%{"supply" => 1_000_000_000, "type" => "fungible"})
+      content = JSON.encode!(%{"supply" => 1_000_000_000, "type" => "fungible"})
 
       tx =
         %Transaction{address: token_addr} =

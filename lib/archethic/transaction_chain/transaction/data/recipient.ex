@@ -50,7 +50,7 @@ defmodule Archethic.TransactionChain.TransactionData.Recipient do
   end
 
   defp serialize_args(args, _version = 2, _) do
-    serialized_args = Jason.encode!(args)
+    serialized_args = JSON.encode!(args)
     args_bytes = serialized_args |> byte_size() |> Utils.VarInt.from_value()
     <<args_bytes::binary, serialized_args::binary>>
   end
@@ -93,7 +93,7 @@ defmodule Archethic.TransactionChain.TransactionData.Recipient do
   defp deserialize_args(rest, _version = 2, _) do
     {args_bytes, rest} = Utils.VarInt.get_value(rest)
     <<args::binary-size(args_bytes), rest::bitstring>> = rest
-    {Jason.decode!(args), rest}
+    {JSON.decode!(args), rest}
   end
 
   defp deserialize_args(<<0::8, rest::bitstring>>, _version = 3, _), do: {[], rest}

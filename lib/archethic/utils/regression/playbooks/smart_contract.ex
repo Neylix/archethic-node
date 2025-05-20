@@ -79,7 +79,7 @@ defmodule Archethic.Utils.Regression.Playbook.SmartContract do
   def read_wasm_contract(bytecode_file, manifest_file) do
     %Contract{
       bytecode: File.read!(bytecode_file) |> :zlib.zip(),
-      manifest: File.read!(manifest_file) |> Jason.decode!()
+      manifest: File.read!(manifest_file) |> JSON.decode!()
     }
   end
 

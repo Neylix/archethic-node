@@ -412,7 +412,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.ConditionInterpreterTest do
              |> elem(2)
              |> ConditionInterpreter.valid_conditions?(%{
                "transaction" => %{
-                 "content" => Jason.encode!(%{uco: %{eur: 2}})
+                 "content" => JSON.encode!(%{uco: %{eur: 2}})
                }
              })
     end

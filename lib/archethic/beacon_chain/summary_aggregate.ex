@@ -195,9 +195,9 @@ defmodule Archethic.BeaconChain.SummaryAggregate do
     avg_availabilities
     |> filter_p2p_view_size_by_frequency()
     |> Enum.zip()
-    |> Enum.map(&Tuple.to_list/1)
     |> Enum.map(fn avg_availabilities ->
-      Float.round(Enum.sum(avg_availabilities) / length(avg_availabilities), 3)
+      avg = Tuple.sum(avg_availabilities) / tuple_size(avg_availabilities)
+      Float.round(avg, 3)
     end)
   end
 
@@ -206,10 +206,7 @@ defmodule Archethic.BeaconChain.SummaryAggregate do
     |> filter_p2p_view_size_by_frequency()
     |> Enum.zip()
     |> Enum.map(fn network_patches ->
-      network_patches
-      |> Tuple.to_list()
-      |> Enum.dedup()
-      |> resolve_patches_conflicts()
+      network_patches |> Tuple.to_list() |> Enum.dedup() |> resolve_patches_conflicts()
     end)
     |> List.flatten()
   end

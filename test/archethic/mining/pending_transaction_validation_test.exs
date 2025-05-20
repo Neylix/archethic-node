@@ -439,7 +439,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
   describe "Hosting" do
     test "should return :ok when we deploy a aeweb ref transaction" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           "aewebVersion" => 1,
           "metaData" => %{
             "index.html" => %{
@@ -463,7 +463,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
 
     test "should return :ok when we deploy a aeweb ref transaction with publicationStatus" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           "aewebVersion" => 1,
           "publicationStatus" => "PUBLISHED",
           "metaData" => %{
@@ -488,7 +488,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
 
     test "should return :ok when we deploy a aeweb ref transaction (unpublished)" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           "aewebVersion" => 1,
           "publicationStatus" => "UNPUBLISHED"
         })
@@ -500,7 +500,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
 
     test "should return :ok when we deploy a aeweb file transaction" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           "index.html" => Base.url_encode64(:crypto.strong_rand_bytes(1000))
         })
 
@@ -510,7 +510,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
     end
 
     test "should return :error when we deploy a wrong aeweb file transaction" do
-      content = Jason.encode!(%{"index.html" => 32})
+      content = JSON.encode!(%{"index.html" => 32})
 
       tx = TransactionFactory.create_non_valided_transaction(type: :hosting, content: content)
 
@@ -520,7 +520,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
 
     test "should return :error when we deploy a wrong aeweb ref transaction" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           "wrongKey" => 1,
           "metaData" => %{
             "index.html" => %{
@@ -545,7 +545,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
 
     test "should return :error when we deploy a wrong aeweb ref transaction (unpublished)" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           "aewebVersion" => 1,
           "publicationStatus" => "UNPUBLISHED",
           "metaData" => %{
@@ -571,7 +571,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
 
     test "should return :error when it does not respect the schema" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           "aewebVersion" => 1,
           "hello" => "world",
           "metaData" => %{
@@ -1046,7 +1046,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       :persistent_term.put(:archethic_up, nil)
 
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 300_000_000,
           name: "MyToken",
           type: "fungible",
@@ -1088,7 +1088,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       :persistent_term.put(:archethic_up, nil)
 
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 300_000_000,
           name: "MyToken",
           type: "fungible",
@@ -1121,7 +1121,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       :persistent_term.put(:archethic_up, nil)
 
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 300_000_000,
           name: "MyToken",
           type: "fungible",
@@ -1168,7 +1168,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
   describe "token" do
     test "should return :ok when a transaction contains valid fields for token creation" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 300_000_000,
           name: "MyToken",
           type: "non-fungible",
@@ -1191,7 +1191,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
 
     test "should return ok with a token creation with allow_mint flag" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           aeip: [2, 18],
           supply: 100_000_000_000,
           name: "CoinCoin",
@@ -1209,7 +1209,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       address = random_address()
 
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 100_000_000_000,
           aeip: [2, 18],
           token_reference: address |> Base.encode16()
@@ -1249,7 +1249,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       genesis_address = random_address()
 
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 100_000_000_000,
           aeip: [2, 18],
           token_reference: address |> Base.encode16()
@@ -1293,7 +1293,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       address = random_address()
 
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 100_000_000_000,
           aeip: [2, 18],
           token_reference: address |> Base.encode16()
@@ -1333,7 +1333,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       address = random_address()
 
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 100_000_000_000,
           aeip: [2, 18],
           token_reference: address |> Base.encode16()
@@ -1383,7 +1383,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       genesis_address = random_address()
 
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 100_000_000_000,
           aeip: [2, 18],
           token_reference: address |> Base.encode16()
@@ -1408,7 +1408,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       address = random_address()
 
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 100_000_000_000,
           aeip: [2, 18],
           token_reference: address |> Base.encode16()
@@ -1436,7 +1436,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
 
     test "should return error if token reference is not hexadecimal" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 100_000_000_000,
           aeip: [2, 18],
           token_reference: "invalidtokenref"
@@ -1452,7 +1452,7 @@ defmodule Archethic.Mining.PendingTransactionValidationTest do
       tx =
         TransactionFactory.create_non_valided_transaction(
           type: :token,
-          content: Jason.encode!(%{})
+          content: JSON.encode!(%{})
         )
 
       assert {:error, "Invalid token transaction - neither a token creation nor a token resupply"} =

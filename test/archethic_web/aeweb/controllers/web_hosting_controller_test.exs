@@ -469,58 +469,58 @@ defmodule ArchethicWeb.AEWeb.WebHostingControllerTest do
       content = """
       {
         "aewebVersion": 1,
-      "hashFunction": "sha-1",
-      "metaData":{
-        "dir1/file10.txt":{
-          "size": 10,
-          "encoding":"gzip",
-          "addresses":[
-            "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
-          ]
-        },
-        "dir1/file11.txt":{
-          "size": 10,
-          "encoding":"gzip",
-          "addresses":[
-            "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
-          ]
-        },
-        "dir2/hello.txt":{
-          "size": 10,
-          "encoding":"gzip",
-          "addresses":[
-            "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
-          ]
-        },
-        "dir3/index.html":{
-          "size": 10,
-          "encoding":"gzip",
-          "addresses":[
-            "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
-          ]
-        },
-        "file1.txt":{
-          "size": 10,
-          "encoding":"gzip",
-          "addresses":[
-            "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
-          ]
-        },
-        "file2.txt":{
-          "size": 10,
-          "encoding":"gzip",
-          "addresses":[
-            "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
-          ]
-        },
-        "file3.txt":{
-          "size": 10,
-          "encoding":"gzip",
-          "addresses":[
-            "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
-          ]
+        "hashFunction": "sha-1",
+        "metaData":{
+          "dir1/file10.txt":{
+            "size": 10,
+            "encoding":"gzip",
+            "addresses":[
+              "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
+            ]
+          },
+          "dir1/file11.txt":{
+            "size": 10,
+            "encoding":"gzip",
+            "addresses":[
+              "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
+            ]
+          },
+          "dir2/hello.txt":{
+            "size": 10,
+            "encoding":"gzip",
+            "addresses":[
+              "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
+            ]
+          },
+          "dir3/index.html":{
+            "size": 10,
+            "encoding":"gzip",
+            "addresses":[
+              "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
+            ]
+          },
+          "file1.txt":{
+            "size": 10,
+            "encoding":"gzip",
+            "addresses":[
+              "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
+            ]
+          },
+          "file2.txt":{
+            "size": 10,
+            "encoding":"gzip",
+            "addresses":[
+              "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
+            ]
+          },
+          "file3.txt":{
+            "size": 10,
+            "encoding":"gzip",
+            "addresses":[
+              "000071fbc2205f3eba39d310baf15bd89a019b0929be76b7864852cb68c9cd6502de"
+            ]
+          }
         }
-      }
       }
       """
 

@@ -25,8 +25,6 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.Coingecko do
       {:ok, formatted_prices}
     else
       {:ok, %Req.Response{status: status}} -> {:error, status}
-      {:error, %Jason.DecodeError{}} -> {:error, "invalid content"}
-      :error -> {:error, "invalid content"}
       {:error, _} = e -> e
     end
   end

@@ -49,25 +49,25 @@ defmodule Archethic.Mining.PendingTransactionValidation do
   @aeweb_schema :archethic
                 |> Application.app_dir("priv/json-schemas/aeweb.json")
                 |> File.read!()
-                |> Jason.decode!()
+                |> JSON.decode!()
                 |> ExJsonSchema.Schema.resolve()
 
   @did_schema :archethic
               |> Application.app_dir("priv/json-schemas/did-core.json")
               |> File.read!()
-              |> Jason.decode!()
+              |> JSON.decode!()
               |> ExJsonSchema.Schema.resolve()
 
   @token_creation_schema :archethic
                          |> Application.app_dir("priv/json-schemas/token-core.json")
                          |> File.read!()
-                         |> Jason.decode!()
+                         |> JSON.decode!()
                          |> ExJsonSchema.Schema.resolve()
 
   @token_resupply_schema :archethic
                          |> Application.app_dir("priv/json-schemas/token-resupply.json")
                          |> File.read!()
-                         |> Jason.decode!()
+                         |> JSON.decode!()
                          |> ExJsonSchema.Schema.resolve()
 
   @tx_max_size Application.compile_env!(:archethic, :transaction_data_content_max_size)
@@ -276,15 +276,12 @@ defmodule Archethic.Mining.PendingTransactionValidation do
         },
         _
       ) do
-    with {:ok, json} <- Jason.decode(content),
+    with {:ok, json} <- JSON.decode(content),
          {:schema, :ok} <- {:schema, ExJsonSchema.Validator.validate(@aeweb_schema, json)} do
       :ok
     else
-      {:schema, _} ->
-        {:error, "Invalid AEWeb transaction - Does not match JSON schema"}
-
-      {:error, _} ->
-        {:error, "Invalid AEWeb transaction - Not a JSON format"}
+      {:schema, _} -> {:error, "Invalid AEWeb transaction - Does not match JSON schema"}
+      {:error, _} -> {:error, "Invalid AEWeb transaction - Not a JSON format"}
     end
   end
 
@@ -517,7 +514,7 @@ defmodule Archethic.Mining.PendingTransactionValidation do
       )
       when content != "" and ownerships != [] do
     # ownerships validate in :ok <- validate_ownerships(tx),
-    with {:ok, json_did} <- Jason.decode(content),
+    with {:ok, json_did} <- JSON.decode(content),
          :ok <- ExJsonSchema.Validator.validate(@did_schema, json_did) do
       :ok
     else
@@ -575,7 +572,7 @@ defmodule Archethic.Mining.PendingTransactionValidation do
     {last_address, _} =
       Reward.genesis_address() |> TransactionChain.get_last_address(last_scheduling_date)
 
-    with {:ok, %{"supply" => ^total_fee}} <- Jason.decode(content),
+    with {:ok, %{"supply" => ^total_fee}} <- JSON.decode(content),
          true <- Transaction.previous_address(tx) == last_address do
       :ok
     else
@@ -815,13 +812,16 @@ defmodule Archethic.Mining.PendingTransactionValidation do
         tx = %Transaction{type: type, data: %TransactionData{content: content}}
       )
       when type in [:token, :mint_rewards] do
-    with {:ok, json_token} <- Jason.decode(content),
+    with {:ok, json_token} <- JSON.decode(content),
          :ok <- verify_token_creation(tx, json_token) do
       verify_token_recipients(json_token)
       :ok
     else
-      {:error, %Jason.DecodeError{}} -> {:error, "Invalid token transaction - invalid JSON"}
-      {:error, reason} -> {:error, reason}
+      {:error, reason} when is_tuple(reason) ->
+        {:error, "Invalid token transaction - invalid JSON"}
+
+      {:error, reason} ->
+        {:error, reason}
     end
   end
 
@@ -908,7 +908,7 @@ defmodule Archethic.Mining.PendingTransactionValidation do
              data: %TransactionData{content: content},
              validation_stamp: %ValidationStamp{genesis_address: ^genesis_address}
            }}} <- ref_tx_result,
-         {:ok, reference_json_token} <- Jason.decode(content),
+         {:ok, reference_json_token} <- JSON.decode(content),
          %{"type" => "fungible", "allow_mint" => true} <- reference_json_token do
       :ok
     else
@@ -934,7 +934,7 @@ defmodule Archethic.Mining.PendingTransactionValidation do
       {:ok, {:error, :network_issue}} ->
         {:error, "A network issue was raised, please retry later"}
 
-      {:error, %Jason.DecodeError{}} ->
+      {:error, _} ->
         {:error,
          "Invalid token transaction - token_reference exists but does not contain a valid JSON"}
     end

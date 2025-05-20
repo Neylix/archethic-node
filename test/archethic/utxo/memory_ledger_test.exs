@@ -191,8 +191,7 @@ defmodule Archethic.UTXO.MemoryLedgerTest do
       expected_size =
         address
         |> MemoryLedger.get_unspent_outputs()
-        |> Enum.map(&:erlang.external_size/1)
-        |> Enum.sum()
+        |> Enum.sum_by(&:erlang.external_size/1)
 
       assert %{size: ^expected_size} = MemoryLedger.get_genesis_stats(address)
 

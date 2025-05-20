@@ -22,7 +22,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.LibraryTest do
   describe "get_token_id\1" do
     test "should return token_id given the address of the transaction" do
       content =
-        Jason.encode!(%{
+        JSON.encode!(%{
           supply: 300_000_000,
           name: "MyToken",
           type: "non-fungible",

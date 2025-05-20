@@ -59,7 +59,7 @@ defmodule Archethic.OracleChain.Summary do
                          data: %TransactionData{content: content},
                          validation_stamp: %ValidationStamp{timestamp: timestamp}
                        } ->
-        data = Jason.decode!(content)
+        data = JSON.decode!(content)
 
         {DateTime.truncate(timestamp, :second), data}
       end)
@@ -119,6 +119,6 @@ defmodule Archethic.OracleChain.Summary do
     aggregated_data
     |> Enum.map(&{DateTime.to_unix(elem(&1, 0)), elem(&1, 1)})
     |> Enum.into(%{})
-    |> Jason.encode!()
+    |> JSON.encode!()
   end
 end

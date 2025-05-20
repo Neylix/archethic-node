@@ -14,7 +14,7 @@ defmodule Archethic.OracleChain.MemTableLoaderTest do
                MemTableLoader.load_transaction(%Transaction{
                  type: :oracle,
                  data: %TransactionData{
-                   content: %{"uco" => %{"eur" => 0.02}} |> Jason.encode!()
+                   content: %{"uco" => %{"eur" => 0.02}} |> JSON.encode!()
                  },
                  validation_stamp: %ValidationStamp{
                    timestamp: DateTime.utc_now()
@@ -39,7 +39,7 @@ defmodule Archethic.OracleChain.MemTableLoaderTest do
                          "uco" => %{"eur" => 0.07}
                        }
                      }
-                     |> Jason.encode!()
+                     |> JSON.encode!()
                  }
                })
 

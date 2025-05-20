@@ -21,13 +21,13 @@ defmodule Archethic.Mining.Fee do
   @token_creation_schema :archethic
                          |> Application.app_dir("priv/json-schemas/token-core.json")
                          |> File.read!()
-                         |> Jason.decode!()
+                         |> JSON.decode!()
                          |> ExJsonSchema.Schema.resolve()
 
   @token_resupply_schema :archethic
                          |> Application.app_dir("priv/json-schemas/token-resupply.json")
                          |> File.read!()
-                         |> Jason.decode!()
+                         |> JSON.decode!()
                          |> ExJsonSchema.Schema.resolve()
 
   @doc """
@@ -108,18 +108,15 @@ defmodule Archethic.Mining.Fee do
          %Transaction{type: :token, data: %TransactionData{content: content}},
          uco_price_in_usd
        ) do
-    with {:ok, json} <- Jason.decode(content),
+    with {:ok, json} <- JSON.decode(content),
          "non-fungible" <- Map.get(json, "type", "fungible"),
          utxos when is_list(utxos) <- Map.get(json, "collection"),
          nb_utxos when nb_utxos > 0 <- length(utxos) do
       base_fee = minimum_fee(uco_price_in_usd)
       (:math.log10(nb_utxos) + 1) * nb_utxos * base_fee
     else
-      {:error, _} ->
-        0
-
-      _ ->
-        1 * minimum_fee(uco_price_in_usd)
+      {:error, _} -> 0
+      _ -> 1 * minimum_fee(uco_price_in_usd)
     end
   end
 
@@ -169,7 +166,7 @@ defmodule Archethic.Mining.Fee do
          type: :token,
          data: %TransactionData{content: content}
        }) do
-    case Jason.decode(content) do
+    case JSON.decode(content) do
       {:ok, json} ->
         cond do
           ExJsonSchema.Validator.valid?(@token_creation_schema, json) ->

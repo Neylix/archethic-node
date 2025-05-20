@@ -543,8 +543,7 @@ defmodule Archethic.Contracts do
         max_concurrency: 100
       )
       |> Stream.filter(&match?({:ok, _}, &1))
-      |> Stream.map(&elem(&1, 1))
-      |> Enum.sum()
+      |> Enum.sum_by(&elem(&1, 1))
 
     :telemetry.execute(
       [:archethic, :contract],

@@ -107,11 +107,9 @@ defmodule Archethic.Mining.LedgerValidation do
       )
       when type in [:token, :mint_rewards] and not is_nil(timestamp) do
     new_ops =
-      case Jason.decode(content) do
+      case JSON.decode(content) do
         {:ok, json} ->
-          minted_utxos = json |> create_token_utxos(address, timestamp)
-
-          %__MODULE__{ops | minted_utxos: minted_utxos}
+          %__MODULE__{ops | minted_utxos: create_token_utxos(json, address, timestamp)}
 
         _ ->
           ops
@@ -431,7 +429,7 @@ defmodule Archethic.Mining.LedgerValidation do
     |> Enum.filter(&match?({{:token, _, _}, _}, &1))
     |> Enum.reduce([], fn {type = {:token, token_address, token_id}, utxos}, acc ->
       amount_to_spend = Map.get(tokens_to_spend, {token_address, token_id}, 0)
-      consumed_amount = utxos |> Enum.map(& &1.amount) |> Enum.sum()
+      consumed_amount = Enum.sum_by(utxos, & &1.amount)
       remaining_amount = consumed_amount - amount_to_spend
 
       if remaining_amount > 0 do
@@ -524,7 +522,7 @@ defmodule Archethic.Mining.LedgerValidation do
 
   defp add_uco_utxo(utxos, consumed_utxos, uco_to_spend, change_address, timestamp) do
     consumed_amount =
-      consumed_utxos |> Enum.filter(&(&1.type == :UCO)) |> Enum.map(& &1.amount) |> Enum.sum()
+      consumed_utxos |> Enum.filter(&(&1.type == :UCO)) |> Enum.sum_by(& &1.amount)
 
     remaining_amount = consumed_amount - uco_to_spend
 

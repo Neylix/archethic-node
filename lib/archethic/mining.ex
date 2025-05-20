@@ -140,8 +140,7 @@ defmodule Archethic.Mining do
         ordered: false
       )
       |> Stream.filter(&match?({:ok, {:ok, _}}, &1))
-      |> Stream.map(fn {:ok, {:ok, res}} -> res end)
-      |> Enum.frequencies()
+      |> Enum.frequencies_by(fn {:ok, {:ok, res}} -> res end)
 
     nb_ok = Map.get(aggregated_responses, %Ok{}, 0)
     total_response = Map.values(aggregated_responses) |> Enum.sum()

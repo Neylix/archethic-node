@@ -51,7 +51,7 @@ defmodule ArchethicWeb.WebUtils do
     end)
     |> Enum.reduce(%{}, fn
       {:ok, {token_address, content}}, acc ->
-        case Jason.decode(content) do
+        case JSON.decode(content) do
           {:ok, map} ->
             properties = %{
               decimals: Map.get(map, "decimals", 8),
@@ -215,11 +215,8 @@ defmodule ArchethicWeb.WebUtils do
   def stringify_map_keys(map) when is_map(map) do
     map
     |> Enum.reduce(%{}, fn
-      {k, v}, acc when is_binary(k) ->
-        Map.put(acc, k, stringify_map_keys(v))
-
-      {k, v}, acc ->
-        Map.put(acc, Jason.encode!(k), stringify_map_keys(v))
+      {k, v}, acc when is_binary(k) -> Map.put(acc, k, stringify_map_keys(v))
+      {k, v}, acc -> Map.put(acc, JSON.encode!(k), stringify_map_keys(v))
     end)
   end
 

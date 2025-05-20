@@ -95,7 +95,6 @@ defmodule ArchethicWeb.AEWeb.WebHostingController do
       {:ok, file_content, encoding, mime_type, cached?, etag}
     else
       er when er in [:error, false] -> {:error, :invalid_address}
-      {:error, %Jason.DecodeError{}} -> {:error, :invalid_content}
       {:error, :transaction_not_exists} -> {:error, :website_not_found}
       error -> error
     end

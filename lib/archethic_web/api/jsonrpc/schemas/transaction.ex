@@ -11,7 +11,7 @@ defmodule ArchethicWeb.API.JsonRPC.TransactionSchema do
   @transaction_schema :archethic
                       |> Application.app_dir("priv/json-schemas/transaction.json")
                       |> File.read!()
-                      |> Jason.decode!()
+                      |> JSON.decode!()
                       |> ExJsonSchema.Schema.resolve()
 
   @keys_to_base_decode [

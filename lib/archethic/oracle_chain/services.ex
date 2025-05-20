@@ -21,12 +21,12 @@ defmodule Archethic.OracleChain.Services do
         previous_digest =
           previous_content
           |> Map.get(Atom.to_string(service))
-          |> Jason.encode!()
+          |> JSON.encode!()
           |> Crypto.hash()
 
         new_digest =
           data
-          |> Jason.encode!()
+          |> JSON.encode!()
           |> Crypto.hash()
 
         new_digest != previous_digest

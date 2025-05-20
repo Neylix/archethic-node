@@ -62,7 +62,7 @@ defmodule Archethic.OracleChain.MemTableLoader do
     )
 
     content
-    |> Jason.decode!()
+    |> JSON.decode!()
     |> tap(fn data ->
       if !from_db? do
         Absinthe.Subscription.publish(
@@ -94,7 +94,7 @@ defmodule Archethic.OracleChain.MemTableLoader do
     )
 
     content
-    |> Jason.decode!()
+    |> JSON.decode!()
     |> Enum.each(fn {timestamp, aggregated_data} ->
       Enum.each(aggregated_data, fn {service, data} ->
         {timestamp, _} = Integer.parse(timestamp)

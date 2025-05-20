@@ -20,17 +20,17 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.Json do
 
   @spec to_string(any()) :: String.t()
   defdelegate to_string(term),
-    to: Jason,
+    to: JSON,
     as: :encode!
 
   @spec parse(String.t()) :: any()
   defdelegate parse(text),
-    to: Jason,
+    to: JSON,
     as: :decode!
 
   @spec is_valid?(String.t()) :: boolean()
   def is_valid?(str) do
-    case Jason.decode(str) do
+    case JSON.decode(str) do
       {:ok, _} -> true
       {:error, _} -> false
     end

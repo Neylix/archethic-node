@@ -117,9 +117,7 @@ defmodule ArchethicWeb.Explorer.DashboardLive do
   defp network_transactions_avg_duration(stats) do
     stats
     |> Enum.reduce(%{}, fn {{_node, datetime}, duration_by_address}, acc ->
-      durations =
-        duration_by_address
-        |> Enum.map(&elem(&1, 1))
+      durations = Enum.map(duration_by_address, &elem(&1, 1))
 
       cur_count = length(durations)
       cur_sum = Enum.sum(durations)

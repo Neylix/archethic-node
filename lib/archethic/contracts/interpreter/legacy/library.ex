@@ -80,7 +80,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.Library do
   def json_path_extract(text, path) when is_binary(text) and is_binary(path) do
     res =
       text
-      |> Jason.decode!()
+      |> JSON.decode!()
       |> ExJSONPath.eval(path)
 
     case res do

@@ -17,7 +17,7 @@ defmodule Archethic.OracleChainTest do
       %{
         "uco" => %{"eur" => 0.20, "usd" => 0.12}
       }
-      |> Jason.encode!()
+      |> JSON.encode!()
 
     assert true == OracleChain.valid_services_content?(content)
   end
@@ -31,7 +31,7 @@ defmodule Archethic.OracleChainTest do
           "uco" => %{"eur" => 0.20, "usd" => 0.12}
         }
       }
-      |> Jason.encode!()
+      |> JSON.encode!()
 
     chain = [
       %Transaction{
@@ -41,7 +41,7 @@ defmodule Archethic.OracleChainTest do
             %{
               "uco" => %{"eur" => 0.20, "usd" => 0.12}
             }
-            |> Jason.encode!()
+            |> JSON.encode!()
         },
         validation_stamp: %ValidationStamp{
           timestamp: DateTime.from_unix!(last_update_at)

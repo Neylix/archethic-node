@@ -29,13 +29,13 @@ defmodule Archethic.TransactionChain.Transaction do
   @token_creation_schema :archethic
                          |> Application.app_dir("priv/json-schemas/token-core.json")
                          |> File.read!()
-                         |> Jason.decode!()
+                         |> JSON.decode!()
                          |> ExJsonSchema.Schema.resolve()
 
   @token_resupply_schema :archethic
                          |> Application.app_dir("priv/json-schemas/token-resupply.json")
                          |> File.read!()
-                         |> Jason.decode!()
+                         |> JSON.decode!()
                          |> ExJsonSchema.Schema.resolve()
 
   @unit_uco 100_000_000
@@ -875,7 +875,7 @@ defmodule Archethic.TransactionChain.Transaction do
           tx_content :: binary()
         ) :: list(TransactionMovement.t())
   def get_movements_from_token_transaction(tx_address, tx_content) do
-    case Jason.decode(tx_content) do
+    case JSON.decode(tx_content) do
       {:ok, json} ->
         cond do
           ExJsonSchema.Validator.valid?(@token_creation_schema, json) ->

@@ -45,7 +45,7 @@ defmodule ArchethicWeb.Explorer.ExplorerView do
   end
 
   def is_json_content?(content) do
-    case Jason.decode(content) do
+    case JSON.decode(content) do
       {:ok, _} -> true
       _ -> false
     end
@@ -238,7 +238,7 @@ defmodule ArchethicWeb.Explorer.ExplorerView do
   end
 
   def format_transaction_content(_, content) do
-    case Jason.decode(content) do
+    case JSON.decode(content) do
       {:ok, _} -> Jason.Formatter.pretty_print_to_iodata(content)
       _ -> content
     end

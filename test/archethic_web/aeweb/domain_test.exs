@@ -200,7 +200,7 @@ defmodule ArchethicWeb.AEWeb.DomainTest do
 
     ownership = Ownership.new(secret, aes_key, [authorized_key])
 
-    content = Jason.encode!(%{"sslCertificate" => fake_cert_pem})
+    content = JSON.encode!(%{"sslCertificate" => fake_cert_pem})
 
     tx =
       TransactionFactory.create_valid_transaction(
