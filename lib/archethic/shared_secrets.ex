@@ -152,7 +152,7 @@ defmodule Archethic.SharedSecrets do
     end
   rescue
     error ->
-      Logger.debug(error, nss: :error)
+      Logger.debug(error)
       :error
   end
 
@@ -188,7 +188,7 @@ defmodule Archethic.SharedSecrets do
     :ok
   rescue
     error ->
-      Logger.debug(error, ss_o: :error)
+      Logger.debug(error)
       :error
   end
 

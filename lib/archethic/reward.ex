@@ -132,7 +132,7 @@ defmodule Archethic.Reward do
     reward_balance =
       genesis_address()
       |> Archethic.get_balance()
-      |> Map.get(:token)
+      |> Map.fetch!(:token)
       |> Enum.sort(fn {_, qty1}, {_, qty2} -> qty1 < qty2 end)
 
     do_get_transfers(nodes, reward_balance, [])

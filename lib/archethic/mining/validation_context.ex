@@ -1096,9 +1096,9 @@ defmodule Archethic.Mining.ValidationContext do
     }
 
     sub_tree = %{
-      chain: tree |> Map.get(:chain) |> Enum.at(0, <<>>),
-      beacon: tree |> Map.get(:beacon) |> Enum.at(0, <<>>),
-      IO: tree |> Map.get(:IO) |> Enum.at(0, <<>>)
+      chain: tree |> Map.fetch!(:chain) |> Enum.at(0, <<>>),
+      beacon: tree |> Map.fetch!(:beacon) |> Enum.at(0, <<>>),
+      IO: tree |> Map.fetch!(:IO) |> Enum.at(0, <<>>)
     }
 
     %{

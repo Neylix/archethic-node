@@ -154,7 +154,7 @@ defmodule Archethic.TransactionChain.TransactionSummary do
     %__MODULE__{
       address: address,
       timestamp: timestamp,
-      type: String.to_atom(type),
+      type: String.to_existing_atom(type),
       movements_addresses: movements_addresses,
       fee: fee,
       validation_stamp_checksum: validation_stamp_checksum,

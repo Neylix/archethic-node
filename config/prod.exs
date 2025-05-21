@@ -111,11 +111,8 @@ config :archethic,
           |> System.get_env("SOFTWARE")
           |> String.upcase()
         ) do
-          "TPM" ->
-            Archethic.Crypto.NodeKeystore.Origin.TPMImpl
-
-          "SOFTWARE" ->
-            SoftwareImpl
+          "TPM" -> Archethic.Crypto.NodeKeystore.Origin.TPMImpl
+          "SOFTWARE" -> SoftwareImpl
         end)
 
 config :archethic, Archethic.Governance.Pools,
@@ -134,11 +131,8 @@ config :archethic, Archethic.Mining.PendingTransactionValidation,
     |> String.upcase()
     |> String.split(";", trim: true)
     |> Enum.map(fn
-      "TPM" ->
-        :tpm
-
-      "SOFTWARE" ->
-        :software
+      "TPM" -> :tpm
+      "SOFTWARE" -> :software
     end)
 
 config :archethic, Archethic.Networking,
@@ -147,24 +141,16 @@ config :archethic, Archethic.Networking,
 config :archethic,
        Archethic.Networking.IPLookup,
        (case("ARCHETHIC_NETWORKING_IMPL" |> System.get_env("NAT") |> String.upcase()) do
-          "NAT" ->
-            Archethic.Networking.IPLookup.NATDiscovery
-
-          "STATIC" ->
-            Static
-
-          "REMOTE" ->
-            Archethic.Networking.IPLookup.RemoteDiscovery
+          "NAT" -> Archethic.Networking.IPLookup.NATDiscovery
+          "STATIC" -> Static
+          "REMOTE" -> Archethic.Networking.IPLookup.RemoteDiscovery
         end)
 
 config :archethic, Archethic.Networking.PortForwarding,
   enabled:
     (case(System.get_env("ARCHETHIC_NETWORKING_PORT_FORWARDING", "true")) do
-       "true" ->
-         true
-
-       _ ->
-         false
+       "true" -> true
+       _ -> false
      end)
 
 config :archethic, Archethic.Networking.Scheduler,
@@ -253,19 +239,9 @@ config :archethic, ArchethicWeb.Explorer.FaucetController,
 config :archethic, ArchethicWeb.Explorer.FaucetRateLimiter,
   enabled: System.get_env("ARCHETHIC_NETWORK_TYPE") == "testnet"
 
-config :archethic,
-       SharedSecretsKeystore,
-       Archethic.Crypto.SharedSecretsKeystore.SoftwareImpl
-
 # TODO: to remove when the implementation will be detected
-config :archethic,
-       SharedSecretsKeystore,
-       Archethic.Crypto.SharedSecretsKeystore.SoftwareImpl
-
-config :archethic,
-       SoftwareImpl,
-       node_seed: System.get_env("ARCHETHIC_CRYPTO_SEED")
-
+config :archethic, SharedSecretsKeystore, Archethic.Crypto.SharedSecretsKeystore.SoftwareImpl
+config :archethic, SoftwareImpl, node_seed: System.get_env("ARCHETHIC_CRYPTO_SEED")
 config :archethic, Static, hostname: System.get_env("ARCHETHIC_STATIC_IP")
 
 # Apply geopatch in 10 min (needs to be over global timeout)

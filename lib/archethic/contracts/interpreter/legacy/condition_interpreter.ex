@@ -615,7 +615,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.ConditionInterpreter do
 
   defp atom_encoder(atom, _) do
     if atom in ["if"] do
-      {:ok, String.to_atom(atom)}
+      {:ok, String.to_existing_atom(atom)}
     else
       {:ok, {:atom, atom}}
     end

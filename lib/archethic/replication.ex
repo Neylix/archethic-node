@@ -401,7 +401,7 @@ defmodule Archethic.Replication do
     |> tap(fn inputs ->
       Logger.debug("Got #{inspect(inputs)} for #{Base.encode16(genesis_address)}",
         transaction_address: Base.encode16(address),
-        type: type
+        transaction_type: type
       )
     end)
   end

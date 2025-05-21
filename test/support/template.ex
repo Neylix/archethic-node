@@ -14,19 +14,20 @@ defmodule ArchethicCase do
   alias Archethic.Governance.Pools.MemTable, as: PoolsMemTable
   alias Archethic.Mining
   alias Archethic.OracleChain.MemTable, as: OracleMemTable
+  alias Archethic.OracleChain.Services.ProviderCacheSupervisor
+  alias Archethic.OracleChain.Services.UCOPrice
   alias Archethic.P2P
   alias Archethic.P2P.MemTable, as: P2PMemTable
   alias Archethic.P2P.Node
   alias Archethic.SharedSecrets
-  alias Archethic.TransactionChain
+  alias Archethic.SharedSecrets.MemTables.NetworkLookup
+  alias Archethic.SharedSecrets.MemTables.OriginKeyLookup
+  alias Archethic.TransactionChain.MemTables.PendingLedger
+  alias Archethic.TransactionChain.Transaction
+  alias Archethic.TransactionChain.TransactionData
   alias Archethic.Utils
   alias Archethic.UTXO.MemoryLedger
   alias ArchethicWeb.TransactionSubscriber
-  alias SharedSecrets.MemTables.NetworkLookup
-  alias SharedSecrets.MemTables.OriginKeyLookup
-  alias TransactionChain.MemTables.PendingLedger
-  alias TransactionChain.Transaction
-  alias TransactionChain.TransactionData
 
   def current_protocol_version, do: Mining.protocol_version()
   def current_transaction_version, do: Transaction.version()
@@ -84,6 +85,13 @@ defmodule ArchethicCase do
     |> stub(:clear_beacon_summaries, fn -> :ok end)
     |> stub(:get_beacon_summary, fn _ -> {:error, :not_exists} end)
     |> stub(:get_last_chain_address_stored, fn addr -> addr end)
+
+    stub(MockUCOPrice, :cache_child_spec, fn ->
+      Supervisor.child_spec(
+        {ProviderCacheSupervisor, providers: UCOPrice.providers(), fetch_args: ["usd", "eur"]},
+        id: CacheSupervisor
+      )
+    end)
 
     MockUTXOLedger
     |> stub(:list_genesis_addresses, fn -> [] end)

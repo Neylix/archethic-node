@@ -330,7 +330,7 @@ defmodule Archethic.Election do
         },
         &reduce_storage_nodes/2
       )
-      |> Map.get(:nodes)
+      |> Map.fetch!(:nodes)
       |> Enum.reverse()
 
     :telemetry.execute(

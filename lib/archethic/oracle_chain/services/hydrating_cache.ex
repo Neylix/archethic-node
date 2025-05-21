@@ -31,7 +31,7 @@ defmodule Archethic.OracleChain.Services.HydratingCache do
   @spec start_link(keyword()) ::
           {:ok, GenServer.on_start()} | {:error, term()}
   def start_link(arg \\ []) do
-    GenServer.start_link(__MODULE__, arg, Keyword.take(arg, [:name]))
+    GenServer.start_link(__MODULE__, arg)
   end
 
   @spec get(GenServer.server(), integer()) :: {:ok, any()} | :error

@@ -29,12 +29,8 @@ defmodule Archethic.Contracts.WorkerTest do
   alias Archethic.TransactionFactory
   alias Archethic.UTXO
 
-  def load_send_tx_constraints do
-    setup_before_send_tx()
-  end
-
   setup do
-    load_send_tx_constraints()
+    setup_before_send_tx()
 
     P2P.add_and_connect_node(%Node{
       ip: {127, 0, 0, 1},

@@ -20,7 +20,7 @@ defmodule Archethic.OracleChain.Services.UCOPrice do
     )
   end
 
-  defp providers do
+  def providers do
     :archethic |> Application.get_env(__MODULE__) |> Keyword.fetch!(:providers)
   end
 
@@ -102,11 +102,8 @@ defmodule Archethic.OracleChain.Services.UCOPrice do
   def parse_data(service_data) when is_map(service_data) do
     valid? =
       Enum.all?(service_data, fn
-        {key, val} when key in @pairs and is_float(val) ->
-          true
-
-        _ ->
-          false
+        {key, val} when key in @pairs and is_float(val) -> true
+        _ -> false
       end)
 
     if valid?, do: {:ok, service_data}, else: :error

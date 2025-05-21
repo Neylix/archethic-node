@@ -61,11 +61,8 @@ defmodule Archethic.Governance.Pools.MemTable do
   defp put_and_update_weight(pool, member, weight_factor) do
     Agent.update(__MODULE__, fn distribution ->
       case get_in(distribution, [pool, member]) do
-        nil ->
-          put_in(distribution, [pool, member], weight_factor)
-
-        _ ->
-          update_in(distribution, [pool, member], &(&1 + weight_factor))
+        nil -> put_in(distribution, [pool, member], weight_factor)
+        _ -> update_in(distribution, [pool, member], &(&1 + weight_factor))
       end
     end)
   end
@@ -99,9 +96,7 @@ defmodule Archethic.Governance.Pools.MemTable do
   @spec list_pool_members(Pools.pool()) :: list({binary(), weight :: non_neg_integer()})
   def list_pool_members(pool) do
     Agent.get(__MODULE__, fn distribution ->
-      distribution
-      |> Map.get(pool)
-      |> Enum.to_list()
+      distribution |> Map.fetch!(pool) |> Enum.to_list()
     end)
   end
 end

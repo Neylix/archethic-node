@@ -1,10 +1,10 @@
 defmodule Archethic.OracleChain.Services.UCOPriceTest do
-  use ExUnit.Case, async: false
+  use ArchethicCase, async: false
 
   import ExUnit.CaptureLog
   import Mox
 
-  alias Archethic.OracleChain.Services.HydratingCache
+  alias Archethic.OracleChain.ServiceCacheSupervisor
   alias Archethic.OracleChain.Services.UCOPrice
 
   setup :verify_on_exit!
@@ -20,17 +20,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
         {:ok, %{"usd" => [0.12], "eur" => [0.20]}}
       end)
 
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider1Cache,
-        mfa: {MockUCOProvider1, :fetch, [["usd", "eur"]]}
-      )
-
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider2Cache,
-        mfa: {MockUCOProvider2, :fetch, [["usd", "eur"]]}
-      )
+      ServiceCacheSupervisor.start_link()
 
       Process.sleep(10)
 
@@ -46,17 +36,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
         {:ok, %{"usd" => [0.123454789], "eur" => [0.123456789]}}
       end)
 
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider1Cache,
-        mfa: {MockUCOProvider1, :fetch, [["usd", "eur"]]}
-      )
-
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider2Cache,
-        mfa: {MockUCOProvider2, :fetch, [["usd", "eur"]]}
-      )
+      ServiceCacheSupervisor.start_link()
 
       Process.sleep(10)
 
@@ -73,17 +53,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
         {:ok, {:error, :error_message}}
       end)
 
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider1Cache,
-        mfa: {MockUCOProvider1, :fetch, [["usd", "eur"]]}
-      )
-
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider2Cache,
-        mfa: {MockUCOProvider2, :fetch, [["usd", "eur"]]}
-      )
+      ServiceCacheSupervisor.start_link()
 
       Process.sleep(10)
 
@@ -99,17 +69,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
         {:ok, %{"usd" => [0.30], "eur" => [0.40]}}
       end)
 
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider1Cache,
-        mfa: {MockUCOProvider1, :fetch, [["usd", "eur"]]}
-      )
-
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider2Cache,
-        mfa: {MockUCOProvider2, :fetch, [["usd", "eur"]]}
-      )
+      ServiceCacheSupervisor.start_link()
 
       Process.sleep(10)
 
@@ -125,17 +85,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
         {:error, "reason"}
       end)
 
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider1Cache,
-        mfa: {MockUCOProvider1, :fetch, [["usd", "eur"]]}
-      )
-
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider2Cache,
-        mfa: {MockUCOProvider2, :fetch, [["usd", "eur"]]}
-      )
+      ServiceCacheSupervisor.start_link()
 
       Process.sleep(10)
 
@@ -153,17 +103,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
         {:ok, %{"usd" => [0.30], "eur" => [0.40]}}
       end)
 
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider1Cache,
-        mfa: {MockUCOProvider1, :fetch, [["usd", "eur"]]}
-      )
-
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider2Cache,
-        mfa: {MockUCOProvider2, :fetch, [["usd", "eur"]]}
-      )
+      ServiceCacheSupervisor.start_link()
 
       Process.sleep(10)
 
@@ -179,17 +119,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
         {:ok, %{"usd" => [0.40], "eur" => [0.50]}}
       end)
 
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider1Cache,
-        mfa: {MockUCOProvider1, :fetch, [["usd", "eur"]]}
-      )
-
-      HydratingCache.start_link(
-        refresh_interval: 1000,
-        name: MockUCOProvider2Cache,
-        mfa: {MockUCOProvider2, :fetch, [["usd", "eur"]]}
-      )
+      ServiceCacheSupervisor.start_link()
 
       Process.sleep(10)
 
@@ -206,17 +136,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
       {:error, ""}
     end)
 
-    HydratingCache.start_link(
-      refresh_interval: 1000,
-      name: MockUCOProvider1Cache,
-      mfa: {MockUCOProvider1, :fetch, [["usd", "eur"]]}
-    )
-
-    HydratingCache.start_link(
-      refresh_interval: 1000,
-      name: MockUCOProvider2Cache,
-      mfa: {MockUCOProvider2, :fetch, [["usd", "eur"]]}
-    )
+    ServiceCacheSupervisor.start_link()
 
     Process.sleep(10)
 
@@ -234,17 +154,7 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
       {:ok, %{"eur" => [0.25], "usd" => [0.25]}}
     end)
 
-    HydratingCache.start_link(
-      refresh_interval: 1000,
-      name: MockUCOProvider1Cache,
-      mfa: {MockUCOProvider1, :fetch, [["usd", "eur"]]}
-    )
-
-    HydratingCache.start_link(
-      refresh_interval: 1000,
-      name: MockUCOProvider2Cache,
-      mfa: {MockUCOProvider2, :fetch, [["usd", "eur"]]}
-    )
+    ServiceCacheSupervisor.start_link()
 
     Process.sleep(10)
 

@@ -349,11 +349,9 @@ defmodule Archethic.Contracts.Interpreter do
   # parsing
   # -----------------------------------------
   defp atom_encoder(atom, _) do
-    if atom in ["if"] do
-      {:ok, String.to_atom(atom)}
-    else
-      {:ok, {:atom, atom}}
-    end
+    if atom in ["if"],
+      do: {:ok, String.to_existing_atom(atom)},
+      else: {:ok, {:atom, atom}}
   end
 
   defp parse_contract(1, ast) do
