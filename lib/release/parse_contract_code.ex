@@ -1,12 +1,11 @@
 defmodule Archethic.Release.ParseContractCode do
   @moduledoc false
 
-  alias Archethic.Contracts.Loader
-
   use Distillery.Releases.Appup.Transform
 
-  def up(:archethic, _v1, _v2, instructions, _opts),
-    do: add_contract_reparse(instructions)
+  alias Archethic.Contracts.Loader
+
+  def up(:archethic, _v1, _v2, instructions, _opts), do: add_contract_reparse(instructions)
 
   def up(_, _, _, instructions, _), do: instructions
 

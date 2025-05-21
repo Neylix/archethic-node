@@ -3,6 +3,7 @@ defmodule Archethic.P2P.Message.GetNetworkStatsTest do
   use ExUnit.Case
 
   alias Archethic.P2P.Message.GetNetworkStats
+
   doctest GetNetworkStats
 
   describe "serialize/deserialize" do

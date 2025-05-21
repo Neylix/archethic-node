@@ -4,6 +4,8 @@ defmodule ArchethicWeb.API.GraphQL.Schema.JsonType do
   """
   use Absinthe.Schema.Notation
 
+  alias Absinthe.Blueprint.Input.Null
+
   scalar :json, name: "Json" do
     description("""
     The `Json` scalar type represents arbitrary json string data, represented as UTF-8
@@ -16,7 +18,7 @@ defmodule ArchethicWeb.API.GraphQL.Schema.JsonType do
   end
 
   @spec decode(Absinthe.Blueprint.Input.String.t()) :: {:ok, term()} | :error
-  @spec decode(Absinthe.Blueprint.Input.Null.t()) :: {:ok, nil}
+  @spec decode(Null.t()) :: {:ok, nil}
   defp decode(%Absinthe.Blueprint.Input.String{value: value}) do
     case JSON.decode(value) do
       {:ok, result} -> {:ok, result}
@@ -24,7 +26,7 @@ defmodule ArchethicWeb.API.GraphQL.Schema.JsonType do
     end
   end
 
-  defp decode(%Absinthe.Blueprint.Input.Null{}) do
+  defp decode(%Null{}) do
     {:ok, nil}
   end
 

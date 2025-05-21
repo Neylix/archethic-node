@@ -5,18 +5,15 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.TokenTest do
   """
 
   use ArchethicCase
+
   import ArchethicCase
+  import Mox
 
   alias Archethic.Contracts.Interpreter.Library.Common.Token
-
   alias Archethic.TransactionChain.Transaction
   alias Archethic.TransactionChain.TransactionData
-
-  alias Archethic.Utils
-
   alias Archethic.TransactionFactory
-
-  import Mox
+  alias Archethic.Utils
 
   doctest Token
 
@@ -42,9 +39,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.TokenTest do
         %Transaction{address: token_address} =
         TransactionFactory.create_valid_transaction([], content: content, type: :token, index: 24)
 
-      MockDB
-      |> stub(:get_transaction, fn ^token_address, _, _ -> {:ok, tx} end)
-
+      stub(MockDB, :get_transaction, fn ^token_address, _, _ -> {:ok, tx} end)
       {:ok, %{id: token_id}} = Utils.get_token_properties(tx)
 
       code = ~s"""

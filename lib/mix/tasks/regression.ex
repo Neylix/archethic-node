@@ -1,16 +1,13 @@
 defmodule Mix.Tasks.Archethic.Regression do
   @shortdoc "Run regression utilities to benchmark and validate nodes"
-  @bench false
-  @validate false
-
   @moduledoc """
   This task validates and/or benchmarks a network of nodes.
 
   ## Command line options
 
     * `--help` - show this help
-    * `--bench` - run benchmark "#{@bench}"
-    * `--playbook` - run all playbooks, default "#{@validate}"
+    * `--bench` - run benchmark
+    * `--playbook` - run all playbooks
     * `--only BENCHMARK_NAME` - run only the specified benchmark(s), can be specified multiple times
 
   ## Example

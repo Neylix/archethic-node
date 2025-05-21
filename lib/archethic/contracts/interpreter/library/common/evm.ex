@@ -2,11 +2,10 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.Evm do
   @moduledoc false
   @behaviour Archethic.Contracts.Interpreter.Library
 
-  alias Archethic.Tag
-  alias Archethic.Contracts.Interpreter.Legacy.UtilsInterpreter
-  alias Archethic.Contracts.Interpreter.ASTHelper, as: AST
+  use Archethic.Tag
 
-  use Tag
+  alias Archethic.Contracts.Interpreter.ASTHelper, as: AST
+  alias Archethic.Contracts.Interpreter.Legacy.UtilsInterpreter
 
   @spec abi_encode(String.t(), list()) :: String.t()
   def abi_encode(signature, params \\ [])
@@ -17,7 +16,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.Evm do
 
     params = if String.starts_with?(signature, "("), do: [List.to_tuple(params)], else: params
 
-    ABI.encode(signature, params) |> Base.encode16(case: :lower)
+    signature |> ABI.encode(params) |> Base.encode16(case: :lower)
   end
 
   @spec abi_decode(String.t(), String.t()) :: list()

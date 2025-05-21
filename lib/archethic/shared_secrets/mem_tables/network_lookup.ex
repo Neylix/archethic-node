@@ -1,15 +1,17 @@
 defmodule Archethic.SharedSecrets.MemTables.NetworkLookup do
   @moduledoc false
 
+  use GenServer
+
   alias Archethic.Bootstrap.NetworkInit
   alias Archethic.Crypto
 
-  use GenServer
   @vsn 2
 
   @table_name :archethic_shared_secrets_network
 
-  @genesis_daily_nonce_public_key Application.compile_env!(:archethic, [
+  @genesis_daily_nonce_public_key :archethic
+                                  |> Application.compile_env!([
                                     NetworkInit,
                                     :genesis_daily_nonce_seed
                                   ])
@@ -60,7 +62,7 @@ defmodule Archethic.SharedSecrets.MemTables.NetworkLookup do
       ]
   """
   @spec set_daily_nonce_public_key(Crypto.key(), DateTime.t()) :: :ok
-  def set_daily_nonce_public_key(public_key, date = %DateTime{}) when is_binary(public_key) do
+  def set_daily_nonce_public_key(public_key, %DateTime{} = date) when is_binary(public_key) do
     true = :ets.insert(@table_name, {{:daily_nonce, DateTime.to_unix(date)}, public_key})
     :ok
   end

@@ -1,6 +1,9 @@
 defmodule Archethic.UTXO.MemoryLedgerTest do
   use ExUnit.Case
 
+  import ArchethicCase
+  import Mox
+
   alias Archethic.TransactionChain.Transaction
   alias Archethic.TransactionChain.Transaction.ValidationStamp
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations
@@ -8,11 +11,7 @@ defmodule Archethic.UTXO.MemoryLedgerTest do
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.TransactionMovement
 
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
-
   alias Archethic.UTXO.MemoryLedger
-
-  import Mox
-  import ArchethicCase
 
   setup :verify_on_exit!
   setup :set_mox_global
@@ -89,9 +88,7 @@ defmodule Archethic.UTXO.MemoryLedgerTest do
 
   describe "add_chain_utxo/2" do
     setup do
-      MockUTXOLedger
-      |> stub(:list_genesis_addresses, fn -> [] end)
-
+      stub(MockUTXOLedger, :list_genesis_addresses, fn -> [] end)
       MemoryLedger.start_link()
 
       :ok
@@ -136,9 +133,7 @@ defmodule Archethic.UTXO.MemoryLedgerTest do
 
   describe "remove_consumed_input/2" do
     setup do
-      MockUTXOLedger
-      |> stub(:list_genesis_addresses, fn -> [] end)
-
+      stub(MockUTXOLedger, :list_genesis_addresses, fn -> [] end)
       MemoryLedger.start_link()
 
       :ok

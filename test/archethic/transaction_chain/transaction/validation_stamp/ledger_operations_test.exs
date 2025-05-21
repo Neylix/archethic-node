@@ -1,14 +1,14 @@
 defmodule Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperationsTest do
-  alias Archethic.Reward.MemTables.RewardTokens
+  use ArchethicCase
 
+  import ArchethicCase
+
+  alias Archethic.Reward.MemTables.RewardTokens
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations
 
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.TransactionMovement
 
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
-
-  use ArchethicCase
-  import ArchethicCase
 
   doctest LedgerOperations
 
@@ -40,7 +40,7 @@ defmodule Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperation
         ]
       }
 
-      assert {^ops, <<>>} = LedgerOperations.serialize(ops) |> LedgerOperations.deserialize()
+      assert {^ops, <<>>} = ops |> LedgerOperations.serialize() |> LedgerOperations.deserialize()
     end
   end
 end

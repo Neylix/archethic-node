@@ -1,24 +1,22 @@
 defmodule Archethic.OracleChain.Services.UCOPriceTest do
   use ExUnit.Case, async: false
 
+  import ExUnit.CaptureLog
+  import Mox
+
   alias Archethic.OracleChain.Services.HydratingCache
   alias Archethic.OracleChain.Services.UCOPrice
-
-  import Mox
-  import ExUnit.CaptureLog
 
   setup :verify_on_exit!
   setup :set_mox_global
 
   describe "fetch/0" do
     test "should retrieve some data and build a map with the oracle name in it" do
-      MockUCOProvider1
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider1, :fetch, fn _ ->
         {:ok, %{"usd" => [0.12], "eur" => [0.20]}}
       end)
 
-      MockUCOProvider2
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider2, :fetch, fn _ ->
         {:ok, %{"usd" => [0.12], "eur" => [0.20]}}
       end)
 
@@ -40,13 +38,11 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
     end
 
     test "should retrieve some data and build a map with the oracle name in it and keep the precision to 5" do
-      MockUCOProvider1
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider1, :fetch, fn _ ->
         {:ok, %{"usd" => [0.123454789], "eur" => [0.123456789]}}
       end)
 
-      MockUCOProvider2
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider2, :fetch, fn _ ->
         {:ok, %{"usd" => [0.123454789], "eur" => [0.123456789]}}
       end)
 
@@ -68,13 +64,11 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
     end
 
     test "should handle a service timing out" do
-      MockUCOProvider1
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider1, :fetch, fn _ ->
         {:ok, %{"usd" => [0.20], "eur" => [0.20]}}
       end)
 
-      MockUCOProvider2
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider2, :fetch, fn _ ->
         :timer.sleep(5_000)
         {:ok, {:error, :error_message}}
       end)
@@ -97,13 +91,11 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
     end
 
     test "should return the median value when multiple providers queried" do
-      MockUCOProvider1
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider1, :fetch, fn _ ->
         {:ok, %{"usd" => [0.20], "eur" => [0.10]}}
       end)
 
-      MockUCOProvider2
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider2, :fetch, fn _ ->
         {:ok, %{"usd" => [0.30], "eur" => [0.40]}}
       end)
 
@@ -125,13 +117,11 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
     end
 
     test "should return an error if any service responded the request" do
-      MockUCOProvider1
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider1, :fetch, fn _ ->
         {:error, "error"}
       end)
 
-      MockUCOProvider2
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider2, :fetch, fn _ ->
         {:error, "reason"}
       end)
 
@@ -155,13 +145,11 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
 
   describe "verify/1" do
     test "should return true if the prices are the good one" do
-      MockUCOProvider1
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider1, :fetch, fn _ ->
         {:ok, %{"usd" => [0.20], "eur" => [0.10]}}
       end)
 
-      MockUCOProvider2
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider2, :fetch, fn _ ->
         {:ok, %{"usd" => [0.30], "eur" => [0.40]}}
       end)
 
@@ -183,13 +171,11 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
     end
 
     test "should return false if the prices have deviated" do
-      MockUCOProvider1
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider1, :fetch, fn _ ->
         {:ok, %{"usd" => [0.30], "eur" => [0.20]}}
       end)
 
-      MockUCOProvider2
-      |> expect(:fetch, fn _ ->
+      expect(MockUCOProvider2, :fetch, fn _ ->
         {:ok, %{"usd" => [0.40], "eur" => [0.50]}}
       end)
 
@@ -212,13 +198,11 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
   end
 
   test "verify?/1 should return false when no data are returned from all providers" do
-    MockUCOProvider1
-    |> expect(:fetch, fn _ ->
+    expect(MockUCOProvider1, :fetch, fn _ ->
       {:error, ""}
     end)
 
-    MockUCOProvider2
-    |> expect(:fetch, fn _ ->
+    expect(MockUCOProvider2, :fetch, fn _ ->
       {:error, ""}
     end)
 
@@ -242,13 +226,11 @@ defmodule Archethic.OracleChain.Services.UCOPriceTest do
   end
 
   test "should report values even if a provider returns an error" do
-    MockUCOProvider1
-    |> expect(:fetch, fn _ ->
+    expect(MockUCOProvider1, :fetch, fn _ ->
       {:error, ""}
     end)
 
-    MockUCOProvider2
-    |> expect(:fetch, fn _ ->
+    expect(MockUCOProvider2, :fetch, fn _ ->
       {:ok, %{"eur" => [0.25], "usd" => [0.25]}}
     end)
 

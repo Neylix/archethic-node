@@ -99,8 +99,7 @@ defmodule Archethic.Crypto.Ed25519 do
       "D85E07EC22B0AD881537C2F44D662D1A143CF830C57ACA4305D85C7A90F6B62E"
   """
   @spec convert_to_x25519_public_key(ed25519_public_key :: binary()) :: binary()
-  def convert_to_x25519_public_key(ed25519_public_key)
-      when byte_size(ed25519_public_key) == 32 do
+  def convert_to_x25519_public_key(ed25519_public_key) when byte_size(ed25519_public_key) == 32 do
     # Extract y-coordinate (clearing sign bit)
     <<y_bytes::binary-size(31), last_byte>> = ed25519_public_key
     y = :binary.decode_unsigned(y_bytes <> <<last_byte &&& 0x7F>>, :little)
@@ -128,7 +127,7 @@ defmodule Archethic.Crypto.Ed25519 do
   Sign a message with the given Ed25519 private key
   """
   @spec sign(binary(), iodata()) :: binary()
-  def sign(_key = <<private_key::binary-32>>, data) when is_binary(data) or is_list(data) do
+  def sign(<<private_key::binary-32>> = _key, data) when is_binary(data) or is_list(data) do
     :crypto.sign(:eddsa, :sha512, data, [private_key, :ed25519])
   end
 

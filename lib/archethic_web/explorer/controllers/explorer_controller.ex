@@ -10,7 +10,7 @@ defmodule ArchethicWeb.Explorer.ExplorerController do
     render(conn, "index.html", layout: {ArchethicWeb.Explorer.LayoutView, "index.html"})
   end
 
-  def search(conn, _params = %{"address" => address}) do
+  def search(conn, %{"address" => address} = _params) do
     with {:ok, address} <- Base.decode16(address, case: :mixed),
          true <- Crypto.valid_address?(address),
          {:ok, tx} <- Archethic.search_transaction(address) do

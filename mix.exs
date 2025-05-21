@@ -53,69 +53,37 @@ defmodule Archethic.MixProject do
   # Run "mix help deps" to learn about dependencies.
   defp deps do
     [
-      # Web
+      # Web Server
       {:phoenix, "~> 1.7"},
       {:phoenix_html, "~> 4.2"},
       {:phoenix_live_view, "~> 1.0"},
       {:phoenix_pubsub, "~> 2.1"},
       {:phoenix_view, "~> 2.0"},
       {:phoenix_html_helpers, "~> 1.0"},
-      {:jason, "~> 1.0"},
       {:plug_cowboy, "~> 2.7"},
+      {:cors_plug, "~> 3.0"},
+      {:plug_attack, "~> 0.4.3"},
+      {:ecto, "~> 3.12"},
+
+      # Javascript
+      {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
+      {:dart_sass, "~> 0.7", runtime: Mix.env() == :dev},
+
+      # Graphql
       {:absinthe, "~> 1.7"},
       {:absinthe_plug, "~> 1.5"},
       {:absinthe_phoenix, "~> 2.0"},
-      {:cors_plug, "~> 3.0"},
-      {:ecto, "~> 3.12"},
-      {:plug_attack, "~> 0.4.3"},
+
+      # HTTP Client
       {:req, "~> 0.5"},
+      {:floki, "~> 0.37"},
 
-      # Dev
-      {:benchee, "~> 1.4", only: [:dev, :test]},
-      {:benchee_html, "~> 1.0", only: :dev},
-      {:ex_doc, "~> 0.38", runtime: false},
-      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      # Language integration
       {:elixir_make, "~> 0.9", runtime: false},
-      {:dialyxir, "~> 1.2", runtime: false},
-      {:esbuild, "~> 0.9", runtime: Mix.env() == :dev},
-      {:dart_sass, "~> 0.7", runtime: Mix.env() == :dev},
-      {:doctest_formatter, "~> 0.4", only: [:dev, :test], runtime: false},
-      {:gnuplot, "~> 1.22", only: :test, runtime: false},
-
-      # Security
-      {:sobelow, "~> 0.14", only: :dev, runtime: false},
-
-      # Test
-      {:mox, "~> 1.2", only: [:test]},
-      {:mock, "~> 0.3", only: [:test]},
-      {:stream_data, "~> 1.2", only: [:test], runtime: false},
 
       # P2P
       {:ranch, "~> 2.2"},
       {:mmdb2_decoder, "~> 3.0"},
-
-      # Monitoring
-      {:observer_cli, "~> 1.8"},
-      {:telemetry_metrics, "~> 1.1"},
-      {:telemetry_metrics_prometheus_core, "~> 1.2"},
-      {:telemetry_poller, "~> 1.2"},
-      {:phoenix_live_dashboard, "~> 0.8"},
-
-      # Utils
-      {:crontab, "~> 1.1"},
-      {:earmark, "~> 1.4"},
-      {:sizeable, "~> 1.0"},
-      {:distillery, github: "pasteque-org/distillery"},
-      {:exjsonpath, "~> 0.9"},
-      {:rand_compat, "~> 0.0.3"},
-      {:gen_state_machine, "~> 3.0"},
-      {:retry, "~> 0.19"},
-      {:knigge, "~> 1.4"},
-      {:ex_json_schema, "~> 0.11"},
-      {:floki, "~> 0.37"},
-      {:git_diff, "~> 0.6.4"},
-      {:decimal, "~> 2.0"},
-      {:ex_abi, "~> 0.8"},
 
       # Crypto
       {:plug_crypto, "~> 2.1", override: true},
@@ -126,13 +94,58 @@ defmodule Archethic.MixProject do
       # Numbering
       {:nx, "~> 0.9"},
       {:exla, "~> 0.9"},
-      {:nimble_csv, "~> 1.1", only: :test, runtime: false},
 
       # WASM
       {:wasmex, "~> 0.11"},
 
+      # Release
+      {:distillery, github: "pasteque-org/distillery"},
+
+      # Utils
+      {:jason, "~> 1.0"},
+      {:crontab, "~> 1.1"},
+      {:earmark, "~> 1.4"},
+      {:sizeable, "~> 1.0"},
+      {:exjsonpath, "~> 0.9"},
+      {:rand_compat, "~> 0.0.3"},
+      {:gen_state_machine, "~> 3.0"},
+      {:retry, "~> 0.19"},
+      {:knigge, "~> 1.4"},
+      {:ex_json_schema, "~> 0.11"},
+      {:git_diff, "~> 0.6.4"},
+      {:decimal, "~> 2.0"},
+      {:ex_abi, "~> 0.8"},
+
       # Archethic Client
-      {:archethic_client, github: "pasteque-org/libelixir", only: [:dev, :test]}
+      {:archethic_client, github: "pasteque-org/libelixir", only: [:dev, :test]},
+
+      # Monitoring
+      {:observer_cli, "~> 1.8"},
+      {:telemetry_metrics, "~> 1.1"},
+      {:telemetry_metrics_prometheus_core, "~> 1.2"},
+      {:telemetry_poller, "~> 1.2"},
+      {:phoenix_live_dashboard, "~> 0.8"},
+
+      # Benchmarks
+      {:benchee, "~> 1.4", only: [:dev, :test]},
+      {:benchee_html, "~> 1.0", only: :dev},
+
+      # Documentation
+      {:ex_doc, "~> 0.38", only: [:dev, :test], runtime: false},
+
+      # Test
+      {:mox, "~> 1.2", only: :test},
+      {:mock, "~> 0.3", only: :test},
+      {:stream_data, "~> 1.2", only: :test, runtime: false},
+      {:gnuplot, "~> 1.22", only: :test, runtime: false},
+      {:nimble_csv, "~> 1.1", only: :test, runtime: false},
+
+      # Quality tools
+      {:dialyxir, "~> 1.2", only: [:dev, :test], runtime: false},
+      {:doctest_formatter, "~> 0.4", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.7", only: [:dev, :test], runtime: false},
+      {:sobelow, "~> 0.14", only: :dev, runtime: false},
+      {:styler, "~> 1.4", only: [:dev, :test], runtime: false}
     ]
   end
 

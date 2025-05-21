@@ -5,8 +5,9 @@ defmodule ArchethicWeb.Explorer do
     quote do
       use Phoenix.Controller, namespace: ArchethicWeb.Explorer
 
-      import Plug.Conn
       import Phoenix.LiveView.Controller
+      import Plug.Conn
+
       alias ArchethicWeb.Router.Helpers, as: Routes
     end
   end
@@ -44,18 +45,18 @@ defmodule ArchethicWeb.Explorer do
 
   defp view_helpers do
     quote do
+      use PhoenixHTMLHelpers
+
+      import ArchethicWeb.WebUtils
       # Use all HTML functionality (forms, tags, etc)
       import Phoenix.HTML
       import Phoenix.HTML.Form
-      use PhoenixHTMLHelpers
 
       # Import LiveView helpers (live_render, live_component, live_patch, etc)
       import Phoenix.LiveView.Helpers
 
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
-
-      import ArchethicWeb.WebUtils
 
       alias ArchethicWeb.ExplorerRouter.Helpers, as: Routes
     end
@@ -64,9 +65,10 @@ defmodule ArchethicWeb.Explorer do
   def router do
     quote do
       use Phoenix.Router
-      import Plug.Conn
-      import Phoenix.LiveView.Router
+
       import Phoenix.LiveDashboard.Router
+      import Phoenix.LiveView.Router
+      import Plug.Conn
     end
   end
 

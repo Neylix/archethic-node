@@ -1,16 +1,16 @@
 defmodule ArchethicWeb.Explorer.Components.Amount do
   @moduledoc false
 
-  alias ArchethicWeb.ExplorerRouter.Helpers, as: Routes
-
   use Phoenix.Component
   use PhoenixHTMLHelpers
 
   import ArchethicWeb.WebUtils
 
+  alias ArchethicWeb.ExplorerRouter.Helpers, as: Routes
+
   @max_symbol_len 6
 
-  def uco(assigns = %{amount: 0}) do
+  def uco(%{amount: 0} = assigns) do
     ~H"""
     <span class="mono" data-tooltip="at time: 0$, now: 0$">
       0 <span class="tag is-gradient mono">UCO</span>
@@ -30,12 +30,12 @@ defmodule ArchethicWeb.Explorer.Components.Amount do
   end
 
   def token(
-        assigns = %{
+        %{
           amount: amount,
           token_properties: token_properties,
           token_address: token_address,
           token_id: token_id
-        }
+        } = assigns
       ) do
     token_properties = Map.get(token_properties, token_address, %{})
     decimals = Map.get(token_properties, :decimals, 8)

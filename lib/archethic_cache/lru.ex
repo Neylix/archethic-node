@@ -36,7 +36,7 @@ defmodule ArchethicCache.LRU do
       nil ->
         nil
 
-      entry = %{value: value} ->
+      %{value: value} = entry ->
         GenServer.cast(cache_name, {:update_recent, key, entry})
 
         get_fn = :persistent_term.get(cache_name)
@@ -94,14 +94,14 @@ defmodule ArchethicCache.LRU do
     :ets.insert(table_name(:cache_stats, cache_name), {:id, 0})
   end
 
-  def handle_cast({:update_recent, key, node}, state = %{cache_name: cache_name}) do
+  def handle_cast({:update_recent, key, node}, %{cache_name: cache_name} = state) do
     update_recently_used(cache_name, key, node)
     {:noreply, state}
   end
 
   def handle_cast(
         {:put, key, value},
-        state = %{cache_name: cache_name, put_fn: put_fn, evict_fn: evict_fn}
+        %{cache_name: cache_name, put_fn: put_fn, evict_fn: evict_fn} = state
       ) do
     put_cache_entry(cache_name, key, value, put_fn, evict_fn)
     {:noreply, state}
@@ -110,13 +110,13 @@ defmodule ArchethicCache.LRU do
   def handle_call(
         {:put, key, value},
         _from,
-        state = %{cache_name: cache_name, put_fn: put_fn, evict_fn: evict_fn}
+        %{cache_name: cache_name, put_fn: put_fn, evict_fn: evict_fn} = state
       ) do
     put_cache_entry(cache_name, key, value, put_fn, evict_fn)
     {:reply, :ok, state}
   end
 
-  def handle_call(:purge, _from, state = %{cache_name: cache_name, evict_fn: evict_fn}) do
+  def handle_call(:purge, _from, %{cache_name: cache_name, evict_fn: evict_fn} = state) do
     # we call the evict_fn to be able to clean effects (ex: file written to disk)
     :ets.foldr(
       fn {key, %{value: value}}, acc ->
@@ -187,7 +187,7 @@ defmodule ArchethicCache.LRU do
          cache_name,
          key,
          value,
-         entry = %{value: old_value, size: previous_size},
+         %{value: old_value, size: previous_size} = entry,
          value_size,
          put_fn,
          evict_fn
@@ -257,7 +257,7 @@ defmodule ArchethicCache.LRU do
     )
   end
 
-  defp update_recently_used(cache_name, key, entry = %{id: previous_id}) do
+  defp update_recently_used(cache_name, key, %{id: previous_id} = entry) do
     # Acquire a new id
     new_id = get_index_id(cache_name)
 

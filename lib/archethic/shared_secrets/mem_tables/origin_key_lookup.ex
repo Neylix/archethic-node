@@ -4,13 +4,13 @@ defmodule Archethic.SharedSecrets.MemTables.OriginKeyLookup do
   """
 
   use GenServer
-  @vsn 1
 
   alias Archethic.Crypto
-
   alias Archethic.SharedSecrets
 
   require Logger
+
+  @vsn 1
 
   @origin_key_table :archethic_origin_keys
   @origin_key_by_type_table :archethic_origin_key_by_type

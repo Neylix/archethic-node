@@ -92,17 +92,17 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
   end
 
   defp parse_der(certificate_der) do
-    cert = :public_key.pkix_decode_cert(certificate_der, :otp) |> get_field(:tbsCertificate)
+    cert = certificate_der |> :public_key.pkix_decode_cert(:otp) |> get_field(:tbsCertificate)
 
-    subject = cert |> parse_rdnsequence(:subject)
+    subject = parse_rdnsequence(cert, :subject)
 
     Map.new()
-    |> Map.put(:fingerprint, certificate_der |> fingerprint_cert)
+    |> Map.put(:fingerprint, fingerprint_cert(certificate_der))
     |> Map.put(:serial_number, cert |> get_field(:serialNumber) |> Integer.to_string(16))
-    |> Map.put(:signature_algorithm, cert |> parse_signature_algo)
+    |> Map.put(:signature_algorithm, parse_signature_algo(cert))
     |> Map.put(:subject, subject)
-    |> Map.put(:issuer, cert |> parse_rdnsequence(:issuer))
-    |> Map.put(:extensions, cert |> parse_extensions)
+    |> Map.put(:issuer, parse_rdnsequence(cert, :issuer))
+    |> Map.put(:extensions, parse_extensions(cert))
     |> Map.put(:all_domains, get_all_domain_names(cert, subject))
     |> Map.merge(parse_expiry(cert))
   end
@@ -146,13 +146,13 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
   end
 
   defp parse_expiry(cert) do
-    {:Validity, not_before, not_after} = cert |> get_field(:validity)
+    {:Validity, not_before, not_after} = get_field(cert, :validity)
     not_before = clean_time(not_before)
     not_after = clean_time(not_after)
 
     %{
-      :not_before => not_before |> to_generalized_time |> asn1_to_epoch,
-      :not_after => not_after |> to_generalized_time |> asn1_to_epoch
+      :not_before => not_before |> to_generalized_time() |> asn1_to_epoch(),
+      :not_after => not_after |> to_generalized_time() |> asn1_to_epoch()
     }
   end
 
@@ -161,7 +161,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
 
     output =
       time_charlist
-      |> to_string
+      |> to_string()
       |> String.split("+")
       |> List.first()
       |> then(fn foo ->
@@ -172,7 +172,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
           _ -> foo <> "Z"
         end
       end)
-      |> to_charlist
+      |> to_charlist()
 
     {type, output}
   end
@@ -189,7 +189,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
     {year, rest} = Enum.split(asn1_time, 4)
 
     date =
-      case rest |> Enum.chunk_every(2) do
+      case Enum.chunk_every(rest, 2) do
         [month, day, hour, minute, second, ~c"Z"] ->
           [year, month, day, hour, minute, second]
 
@@ -201,7 +201,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
           nil
       end
 
-    date_args = date |> Enum.map(&(to_string(&1) |> String.to_integer()))
+    date_args = Enum.map(date, &(&1 |> to_string() |> String.to_integer()))
 
     case apply(NaiveDateTime, :new, date_args) do
       {:ok, ~N[9999-12-31 23:59:59]} ->
@@ -222,8 +222,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
     |> get_field(:algorithm)
     |> :public_key.pkix_sign_types()
     |> Tuple.to_list()
-    |> Enum.map(&Atom.to_string/1)
-    |> Enum.join(", ")
+    |> Enum.map_join(", ", &Atom.to_string/1)
   end
 
   defp parse_rdnsequence(cert, field) do
@@ -237,7 +236,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
       :emailAddress => nil
     }
 
-    {:rdnSequence, rdnsequence_attribute} = cert |> get_field(field)
+    {:rdnSequence, rdnsequence_attribute} = get_field(cert, field)
 
     rdnsequence =
       rdnsequence_attribute
@@ -259,11 +258,11 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
 
         case attr_atom do
           nil -> rdnsequence
-          _ -> %{rdnsequence | attr_atom => attribute_value |> coerce_to_string |> to_string}
+          _ -> %{rdnsequence | attr_atom => attribute_value |> coerce_to_string() |> to_string()}
         end
       end)
 
-    Map.put(rdnsequence, :aggregated, rdnsequence |> aggregate_rdnsequence)
+    Map.put(rdnsequence, :aggregated, aggregate_rdnsequence(rdnsequence))
   end
 
   defp parse_crl_distribution_points(crl_distribution_points)
@@ -314,11 +313,11 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
     {:authorityInfoAccess, value}
   end
 
-  defp parse_extension({1, 3, 6, 1, 4, 1, 11129, 2, 4, 2}, sct_data) do
+  defp parse_extension({1, 3, 6, 1, 4, 1, 11_129, 2, 4, 2}, sct_data) do
     {:ctlSignedCertificateTimestamp, Base.url_encode64(sct_data)}
   end
 
-  defp parse_extension({1, 3, 6, 1, 4, 1, 11129, 2, 4, 3}, _) do
+  defp parse_extension({1, 3, 6, 1, 4, 1, 11_129, 2, 4, 3}, _) do
     {:ctlPoisonByte, true}
   end
 
@@ -363,7 +362,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
   defp parse_extension({2, 5, 29, 31}, crl_distribution_points) do
     value =
       crl_distribution_points
-      |> parse_crl_distribution_points
+      |> parse_crl_distribution_points()
       |> Enum.filter(
         &match?({:DistributionPoint, {:fullName, _}, :asn1_NOVALUE, :asn1_NOVALUE}, &1)
       )
@@ -394,9 +393,9 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
             Enum.map(policy_information, fn
               {:PolicyQualifierInfo, {1, 3, 6, 1, 5, 5, 7, 2, 1}, cps_data} ->
                 cps_data
-                |> to_charlist
+                |> to_charlist()
                 |> Enum.drop(2)
-                |> to_string
+                |> to_string()
                 |> String.replace_prefix("", "  CPS: ")
 
               {:PolicyQualifierInfo, {1, 3, 6, 1, 5, 5, 7, 2, 2}, user_notice_data} ->
@@ -459,7 +458,7 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
   end
 
   defp ip_to_string(ip) do
-    ip |> :binary.bin_to_list() |> Enum.map(&to_string/1) |> Enum.join(".")
+    ip |> :binary.bin_to_list() |> Enum.map_join(".", &to_string/1)
   end
 
   defp join_usage_types(key_usage) do
@@ -472,13 +471,14 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
     |> Enum.reduce([], fn char, charlist ->
       charlist = [char | charlist]
 
-      case char in 65..90 do
-        true -> List.insert_at(charlist, 1, ~c" ")
-        false -> charlist
+      if char in 65..90 do
+        List.insert_at(charlist, 1, ~c" ")
+      else
+        charlist
       end
     end)
     |> Enum.reverse()
-    |> to_string
+    |> to_string()
     |> String.split()
     |> Enum.map_join(" ", &String.capitalize/1)
   end

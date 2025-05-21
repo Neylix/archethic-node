@@ -7,22 +7,16 @@ defmodule ArchethicWeb.Explorer.ExplorerView do
   alias Archethic.BeaconChain.ReplicationAttestation
   alias Archethic.BeaconChain.Slot
   alias Archethic.BeaconChain.Slot.EndOfNodeSync
+  alias Archethic.BeaconChain.Subset.P2PSampling
   alias Archethic.BeaconChain.Summary
-
+  alias Archethic.Crypto
   alias Archethic.Mining.LedgerValidation
-
-  alias Archethic.SharedSecrets
-  alias Archethic.SharedSecrets.NodeRenewal
-
   alias Archethic.P2P.Node
   alias Archethic.P2P.NodeConfig
-
+  alias Archethic.SharedSecrets
+  alias Archethic.SharedSecrets.NodeRenewal
   alias Archethic.TransactionChain.TransactionSummary
-
   alias Archethic.Utils
-
-  alias Archethic.Crypto
-
   alias Phoenix.Naming
 
   def roles_to_string(roles) do
@@ -133,7 +127,7 @@ defmodule ArchethicWeb.Explorer.ExplorerView do
       if Enum.empty?(p2p_availabilities) do
         content
       else
-        node_list = Archethic.BeaconChain.Subset.P2PSampling.list_nodes_to_sample(subset)
+        node_list = P2PSampling.list_nodes_to_sample(subset)
 
         p2p_content =
           p2p_availabilities
@@ -197,7 +191,7 @@ defmodule ArchethicWeb.Explorer.ExplorerView do
       if Enum.empty?(p2p_availabilities) do
         content
       else
-        node_list = Archethic.BeaconChain.Subset.P2PSampling.list_nodes_to_sample(subset)
+        node_list = P2PSampling.list_nodes_to_sample(subset)
 
         p2p_content =
           p2p_availabilities

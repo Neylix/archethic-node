@@ -2,15 +2,14 @@ defmodule Archethic.Utils.Regression do
   @moduledoc """
   Run some regression test to ensure the right behavior of the system
   """
-  require Logger
-
   alias Archethic.Utils
-
-  alias Archethic.Utils.Regression.Playbook.UCO
-  alias Archethic.Utils.Regression.Playbook.SmartContract
-  alias Archethic.Utils.Regression.Benchmark.WasmSmartContractTrigger
   alias Archethic.Utils.Regression.Benchmark.EndToEndValidation
   alias Archethic.Utils.Regression.Benchmark.P2PMessage
+  alias Archethic.Utils.Regression.Benchmark.WasmSmartContractTrigger
+  alias Archethic.Utils.Regression.Playbook.SmartContract
+  alias Archethic.Utils.Regression.Playbook.UCO
+
+  require Logger
 
   @playbooks [UCO, SmartContract]
   @benchmarks [
@@ -53,7 +52,8 @@ defmodule Archethic.Utils.Regression do
     benchmark_map =
       Map.new(@benchmarks, fn benchmark -> {benchmark_name(benchmark), benchmark} end)
 
-    Enum.reduce(benchmark_names, [], fn name, acc ->
+    benchmark_names
+    |> Enum.reduce([], fn name, acc ->
       case Map.get(benchmark_map, name) do
         nil ->
           Logger.warning("Unknown benchmark: #{name}")
@@ -125,7 +125,7 @@ defmodule Archethic.Utils.Regression do
   def nodes_up?(nodes) do
     nodes
     |> Task.async_stream(&node_up?/1, ordered: false, timeout: @node_up_timeout)
-    |> Enum.into([])
+    |> Enum.to_list()
     |> Enum.all?(&(&1 == {:ok, true}))
   end
 

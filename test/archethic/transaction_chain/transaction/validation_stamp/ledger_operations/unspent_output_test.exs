@@ -1,9 +1,10 @@
 defmodule Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutputTest do
+  use ArchethicCase
+
+  import ArchethicCase
+
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
   alias Archethic.Utils
-
-  use ArchethicCase
-  import ArchethicCase
 
   doctest UnspentOutput
 

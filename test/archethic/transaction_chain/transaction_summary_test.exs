@@ -1,5 +1,6 @@
 defmodule Archethic.TransactionChain.TransactionSummaryTest do
   use ExUnit.Case
+
   import ArchethicCase
 
   alias Archethic.TransactionChain.TransactionSummary

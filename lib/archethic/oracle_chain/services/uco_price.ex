@@ -3,14 +3,13 @@ defmodule Archethic.OracleChain.Services.UCOPrice do
   Define Oracle behaviors to support UCO Price feed oracle
   """
 
-  require Logger
+  @behaviour Archethic.OracleChain.Services.Impl
 
   alias Archethic.OracleChain.Services.Impl
   alias Archethic.OracleChain.Services.ProviderCacheSupervisor
-
   alias Archethic.Utils
 
-  @behaviour Impl
+  require Logger
 
   @pairs ["usd", "eur"]
 
@@ -22,7 +21,7 @@ defmodule Archethic.OracleChain.Services.UCOPrice do
   end
 
   defp providers do
-    Application.get_env(:archethic, __MODULE__) |> Keyword.fetch!(:providers)
+    :archethic |> Application.get_env(__MODULE__) |> Keyword.fetch!(:providers)
   end
 
   @impl Impl
@@ -49,8 +48,7 @@ defmodule Archethic.OracleChain.Services.UCOPrice do
   end
 
   defp agregate_providers_data(provider_results, acc) do
-    provider_results
-    |> Enum.reduce(acc, fn
+    Enum.reduce(provider_results, acc, fn
       {currency, values}, acc when values != [] ->
         Map.update(acc, String.downcase(currency), values, fn
           previous_values ->
@@ -64,7 +62,7 @@ defmodule Archethic.OracleChain.Services.UCOPrice do
 
   @impl Impl
   @spec verify?(%{required(String.t()) => any()}) :: boolean
-  def verify?(prices_prior = %{}) do
+  def verify?(%{} = prices_prior) do
     case fetch() do
       {:error, reason} ->
         Logger.error("Cannot fetch UCO price - reason: #{reason}.")

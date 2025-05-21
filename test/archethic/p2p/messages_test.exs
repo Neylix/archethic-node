@@ -5,54 +5,49 @@ defmodule Archethic.P2P.MessageTest do
 
   alias Archethic.Contracts.Contract
   alias Archethic.Crypto
-  alias Archethic.P2P.Node
   alias Archethic.P2P.Message
-
-  alias Archethic.P2P.Message.{
-    AcknowledgeStorage,
-    BootstrappingNodes,
-    CrossValidate,
-    CrossValidationDone,
-    EncryptedStorageNonce,
-    Error,
-    FirstPublicKey,
-    GetBootstrappingNodes,
-    GetFirstPublicKey,
-    GetLastTransaction,
-    GetLastTransactionAddress,
-    GetStorageNonce,
-    GetTransaction,
-    GetTransactionChain,
-    GetTransactionChainLength,
-    GetTransactionInputs,
-    GetTransactionSummary,
-    LastTransactionAddress,
-    ListNodes,
-    NewTransaction,
-    NodeList,
-    NotFound,
-    NotifyEndOfNodeSync,
-    NotifyLastTransactionAddress,
-    NotifyPreviousChain,
-    Ok,
-    Ping,
-    RegisterBeaconUpdates,
-    ReplicateTransaction,
-    StartMining,
-    ShardRepair,
-    TransactionChainLength,
-    TransactionInputList,
-    TransactionList
-  }
-
-  alias Archethic.TransactionChain.TransactionData
-  alias Archethic.TransactionChain.TransactionInput
+  alias Archethic.P2P.Message.AcknowledgeStorage
+  alias Archethic.P2P.Message.BootstrappingNodes
+  alias Archethic.P2P.Message.CrossValidate
+  alias Archethic.P2P.Message.CrossValidationDone
+  alias Archethic.P2P.Message.EncryptedStorageNonce
+  alias Archethic.P2P.Message.Error
+  alias Archethic.P2P.Message.FirstPublicKey
+  alias Archethic.P2P.Message.GetBootstrappingNodes
+  alias Archethic.P2P.Message.GetFirstPublicKey
+  alias Archethic.P2P.Message.GetLastTransaction
+  alias Archethic.P2P.Message.GetLastTransactionAddress
+  alias Archethic.P2P.Message.GetStorageNonce
+  alias Archethic.P2P.Message.GetTransaction
+  alias Archethic.P2P.Message.GetTransactionChain
+  alias Archethic.P2P.Message.GetTransactionChainLength
+  alias Archethic.P2P.Message.GetTransactionInputs
+  alias Archethic.P2P.Message.GetTransactionSummary
+  alias Archethic.P2P.Message.LastTransactionAddress
+  alias Archethic.P2P.Message.ListNodes
+  alias Archethic.P2P.Message.NewTransaction
+  alias Archethic.P2P.Message.NodeList
+  alias Archethic.P2P.Message.NotFound
+  alias Archethic.P2P.Message.NotifyEndOfNodeSync
+  alias Archethic.P2P.Message.NotifyLastTransactionAddress
+  alias Archethic.P2P.Message.NotifyPreviousChain
+  alias Archethic.P2P.Message.Ok
+  alias Archethic.P2P.Message.Ping
+  alias Archethic.P2P.Message.RegisterBeaconUpdates
+  alias Archethic.P2P.Message.ReplicateTransaction
+  alias Archethic.P2P.Message.ShardRepair
+  alias Archethic.P2P.Message.StartMining
+  alias Archethic.P2P.Message.TransactionChainLength
+  alias Archethic.P2P.Message.TransactionInputList
+  alias Archethic.P2P.Message.TransactionList
+  alias Archethic.P2P.Node
   alias Archethic.TransactionChain.Transaction
   alias Archethic.TransactionChain.Transaction.CrossValidationStamp
   alias Archethic.TransactionChain.Transaction.ValidationStamp
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
-
+  alias Archethic.TransactionChain.TransactionData
+  alias Archethic.TransactionChain.TransactionInput
   alias Archethic.TransactionFactory
 
   doctest Message

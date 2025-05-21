@@ -2,11 +2,8 @@ defmodule Archethic.UTXO do
   @moduledoc false
 
   alias Archethic.Crypto
-
   alias Archethic.Election
-
   alias Archethic.P2P
-
   alias Archethic.TransactionChain
   alias Archethic.TransactionChain.Transaction
   alias Archethic.TransactionChain.Transaction.ValidationStamp
@@ -15,7 +12,6 @@ defmodule Archethic.UTXO do
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.TransactionMovement
 
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
-
   alias Archethic.UTXO.DBLedger
   alias Archethic.UTXO.Loader
   alias Archethic.UTXO.MemoryLedger
@@ -38,7 +34,7 @@ defmodule Archethic.UTXO do
   @spec load_transaction(tx :: Transaction.t(), opts :: load_opts()) :: :ok
   def load_transaction(tx, opts \\ []) do
     download_nodes = Keyword.get(opts, :download_nodes, P2P.authorized_and_available_nodes())
-    authorized_nodes = [P2P.get_node_info() | download_nodes] |> P2P.distinct_nodes()
+    authorized_nodes = P2P.distinct_nodes([P2P.get_node_info() | download_nodes])
     skip_consume_inputs? = Keyword.get(opts, :skip_consume_inputs?, false)
     skip_verify_consumed? = Keyword.get(opts, :skip_verify_consumed?, false)
 
@@ -85,8 +81,12 @@ defmodule Archethic.UTXO do
          skip_verify_consumed?
        ) do
     utxos_by_genesis =
-      transaction_movements
-      |> Enum.reduce(%{}, fn %TransactionMovement{to: to, amount: amount, type: type}, acc ->
+      Enum.reduce(transaction_movements, %{}, fn %TransactionMovement{
+                                                   to: to,
+                                                   amount: amount,
+                                                   type: type
+                                                 },
+                                                 acc ->
         utxo = %UnspentOutput{from: address, amount: amount, timestamp: timestamp, type: type}
 
         with true <- Election.chain_storage_node?(to, node_public_key, authorized_nodes),
@@ -109,7 +109,7 @@ defmodule Archethic.UTXO do
     end)
   end
 
-  defp utxo_consumed?(genesis_address, utxo = %UnspentOutput{timestamp: utxo_timestamp}) do
+  defp utxo_consumed?(genesis_address, %UnspentOutput{timestamp: utxo_timestamp} = utxo) do
     {_, last_timestamp} = TransactionChain.get_last_address(genesis_address)
 
     if DateTime.after?(last_timestamp, utxo_timestamp) do

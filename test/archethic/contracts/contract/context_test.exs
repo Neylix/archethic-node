@@ -4,10 +4,9 @@ defmodule Archethic.Contracts.Contract.ContextTest do
   import ArchethicCase
 
   alias Archethic.Contracts.Contract.Context
+  alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
   alias Archethic.TransactionChain.TransactionData.Recipient
   alias Archethic.TransactionChain.TransactionData.VersionedRecipient
-
-  alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
 
   doctest Context
 
@@ -52,8 +51,10 @@ defmodule Archethic.Contracts.Contract.ContextTest do
       now = DateTime.utc_now(:millisecond)
 
       recipient =
-        %Recipient{address: random_address()}
-        |> VersionedRecipient.wrap_recipient(current_transaction_version())
+        VersionedRecipient.wrap_recipient(
+          %Recipient{address: random_address()},
+          current_transaction_version()
+        )
 
       ctx = %Context{
         status: :tx_output,
@@ -68,12 +69,14 @@ defmodule Archethic.Contracts.Contract.ContextTest do
       now = DateTime.utc_now(:millisecond)
 
       recipient =
-        %Recipient{
-          address: random_address(),
-          action: "add",
-          args: %{"a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5}
-        }
-        |> VersionedRecipient.wrap_recipient(current_transaction_version())
+        VersionedRecipient.wrap_recipient(
+          %Recipient{
+            address: random_address(),
+            action: "add",
+            args: %{"a" => 1, "b" => 2, "c" => 3, "d" => 4, "e" => 5}
+          },
+          current_transaction_version()
+        )
 
       ctx = %Context{
         status: :tx_output,

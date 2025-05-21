@@ -1,20 +1,19 @@
 defmodule Archethic.UTXO.LoaderTest do
   use ArchethicCase
 
+  import ArchethicCase
+  import Mox
+
   alias Archethic.TransactionChain.Transaction
-  alias Archethic.TransactionChain.TransactionData.Ledger
-  alias Archethic.TransactionChain.TransactionData.UCOLedger
-  alias Archethic.TransactionChain.TransactionData.UCOLedger.Transfer, as: UCOTransfer
   alias Archethic.TransactionChain.Transaction.ValidationStamp
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
-
+  alias Archethic.TransactionChain.TransactionData.Ledger
+  alias Archethic.TransactionChain.TransactionData.UCOLedger
+  alias Archethic.TransactionChain.TransactionData.UCOLedger.Transfer, as: UCOTransfer
+  alias Archethic.TransactionFactory
   alias Archethic.UTXO.Loader
   alias Archethic.UTXO.MemoryLedger
-
-  alias Archethic.TransactionFactory
-
-  import ArchethicCase
 
   setup do
     PartitionSupervisor.start_link(
@@ -25,8 +24,6 @@ defmodule Archethic.UTXO.LoaderTest do
 
     :ok
   end
-
-  import Mox
 
   describe "add_utxo/2" do
     test "should write the unspent output into memory and file ledger" do
@@ -39,8 +36,7 @@ defmodule Archethic.UTXO.LoaderTest do
 
       me = self()
 
-      MockUTXOLedger
-      |> stub(:append, fn genesis, utxo ->
+      stub(MockUTXOLedger, :append, fn genesis, utxo ->
         send(me, {:append, genesis, utxo})
       end)
 
@@ -72,9 +68,7 @@ defmodule Archethic.UTXO.LoaderTest do
           }
         } = TransactionFactory.create_valid_transaction([utxo], ledger: ledger)
 
-      MockUTXOLedger
-      |> expect(:flush, fn ^genesis, ^unspent_outputs -> :ok end)
-
+      expect(MockUTXOLedger, :flush, fn ^genesis, ^unspent_outputs -> :ok end)
       Loader.consume_inputs(tx)
 
       assert unspent_outputs == MemoryLedger.get_unspent_outputs(genesis)

@@ -2,8 +2,8 @@ defmodule Archethic.P2P.Message.FirstTransactionAddressTest do
   @moduledoc false
   use ExUnit.Case
 
-  alias Archethic.P2P.Message.FirstTransactionAddress
   alias Archethic.P2P.Message
+  alias Archethic.P2P.Message.FirstTransactionAddress
 
   doctest FirstTransactionAddress
 

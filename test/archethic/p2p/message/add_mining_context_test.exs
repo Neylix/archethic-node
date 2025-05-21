@@ -29,22 +29,20 @@ defmodule Archethic.P2P.Message.AddMiningContextTest do
 
   test "serialization/deserialization of utxos_hashes" do
     hash1 =
-      %UnspentOutput{
+      UnspentOutput.hash(%UnspentOutput{
         amount: 1,
         type: {:token, random_address(), 0},
         from: random_address(),
         timestamp: DateTime.utc_now(:millisecond)
-      }
-      |> UnspentOutput.hash()
+      })
 
     hash2 =
-      %UnspentOutput{
+      UnspentOutput.hash(%UnspentOutput{
         amount: 2,
         type: {:token, random_address(), 0},
         from: random_address(),
         timestamp: DateTime.utc_now(:millisecond)
-      }
-      |> UnspentOutput.hash()
+      })
 
     msg = %AddMiningContext{
       address: random_address(),

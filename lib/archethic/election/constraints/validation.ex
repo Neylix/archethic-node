@@ -3,14 +3,14 @@ defmodule Archethic.Election.ValidationConstraints do
   Represents the constraints for the validation nodes election
   """
 
+  alias Archethic.Election.HypergeometricDistribution
+
   @default_min_validation_geo_patch 3
 
   defstruct [
     :min_geo_patch,
     :validation_numbers
   ]
-
-  alias Archethic.Election.HypergeometricDistribution
 
   @typedoc """
   Each validation constraints represent a function which will be executed during the election algorithms:

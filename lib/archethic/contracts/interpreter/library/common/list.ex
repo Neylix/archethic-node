@@ -2,10 +2,9 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.List do
   @moduledoc false
   @behaviour Archethic.Contracts.Interpreter.Library
 
-  alias Archethic.Tag
-  alias Archethic.Contracts.Interpreter.ASTHelper, as: AST
+  use Archethic.Tag
 
-  use Tag
+  alias Archethic.Contracts.Interpreter.ASTHelper, as: AST
 
   @spec at(list(), integer() | float()) :: any()
   def at(list, idx) do

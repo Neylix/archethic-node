@@ -4,13 +4,13 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImpl do
   Implements AEIP-20.
   """
 
-  alias Archethic.Tag
+  @behaviour Archethic.Contracts.Interpreter.Library.Common.Http
+
+  use Archethic.Tag
+
   alias Archethic.Contracts.Interpreter.Library
   alias Archethic.Contracts.Interpreter.Library.Common.Http
 
-  use Tag
-
-  @behaviour Http
   @threshold 256 * 1024
   @timeout Application.compile_env(:archethic, [__MODULE__, :timeout], 2_000)
   @supported_schemes Application.compile_env(
@@ -41,9 +41,9 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImpl do
   def request_many(requests, true) do
     with :ok <- validate_multiple_calls(),
          :ok <- validate_nb_requests(requests),
-         requests <- set_request_default(requests),
-         tasks <- Enum.map(requests, &do_request/1),
-         results <- await_tasks_result(requests, tasks),
+         requests = set_request_default(requests),
+         tasks = Enum.map(requests, &do_request/1),
+         results = await_tasks_result(requests, tasks),
          {:ok, results} <- validate_results(results, true) do
       results
     else
@@ -97,14 +97,12 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImpl do
     end)
   end
 
-  defp validate_multiple_calls() do
-    case Process.get(:smart_contract_http_request_called) do
-      true ->
-        {:error, :multiple_calls}
-
-      _ ->
-        Process.put(:smart_contract_http_request_called, true)
-        :ok
+  defp validate_multiple_calls do
+    if Process.get(:smart_contract_http_request_called) do
+      {:error, :multiple_calls}
+    else
+      Process.put(:smart_contract_http_request_called, true)
+      :ok
     end
   end
 
@@ -118,16 +116,12 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImpl do
 
   # -------------- #
   defp do_request(
-         request = %{
-           "url" => url,
-           "method" => method,
-           "headers" => headers,
-           "body" => request_body
-         }
+         %{"url" => url, "method" => method, "headers" => headers, "body" => request_body} =
+           request
        ) do
     Task.Supervisor.async_nolink(Archethic.task_supervisors(), fn ->
       with {:ok, uri, method} <- validate_request(url, method, headers, request_body),
-           res = {:ok, _} <- execute_request(method, uri, headers, request_body) do
+           {:ok, _} = res <- execute_request(method, uri, headers, request_body) do
         res
       else
         {:error, reason} -> {:error, reason, request}
@@ -190,7 +184,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImpl do
     ]
 
     case Req.request(req_opts) do
-      {:ok, resp = %Req.Response{status: status, body: response_body}} ->
+      {:ok, %Req.Response{status: status, body: response_body} = resp} ->
         if Req.Response.get_private(resp, :archethic_threshold?, false),
           do: {:error, :threshold_reached},
           else: {:ok, %{"status" => status, "body" => response_body}}
@@ -208,8 +202,11 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImpl do
       {:halt, {req, Req.Response.put_private(resp, :archethic_threshold?, true)}}
     else
       resp =
-        %Req.Response{resp | body: resp.body <> data}
-        |> Req.Response.put_private(:archethic_resp_size, new_resp_size)
+        Req.Response.put_private(
+          %{resp | body: resp.body <> data},
+          :archethic_resp_size,
+          new_resp_size
+        )
 
       {:cont, {req, resp}}
     end

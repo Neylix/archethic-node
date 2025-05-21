@@ -3,6 +3,8 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.ContractImpl do
   this is not a behaviour because we define only few functions
   """
 
+  use Archethic.Tag
+
   alias Archethic.Contracts
   alias Archethic.Contracts.Contract.Failure
   alias Archethic.Contracts.Interpreter.Legacy.UtilsInterpreter
@@ -10,8 +12,6 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.ContractImpl do
   alias Archethic.Contracts.WasmContract
   alias Archethic.Contracts.WasmModule
   alias Archethic.Contracts.WasmSpec
-
-  use Archethic.Tag
 
   @tag [:io]
   @spec call_function(address :: binary(), function :: binary(), args :: list()) :: any()

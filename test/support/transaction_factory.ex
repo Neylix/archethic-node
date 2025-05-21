@@ -1,34 +1,28 @@
 defmodule Archethic.TransactionFactory do
   @moduledoc false
 
+  import ArchethicCase
+
   alias Archethic.Crypto
-
   alias Archethic.Election
-
   alias Archethic.Mining.Fee
   alias Archethic.Mining.LedgerValidation
-
+  alias Archethic.SharedSecrets
   alias Archethic.TransactionChain
   alias Archethic.TransactionChain.Transaction
   alias Archethic.TransactionChain.Transaction.CrossValidationStamp
-  alias Archethic.TransactionChain.Transaction.ProofOfValidation
   alias Archethic.TransactionChain.Transaction.ProofOfReplication
   alias Archethic.TransactionChain.Transaction.ProofOfReplication.Signature
+  alias Archethic.TransactionChain.Transaction.ProofOfValidation
   alias Archethic.TransactionChain.Transaction.ValidationStamp
-  alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
 
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.TransactionMovement
 
+  alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
   alias Archethic.TransactionChain.TransactionData
   alias Archethic.TransactionChain.TransactionData.Ledger
-
   alias Archethic.TransactionChain.TransactionSummary
-
-  alias Archethic.SharedSecrets
-
   alias Archethic.Utils
-
-  import ArchethicCase
 
   def create_non_valided_transaction(opts \\ []) do
     type = Keyword.get(opts, :type, :transfer)
@@ -83,7 +77,7 @@ defmodule Archethic.TransactionFactory do
     validation_nodes = Keyword.get(opts, :validation_nodes, [])
 
     timestamp =
-      Keyword.get(opts, :timestamp, DateTime.utc_now()) |> DateTime.truncate(:millisecond)
+      opts |> Keyword.get(:timestamp, DateTime.utc_now()) |> DateTime.truncate(:millisecond)
 
     tx =
       Transaction.new(
@@ -103,7 +97,7 @@ defmodule Archethic.TransactionFactory do
     fee = Fee.calculate(tx, nil, 0.07, timestamp, encoded_state, 0, current_protocol_version())
     movements = Transaction.get_movements(tx)
 
-    resolved_addresses = Enum.map(movements, &{&1.to, &1.to}) |> Map.new()
+    resolved_addresses = Map.new(movements, &{&1.to, &1.to})
 
     ledger_operations =
       %LedgerValidation{fee: fee}
@@ -159,7 +153,7 @@ defmodule Archethic.TransactionFactory do
       |> ProofOfValidation.get_election(tx.address)
       |> ProofOfValidation.create(cross_validation_stamps)
 
-    tx = %Transaction{
+    tx = %{
       tx
       | validation_stamp: validation_stamp,
         proof_of_validation: proof_of_validation
@@ -190,7 +184,7 @@ defmodule Archethic.TransactionFactory do
       |> ProofOfReplication.get_election(tx.address)
       |> ProofOfReplication.create(replication_signatures)
 
-    tx = %Transaction{tx | proof_of_replication: proof_of_replication}
+    tx = %{tx | proof_of_replication: proof_of_replication}
 
     {tx, cross_validation_stamps}
   end
@@ -199,7 +193,7 @@ defmodule Archethic.TransactionFactory do
     signed_stamp = ValidationStamp.sign(stamp)
 
     cross_validation_stamps =
-      CrossValidationStamp.sign(%CrossValidationStamp{}, stamp) |> List.wrap()
+      %CrossValidationStamp{} |> CrossValidationStamp.sign(stamp) |> List.wrap()
 
     {signed_stamp, cross_validation_stamps}
   end
@@ -216,7 +210,7 @@ defmodule Archethic.TransactionFactory do
       |> Utils.wrap_binary()
       |> Crypto.sign(pv)
 
-    signed_stamp = %ValidationStamp{stamp | signature: stamp_sig}
+    signed_stamp = %{stamp | signature: stamp_sig}
 
     cross_validation_stamps =
       Enum.map(cross, fn seed ->
@@ -277,7 +271,7 @@ defmodule Archethic.TransactionFactory do
     fee = Fee.calculate(tx, nil, 0.07, timestamp, nil, 0, protocol_version)
     movements = Transaction.get_movements(tx)
 
-    resolved_addresses = Enum.map(movements, &{&1.to, &1.to}) |> Map.new()
+    resolved_addresses = Map.new(movements, &{&1.to, &1.to})
     contract_context = nil
     encoded_state = nil
 
@@ -316,7 +310,7 @@ defmodule Archethic.TransactionFactory do
     index = Keyword.get(opts, :index, 0)
 
     timestamp =
-      Keyword.get(opts, :timestamp, DateTime.utc_now()) |> DateTime.truncate(:millisecond)
+      opts |> Keyword.get(:timestamp, DateTime.utc_now()) |> DateTime.truncate(:millisecond)
 
     tx = Transaction.new(type, %TransactionData{}, seed, index)
 
@@ -325,7 +319,7 @@ defmodule Archethic.TransactionFactory do
     fee = Fee.calculate(tx, nil, 0.07, timestamp, nil, 0, protocol_version)
     movements = Transaction.get_movements(tx)
 
-    resolved_addresses = Enum.map(movements, &{&1.to, &1.to}) |> Map.new()
+    resolved_addresses = Map.new(movements, &{&1.to, &1.to})
     contract_context = nil
     encoded_state = nil
 
@@ -351,7 +345,7 @@ defmodule Archethic.TransactionFactory do
 
     cross_validation_stamp = CrossValidationStamp.sign(%CrossValidationStamp{}, validation_stamp)
 
-    %Transaction{
+    %{
       tx
       | validation_stamp: validation_stamp,
         cross_validation_stamps: [cross_validation_stamp]
@@ -366,7 +360,7 @@ defmodule Archethic.TransactionFactory do
 
     movements = Transaction.get_movements(tx)
 
-    resolved_addresses = Enum.map(movements, &{&1.to, &1.to}) |> Map.new()
+    resolved_addresses = Map.new(movements, &{&1.to, &1.to})
     contract_context = nil
     encoded_state = nil
 
@@ -380,7 +374,7 @@ defmodule Archethic.TransactionFactory do
       |> LedgerValidation.to_ledger_operations()
 
     validation_stamp =
-      %ValidationStamp{
+      ValidationStamp.sign(%ValidationStamp{
         genesis_address: "seed" |> Crypto.derive_keypair(0) |> elem(0) |> Crypto.derive_address(),
         timestamp: timestamp,
         proof_of_work: Crypto.origin_node_public_key(),
@@ -388,12 +382,11 @@ defmodule Archethic.TransactionFactory do
         proof_of_integrity: TransactionChain.proof_of_integrity([tx]),
         ledger_operations: ledger_operations,
         protocol_version: protocol_version
-      }
-      |> ValidationStamp.sign()
+      })
 
     cross_validation_stamp = CrossValidationStamp.sign(%CrossValidationStamp{}, validation_stamp)
 
-    %Transaction{
+    %{
       tx
       | validation_stamp: validation_stamp,
         cross_validation_stamps: [cross_validation_stamp]
@@ -409,7 +402,7 @@ defmodule Archethic.TransactionFactory do
     fee = Fee.calculate(tx, nil, 0.07, timestamp, nil, 0, protocol_version)
     movements = [%TransactionMovement{to: "@Bob4", amount: 30_330_000_000, type: :UCO}]
 
-    resolved_addresses = Enum.map(movements, &{&1.to, &1.to}) |> Map.new()
+    resolved_addresses = Map.new(movements, &{&1.to, &1.to})
     contract_context = nil
     encoded_state = nil
 
@@ -423,7 +416,7 @@ defmodule Archethic.TransactionFactory do
       |> LedgerValidation.to_ledger_operations()
 
     validation_stamp =
-      %ValidationStamp{
+      ValidationStamp.sign(%ValidationStamp{
         genesis_address: "seed" |> Crypto.derive_keypair(0) |> elem(0) |> Crypto.derive_address(),
         timestamp: timestamp,
         proof_of_work: Crypto.origin_node_public_key(),
@@ -431,12 +424,11 @@ defmodule Archethic.TransactionFactory do
         proof_of_election: Election.validation_nodes_election_seed_sorting(tx, timestamp),
         ledger_operations: ledger_operations,
         protocol_version: protocol_version
-      }
-      |> ValidationStamp.sign()
+      })
 
     cross_validation_stamp = CrossValidationStamp.sign(%CrossValidationStamp{}, validation_stamp)
 
-    %Transaction{
+    %{
       tx
       | validation_stamp: validation_stamp,
         cross_validation_stamps: [cross_validation_stamp]
@@ -448,7 +440,7 @@ defmodule Archethic.TransactionFactory do
   """
   @spec create_network_tx(:node_shared_secrets, keyword) ::
           Archethic.TransactionChain.Transaction.t()
-  def create_network_tx(_type = :node_shared_secrets, opts) do
+  def create_network_tx(:node_shared_secrets = _type, opts) do
     inputs = Keyword.get(opts, :inputs, [])
     seed = Keyword.get(opts, :seed, "daily_nonce_seed")
     index = Keyword.get(opts, :index)
@@ -469,7 +461,7 @@ defmodule Archethic.TransactionFactory do
     fee = Fee.calculate(tx, nil, 0.07, timestamp, nil, 0, protocol_version)
     movements = Transaction.get_movements(tx)
 
-    resolved_addresses = Enum.map(movements, &{&1.to, &1.to}) |> Map.new()
+    resolved_addresses = Map.new(movements, &{&1.to, &1.to})
     contract_context = nil
     encoded_state = nil
 
@@ -483,7 +475,7 @@ defmodule Archethic.TransactionFactory do
       |> LedgerValidation.to_ledger_operations()
 
     validation_stamp =
-      %ValidationStamp{
+      ValidationStamp.sign(%ValidationStamp{
         genesis_address: seed |> Crypto.derive_keypair(0) |> elem(0) |> Crypto.derive_address(),
         timestamp: timestamp,
         proof_of_work: Crypto.origin_node_public_key(),
@@ -491,12 +483,11 @@ defmodule Archethic.TransactionFactory do
         proof_of_integrity: TransactionChain.proof_of_integrity([tx | prev_txn]),
         ledger_operations: ledger_operations,
         protocol_version: protocol_version
-      }
-      |> ValidationStamp.sign()
+      })
 
     cross_validation_stamp = CrossValidationStamp.sign(%CrossValidationStamp{}, validation_stamp)
 
-    %Transaction{
+    %{
       tx
       | validation_stamp: validation_stamp,
         cross_validation_stamps: [cross_validation_stamp]

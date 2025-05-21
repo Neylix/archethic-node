@@ -240,13 +240,11 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.HttpImplTest do
                %{"status" => -4001},
                %{"status" => 200}
              ] =
-               HttpImpl.request_many(
-                 [
-                   %{"url" => "https://127.0.0.1:8081", "method" => "GET"},
-                   %{"url" => "https://127.0.0.1:8081/very-slow", "method" => "GET"}
-                 ],
-                 false
-               )
+               [
+                 %{"url" => "https://127.0.0.1:8081", "method" => "GET"},
+                 %{"url" => "https://127.0.0.1:8081/very-slow", "method" => "GET"}
+               ]
+               |> HttpImpl.request_many(false)
                |> Enum.sort_by(fn %{"status" => status} -> status end)
     end
 

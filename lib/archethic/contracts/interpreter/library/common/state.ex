@@ -1,14 +1,13 @@
 defmodule Archethic.Contracts.Interpreter.Library.Common.State do
   @moduledoc false
 
+  @behaviour Archethic.Contracts.Interpreter.Library
+
+  use Archethic.Tag
+
   alias Archethic.Contracts.Interpreter.ASTHelper, as: AST
   alias Archethic.Contracts.Interpreter.Library
   alias Archethic.Contracts.Interpreter.Scope
-  alias Archethic.Tag
-
-  use Tag
-
-  @behaviour Library
 
   @spec get(String.t()) :: any()
   def get(key) do

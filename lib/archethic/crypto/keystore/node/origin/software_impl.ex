@@ -1,15 +1,15 @@
 defmodule Archethic.Crypto.NodeKeystore.Origin.SoftwareImpl do
   @moduledoc false
 
+  @behaviour Archethic.Crypto.NodeKeystore.Origin
+
   use GenServer
-  @vsn 1
 
   alias Archethic.Crypto
   alias Archethic.Crypto.NodeKeystore.Origin
-
   alias Archethic.Utils
 
-  @behaviour Origin
+  @vsn 1
 
   def start_link(arg \\ [], opts \\ [name: __MODULE__]) do
     GenServer.start_link(__MODULE__, arg, opts)
@@ -47,15 +47,15 @@ defmodule Archethic.Crypto.NodeKeystore.Origin.SoftwareImpl do
   end
 
   @impl GenServer
-  def handle_call({:sign_with_origin_key, data}, _, state = %{origin_keypair: {_pub, pv}}) do
+  def handle_call({:sign_with_origin_key, data}, _, %{origin_keypair: {_pub, pv}} = state) do
     {:reply, Crypto.sign(data, pv), state}
   end
 
-  def handle_call(:origin_public_key, _, state = %{origin_keypair: {pub, _}}) do
+  def handle_call(:origin_public_key, _, %{origin_keypair: {pub, _}} = state) do
     {:reply, pub, state}
   end
 
-  def handle_call(:retrieve_node_seed, _from, state = %{node_seed: node_seed}) do
+  def handle_call(:retrieve_node_seed, _from, %{node_seed: node_seed} = state) do
     {:reply, node_seed, state}
   end
 

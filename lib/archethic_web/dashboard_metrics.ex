@@ -9,11 +9,12 @@ defmodule ArchethicWeb.DashboardMetrics do
             if that happens, consider using an ETS table
   """
 
+  use GenServer
+
   alias Archethic.Crypto
   alias Archethic.PubSub
   alias Archethic.Utils
 
-  use GenServer
   @vsn 1
   @clean_interval_seconds 60
   @history_seconds 3600
@@ -34,7 +35,7 @@ defmodule ArchethicWeb.DashboardMetrics do
   @spec get_all() :: %{
           DateTime.t() => list({Crypto.prepended_hash(), pos_integer()})
         }
-  def get_all() do
+  def get_all do
     GenServer.call(__MODULE__, :get_all)
   end
 
@@ -61,11 +62,11 @@ defmodule ArchethicWeb.DashboardMetrics do
     {:ok, %__MODULE__{}}
   end
 
-  def handle_call(:get_all, _from, state = %__MODULE__{buckets: buckets}) do
+  def handle_call(:get_all, _from, %__MODULE__{buckets: buckets} = state) do
     {:reply, buckets, state}
   end
 
-  def handle_call({:get_since, since}, _from, state = %__MODULE__{buckets: buckets}) do
+  def handle_call({:get_since, since}, _from, %__MODULE__{buckets: buckets} = state) do
     filtered_buckets =
       buckets
       |> Enum.filter(fn {datetime, _} -> not DateTime.before?(datetime, since) end)
@@ -82,7 +83,7 @@ defmodule ArchethicWeb.DashboardMetrics do
            duration: duration,
            success?: _success?
          ]},
-        state = %__MODULE__{buckets: buckets}
+        %__MODULE__{buckets: buckets} = state
       ) do
     # TODO: use success? to provide different aggregations?
 
@@ -91,10 +92,10 @@ defmodule ArchethicWeb.DashboardMetrics do
     new_buckets =
       Map.update(buckets, bucket_key, [{address, duration}], &[{address, duration} | &1])
 
-    {:noreply, %__MODULE__{state | buckets: new_buckets}}
+    {:noreply, %{state | buckets: new_buckets}}
   end
 
-  def handle_info(:clean_state, state = %__MODULE__{buckets: buckets}) do
+  def handle_info(:clean_state, %__MODULE__{buckets: buckets} = state) do
     now = DateTime.utc_now()
     current_bucket_key = bucket_key(now)
 
@@ -113,7 +114,7 @@ defmodule ArchethicWeb.DashboardMetrics do
     # Continue the clean_state loop
     Process.send_after(self(), :clean_state, @clean_interval_seconds * 1_000)
 
-    {:noreply, %__MODULE__{state | buckets: new_buckets}}
+    {:noreply, %{state | buckets: new_buckets}}
   end
 
   # ----------------------------
@@ -126,9 +127,10 @@ defmodule ArchethicWeb.DashboardMetrics do
   defp drop_old_buckets(buckets) do
     now = DateTime.utc_now()
 
-    Enum.reject(buckets, fn {datetime, _value} ->
+    buckets
+    |> Enum.reject(fn {datetime, _value} ->
       DateTime.diff(now, datetime, :second) > @history_seconds
     end)
-    |> Enum.into(%{})
+    |> Map.new()
   end
 end

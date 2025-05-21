@@ -3,22 +3,15 @@ defmodule Archethic.SelfRepair.NetworkChain do
   Synchronization of one or multiple network chains.
   """
   alias Archethic.Crypto
-
   alias Archethic.Election
-
   alias Archethic.OracleChain
-
   alias Archethic.P2P
   alias Archethic.P2P.Node
-
   alias Archethic.SelfRepair
-
   alias Archethic.SharedSecrets
-
   alias Archethic.TransactionChain
   alias Archethic.TransactionChain.Transaction
   alias Archethic.TransactionChain.Transaction.ValidationStamp
-
   alias Archethic.Utils
 
   @type type() :: :origin | :oracle | :node | :node_shared_secrets
@@ -57,8 +50,8 @@ defmodule Archethic.SelfRepair.NetworkChain do
         nodes_to_resync = Enum.filter(nodes, &node_require_resync?/1)
 
         # Load the latest node transactions
-        Task.Supervisor.async_stream_nolink(
-          Archethic.task_supervisors(),
+        Archethic.task_supervisors()
+        |> Task.Supervisor.async_stream_nolink(
           nodes_to_resync,
           fn %Node{last_address: last_address} ->
             SelfRepair.replicate_transaction(last_address)
@@ -78,8 +71,8 @@ defmodule Archethic.SelfRepair.NetworkChain do
 
     case verify_synchronization(type) do
       {:error, addresses} when is_list(addresses) ->
-        Task.Supervisor.async_stream_nolink(
-          Archethic.task_supervisors(),
+        Archethic.task_supervisors()
+        |> Task.Supervisor.async_stream_nolink(
           addresses,
           &SelfRepair.replicate_transaction/1,
           ordered: false,
@@ -100,8 +93,8 @@ defmodule Archethic.SelfRepair.NetworkChain do
     genesis_addresses = SharedSecrets.genesis_address(:origin)
 
     addresses =
-      Task.Supervisor.async_stream(
-        Archethic.task_supervisors(),
+      Archethic.task_supervisors()
+      |> Task.Supervisor.async_stream(
         genesis_addresses,
         &validate_last_address/1
       )
@@ -170,8 +163,8 @@ defmodule Archethic.SelfRepair.NetworkChain do
   """
   @spec synchronous_resync_many(list(type())) :: :ok
   def synchronous_resync_many(network_chain_types) do
-    Task.Supervisor.async_stream_nolink(
-      Archethic.task_supervisors(),
+    Archethic.task_supervisors()
+    |> Task.Supervisor.async_stream_nolink(
       network_chain_types,
       &synchronous_resync(&1),
       ordered: false,

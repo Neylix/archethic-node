@@ -46,9 +46,9 @@ defmodule Archethic.Contracts.WasmResult do
   Represents a WebAssembly module return
   """
   alias Archethic.Contracts.Contract.State
-  alias Archethic.Contracts.WasmSpec
-  alias Archethic.Contracts.Wasm.UpdateResult
   alias Archethic.Contracts.Wasm.ReadResult
+  alias Archethic.Contracts.Wasm.UpdateResult
+  alias Archethic.Contracts.WasmSpec
 
   @doc """
   Cast JSON WebAssembly result in `UpdateResult` or `ReadResult`
@@ -59,7 +59,7 @@ defmodule Archethic.Contracts.WasmResult do
 
   def cast(result, nil) when is_map_key(result, "state") or is_map_key(result, "transaction") do
     %UpdateResult{
-      state: Map.get(result, "state") |> cast_state(),
+      state: result |> Map.get("state") |> cast_state(),
       transaction: result |> Map.get("transaction") |> cast_transaction()
     }
   end

@@ -20,6 +20,7 @@ defmodule Archethic.SelfRepair do
   require Logger
 
   defmodule Error do
+    @moduledoc false
     defexception [:function, :message, :address]
 
     @impl Exception
@@ -72,8 +73,7 @@ defmodule Archethic.SelfRepair do
   end
 
   defp sync_with_retry(sync_fn) do
-    0..@max_retry_count
-    |> Enum.reduce_while(:error, fn _, _ ->
+    Enum.reduce_while(0..@max_retry_count, :error, fn _, _ ->
       try do
         Process.flag(:trap_exit, true)
         res = sync_fn.()
@@ -142,12 +142,7 @@ defmodule Archethic.SelfRepair do
 
   def missed_sync?(nil, _, _, _), do: true
 
-  def missed_sync?(
-        last_sync_date,
-        summary_cron_interval,
-        repair_cron_interval,
-        ref_date
-      ) do
+  def missed_sync?(last_sync_date, summary_cron_interval, repair_cron_interval, ref_date) do
     next_repair_date =
       last_sync_date
       |> BeaconChain.next_summary_date(summary_cron_interval)
@@ -287,7 +282,7 @@ defmodule Archethic.SelfRepair do
   Synchronously synchronize all the transactions that happened since previous summary aggregate
   """
   @spec synchronize_current_summary() :: integer()
-  def synchronize_current_summary() do
+  def synchronize_current_summary do
     sync_fn = fn ->
       BeaconChain.fetch_current_summary_replication_attestations()
       |> Enum.to_list()

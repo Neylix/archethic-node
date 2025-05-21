@@ -2,6 +2,7 @@ defmodule Archethic.Governance.Pools.MemTable do
   @moduledoc false
 
   use Agent
+
   alias Archethic.Governance.Pools
 
   @doc """

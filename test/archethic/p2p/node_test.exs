@@ -1,10 +1,10 @@
 defmodule Archethic.P2P.NodeTest do
   use ExUnit.Case
 
+  import ArchethicCase
+
   alias Archethic.P2P.Node
   alias Archethic.P2P.NodeConfig
-
-  import ArchethicCase
 
   doctest Node
 

@@ -3,10 +3,10 @@ defmodule Archethic.TransactionChain.TransactionData.Ownership do
   Represents an ownership of a secret and the authorized public keys able to
   read the encrypted secret
   """
-  defstruct authorized_keys: %{}, secret: ""
-
   alias Archethic.Crypto
   alias Archethic.Utils.VarInt
+
+  defstruct authorized_keys: %{}, secret: ""
 
   @type t :: %__MODULE__{
           secret: binary(),
@@ -38,10 +38,9 @@ defmodule Archethic.TransactionChain.TransactionData.Ownership do
     %__MODULE__{
       secret: secret,
       authorized_keys:
-        Enum.map(authorized_keys, fn public_key ->
+        Map.new(authorized_keys, fn public_key ->
           {public_key, Crypto.ec_encrypt(secret_key, public_key)}
         end)
-        |> Enum.into(%{})
     }
   end
 
@@ -123,7 +122,7 @@ defmodule Archethic.TransactionChain.TransactionData.Ownership do
         <<secret_size::32, secret::binary-size(secret_size), rest::bitstring>>,
         _tx_version
       ) do
-    {nb_authorized_keys_len, rest} = rest |> VarInt.get_value()
+    {nb_authorized_keys_len, rest} = VarInt.get_value(rest)
     {authorized_keys, rest} = reduce_authorized_keys_bin(rest, nb_authorized_keys_len, %{})
 
     {%__MODULE__{
@@ -165,7 +164,7 @@ defmodule Archethic.TransactionChain.TransactionData.Ownership do
   end
 
   @spec cast(map()) :: t()
-  def cast(ownership = %{}) do
+  def cast(%{} = ownership) do
     %__MODULE__{
       secret: Map.get(ownership, :secret, <<>>),
       authorized_keys: Map.get(ownership, :authorized_keys, %{})

@@ -28,10 +28,11 @@ defmodule Archethic.Utils.JobConductor do
       ...> e1 < s2 and e2 < s3
       true
   """
+  use GenServer
+
   @typedoc "Return value of `conduct` function"
   @type conduct :: {:ok, any} | {:caught, any} | {:rescued, any}
 
-  use GenServer
   @vsn 1
 
   defmodule S do
@@ -81,29 +82,29 @@ defmodule Archethic.Utils.JobConductor do
     case :queue.out(q) do
       {:empty, _} ->
         Task.async(fn -> do_conduct(fun, args, from) end)
-        {:noreply, %S{state | running: r + 1}}
+        {:noreply, %{state | running: r + 1}}
 
       {{:value, {fun0, args0, from0}}, q1} ->
         Task.async(fn -> do_conduct(fun0, args0, from0) end)
-        {:noreply, %S{state | running: r + 1, q: :queue.in({fun, args, from}, q1)}}
+        {:noreply, %{state | running: r + 1, q: :queue.in({fun, args, from}, q1)}}
     end
   end
 
-  def handle_call({:conduct, fun, args}, from, state = %S{q: q}) do
-    {:noreply, %S{state | q: :queue.in({fun, args, from}, q)}}
+  def handle_call({:conduct, fun, args}, from, %S{q: q} = state) do
+    {:noreply, %{state | q: :queue.in({fun, args, from}, q)}}
   end
 
   @impl GenServer
   def handle_info({_ref, _result}, state), do: {:noreply, state}
 
-  def handle_info({:DOWN, _ref, :process, _pid, :normal}, state = %S{running: r, q: q}) do
+  def handle_info({:DOWN, _ref, :process, _pid, :normal}, %S{running: r, q: q} = state) do
     case :queue.out(q) do
       {:empty, _} ->
-        {:noreply, %S{state | running: r - 1}}
+        {:noreply, %{state | running: r - 1}}
 
       {{:value, {fun0, args0, from0}}, q1} ->
         Task.async(fn -> do_conduct(fun0, args0, from0) end)
-        {:noreply, %S{state | q: q1}}
+        {:noreply, %{state | q: q1}}
     end
   end
 

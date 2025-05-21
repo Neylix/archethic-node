@@ -1,18 +1,16 @@
 defmodule Archethic.Mining.LedgerValidationTest do
+  use ArchethicCase
+
+  import ArchethicCase
+
   alias Archethic.Mining.LedgerValidation
-
   alias Archethic.Reward.MemTables.RewardTokens
-
-  alias Archethic.TransactionFactory
-
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations
 
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.TransactionMovement
 
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
-
-  use ArchethicCase
-  import ArchethicCase
+  alias Archethic.TransactionFactory
 
   doctest LedgerValidation
 
@@ -70,7 +68,7 @@ defmodule Archethic.Mining.LedgerValidationTest do
   describe "mint_token_utxos/4 with a token resupply transaction" do
     test "should return a utxo" do
       token_address = random_address()
-      token_address_hex = token_address |> Base.encode16()
+      token_address_hex = Base.encode16(token_address)
       now = DateTime.utc_now()
 
       tx =
@@ -136,7 +134,7 @@ defmodule Archethic.Mining.LedgerValidationTest do
                |> LedgerValidation.mint_token_utxos(tx, now)
 
       token_address = random_address()
-      token_address_hex = token_address |> Base.encode16()
+      token_address_hex = Base.encode16(token_address)
 
       tx =
         TransactionFactory.create_valid_transaction([],
@@ -546,8 +544,7 @@ defmodule Archethic.Mining.LedgerValidationTest do
 
     test "should raise if not in sufficient_funds_validated state" do
       assert_raise FunctionClauseError, fn ->
-        %LedgerValidation{}
-        |> LedgerValidation.consume_inputs(random_address(), DateTime.utc_now())
+        LedgerValidation.consume_inputs(%LedgerValidation{}, random_address(), DateTime.utc_now())
       end
     end
 
@@ -1421,7 +1418,7 @@ defmodule Archethic.Mining.LedgerValidationTest do
     end
 
     test "should sort utxo to be consistent across nodes", %{tx: tx} do
-      [lower_address, higher_address] = [random_address(), random_address()] |> Enum.sort()
+      [lower_address, higher_address] = Enum.sort([random_address(), random_address()])
 
       optimized_utxo = [
         %UnspentOutput{
@@ -1560,7 +1557,7 @@ defmodule Archethic.Mining.LedgerValidationTest do
         %TransactionMovement{to: "@Charlie2", amount: 217_000_000, type: :UCO}
       ]
 
-      resolved_addresses = Enum.map(movements, &{&1.to, &1.to}) |> Map.new()
+      resolved_addresses = Map.new(movements, &{&1.to, &1.to})
 
       assert %LedgerOperations{
                fee: 40_000_000,

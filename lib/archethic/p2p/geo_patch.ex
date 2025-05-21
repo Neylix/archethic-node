@@ -25,7 +25,8 @@ defmodule Archethic.P2P.GeoPatch do
     list_char1 = Enum.concat([?0..?9, ?A..?F])
     list_char2 = Enum.concat([?0..?3, ?C..?F])
 
-    Enum.take_random(list_char1, 2)
+    list_char1
+    |> Enum.take_random(2)
     |> List.insert_at(1, Enum.take_random(list_char2, 1))
     |> List.to_string()
   end
@@ -42,8 +43,8 @@ defmodule Archethic.P2P.GeoPatch do
     first_digit = main_index_patch(trunc(lon_pos))
     second_digit = main_index_patch(trunc(lat_pos))
 
-    lat_precision = ((lat_pos - trunc(lat_pos)) / 0.25) |> trunc()
-    lon_precision = ((lon_pos - trunc(lon_pos)) / 0.25) |> trunc()
+    lat_precision = trunc((lat_pos - trunc(lat_pos)) / 0.25)
+    lon_precision = trunc((lon_pos - trunc(lon_pos)) / 0.25)
 
     third_digit = precision_index_patch(lat_precision, lon_precision)
 
@@ -51,8 +52,7 @@ defmodule Archethic.P2P.GeoPatch do
   end
 
   defp main_index_patch(index) do
-    {"8", "9", "A", "B", "C", "D", "E", "F", "0", "1", "2", "3", "4", "5", "6", "7"}
-    |> elem(index)
+    elem({"8", "9", "A", "B", "C", "D", "E", "F", "0", "1", "2", "3", "4", "5", "6", "7"}, index)
   end
 
   defp precision_index_patch(index1, index2) do
@@ -95,7 +95,11 @@ defmodule Archethic.P2P.GeoPatch do
   end
 
   defp get_main_index(value) do
-    ["8", "9", "A", "B", "C", "D", "E", "F", "0", "1", "2", "3", "4", "5", "6", "7"]
-    |> Enum.find_index(fn el -> el == value end)
+    Enum.find_index(
+      ["8", "9", "A", "B", "C", "D", "E", "F", "0", "1", "2", "3", "4", "5", "6", "7"],
+      fn el ->
+        el == value
+      end
+    )
   end
 end

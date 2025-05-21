@@ -18,13 +18,14 @@ defmodule Archethic.Contracts.Interpreter.Scope do
   Create a new nested scope
   """
   @spec create() :: :ok
-  def create() do
+  def create do
     current_context = get_current_context()
     current_scope_hierarchy = get_context_scope_hierarchy(current_context)
     ref = new_ref()
 
     new_scope =
-      Process.get(:scope)
+      :scope
+      |> Process.get()
       |> put_in([current_context] ++ current_scope_hierarchy ++ [ref], %{})
       |> update_in([current_context, :scope_hierarchy], &(&1 ++ [ref]))
 
@@ -40,7 +41,7 @@ defmodule Archethic.Contracts.Interpreter.Scope do
   Create new context
   """
   @spec create_context() :: :ok
-  def create_context() do
+  def create_context do
     context_ref = new_ref()
 
     new_context = %{
@@ -49,7 +50,8 @@ defmodule Archethic.Contracts.Interpreter.Scope do
 
     # add context to scope and update context list
     new_scope =
-      Process.get(:scope)
+      :scope
+      |> Process.get()
       |> Map.put(context_ref, new_context)
       |> Map.update!(:context_list, &[context_ref | &1])
 
@@ -62,12 +64,13 @@ defmodule Archethic.Contracts.Interpreter.Scope do
   Leave a scope by removing it from current context's scope hierarchy and deleting its content
   """
   @spec leave_scope() :: :ok
-  def leave_scope() do
+  def leave_scope do
     current_context = get_current_context()
     current_scope_hierarchy = get_context_scope_hierarchy(current_context)
 
     new_scope =
-      Process.get(:scope)
+      :scope
+      |> Process.get()
       |> update_in([current_context, :scope_hierarchy], &List.delete_at(&1, -1))
       |> pop_in([current_context] ++ current_scope_hierarchy)
       |> elem(1)
@@ -81,11 +84,12 @@ defmodule Archethic.Contracts.Interpreter.Scope do
   Leave a context by removing it from scope and context_list
   """
   @spec leave_context() :: :ok
-  def leave_context() do
+  def leave_context do
     current_context = get_current_context()
 
     new_scope =
-      Process.get(:scope)
+      :scope
+      |> Process.get()
       |> Map.delete(current_context)
       |> Map.update!(:context_list, fn [_first | rest] -> rest end)
 
@@ -217,8 +221,10 @@ defmodule Archethic.Contracts.Interpreter.Scope do
     )
   end
 
-  defp get_current_context() do
-    get_in(Process.get(:scope), [:context_list])
+  defp get_current_context do
+    :scope
+    |> Process.get()
+    |> get_in([:context_list])
     |> List.first()
   end
 
@@ -226,7 +232,7 @@ defmodule Archethic.Contracts.Interpreter.Scope do
     get_in(Process.get(:scope), [context, :scope_hierarchy])
   end
 
-  defp new_ref() do
+  defp new_ref do
     :erlang.list_to_binary(:erlang.ref_to_list(make_ref()))
   end
 
@@ -272,8 +278,7 @@ defmodule Archethic.Contracts.Interpreter.Scope do
   defp do_where_is(_context, variable_name, []) do
     # there are magic variables at the root of scope (contract/transaction/next/previous)
     if Map.has_key?(Process.get(:scope), variable_name),
-      do: [],
-      else: nil
+      do: []
   end
 
   defp do_where_is(context, variable_name, acc) do

@@ -2,6 +2,7 @@ defmodule Archethic.TransactionChain.TransactionInputTest do
   use ArchethicCase
 
   alias Archethic.TransactionChain.TransactionInput
+
   doctest TransactionInput
 
   describe "serialization/deserialization workflow" do

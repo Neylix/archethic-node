@@ -1,19 +1,18 @@
 defmodule ArchethicWeb.Explorer.Components.TransactionsList do
   @moduledoc false
 
-  alias Archethic.TransactionChain.Transaction
-  alias Archethic.TransactionChain.Transaction.ValidationStamp
-  alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations
-  alias Archethic.TransactionChain.TransactionSummary
-
-  alias ArchethicWeb.ExplorerRouter.Helpers, as: Routes
-  alias ArchethicWeb.Explorer.Components.Amount
-
   use Phoenix.Component
   use PhoenixHTMLHelpers
 
   import ArchethicWeb.Explorer.ExplorerView
   import ArchethicWeb.WebUtils
+
+  alias Archethic.TransactionChain.Transaction
+  alias Archethic.TransactionChain.Transaction.ValidationStamp
+  alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations
+  alias Archethic.TransactionChain.TransactionSummary
+  alias ArchethicWeb.Explorer.Components.Amount
+  alias ArchethicWeb.ExplorerRouter.Helpers, as: Routes
 
   def display_all(assigns) do
     assigns =
@@ -115,8 +114,7 @@ defmodule ArchethicWeb.Explorer.Components.TransactionsList do
        }),
        do: genesis_address
 
-  defp get_genesis(%TransactionSummary{genesis_address: genesis_address}),
-    do: genesis_address
+  defp get_genesis(%TransactionSummary{genesis_address: genesis_address}), do: genesis_address
 
   defp get_genesis(map) do
     Map.get(map, :genesis_address)

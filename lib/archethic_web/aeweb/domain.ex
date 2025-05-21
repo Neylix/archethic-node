@@ -3,14 +3,11 @@ defmodule ArchethicWeb.AEWeb.Domain do
   Manage AEWeb domain logic
   """
 
-  alias Archethic
   alias Archethic.Crypto
   alias Archethic.TransactionChain.TransactionData.Ownership
-
-  alias ArchethicWeb.AEWeb.WebHostingController.ReferenceTransaction
-
   alias ArchethicWeb.AEWeb.DNSClient
   alias ArchethicWeb.AEWeb.SSLParser
+  alias ArchethicWeb.AEWeb.WebHostingController.ReferenceTransaction
 
   require Logger
 
@@ -56,12 +53,12 @@ defmodule ArchethicWeb.AEWeb.Domain do
          {:ok,
           %ReferenceTransaction{
             json_content: json_content,
-            ownerships: [ownership = %Ownership{secret: secret} | _]
+            ownerships: [%Ownership{secret: secret} = ownership | _]
           }} <- ReferenceTransaction.fetch_last(tx_address),
          {:ok, cert_pem} <- Map.fetch(json_content, "sslCertificate"),
          %{all_domains: all_domain_names} <- SSLParser.parse_pem(cert_pem),
          true <- match_domain?(all_domain_names, domain),
-         encrypted_secret_key <-
+         encrypted_secret_key =
            Ownership.get_encrypted_key(ownership, Crypto.storage_nonce_public_key()),
          {:ok, secret_key} <- Crypto.ec_decrypt_with_storage_nonce(encrypted_secret_key),
          {:ok, key_pem} <- Crypto.aes_decrypt(secret, secret_key) do
@@ -119,7 +116,7 @@ defmodule ArchethicWeb.AEWeb.Domain do
 
   # Wildcards
   defp do_match_domain?("*." <> cert_domain_suffix, domain) do
-    String.ends_with?(domain, cert_domain_suffix) and String.split(domain, ".") |> length() > 2
+    String.ends_with?(domain, cert_domain_suffix) and domain |> String.split(".") |> length() > 2
   end
 
   # no match for other cases

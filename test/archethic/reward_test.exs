@@ -2,18 +2,16 @@ defmodule Archethic.RewardTest do
   use ArchethicCase
   use ExUnitProperties
 
+  import ArchethicCase
+  import Mox
+
   alias Archethic.P2P
   alias Archethic.P2P.Message.GetUnspentOutputs
   alias Archethic.P2P.Message.UnspentOutputList
   alias Archethic.P2P.Node
-
   alias Archethic.Reward
-  alias Archethic.TransactionChain.TransactionData.TokenLedger.Transfer
-
   alias Archethic.TransactionChain.Transaction.ValidationStamp.LedgerOperations.UnspentOutput
-
-  import ArchethicCase
-  import Mox
+  alias Archethic.TransactionChain.TransactionData.TokenLedger.Transfer
 
   doctest Reward
 
@@ -70,8 +68,7 @@ defmodule Archethic.RewardTest do
 
     utxos = [unspent_outputs1, unspent_outputs2]
 
-    MockClient
-    |> expect(:send_message, fn _, %GetUnspentOutputs{}, _ ->
+    expect(MockClient, :send_message, fn _, %GetUnspentOutputs{}, _ ->
       {:ok, %UnspentOutputList{unspent_outputs: utxos}}
     end)
 

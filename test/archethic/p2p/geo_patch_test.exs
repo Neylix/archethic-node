@@ -6,9 +6,9 @@ defmodule Archethic.P2P.GeoPatchTest do
 
   use ExUnit.Case
 
-  alias Archethic.P2P.GeoPatch
-
   import Mox
+
+  alias Archethic.P2P.GeoPatch
 
   test "from_ip/1 should compute patch from coordinates" do
     stub(MockGeoIP, :get_coordinates, fn ip ->

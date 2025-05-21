@@ -1,15 +1,13 @@
 defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
   @moduledoc false
 
+  alias Archethic.Contracts.Interpreter.Legacy.UtilsInterpreter
+  alias Archethic.Contracts.Interpreter.Library
   alias Archethic.TransactionChain.Transaction
-  alias Archethic.TransactionChain.TransactionData.TokenLedger.Transfer, as: TokenTransfer
   alias Archethic.TransactionChain.TransactionData.Ownership
   alias Archethic.TransactionChain.TransactionData.Recipient
+  alias Archethic.TransactionChain.TransactionData.TokenLedger.Transfer, as: TokenTransfer
   alias Archethic.TransactionChain.TransactionData.UCOLedger.Transfer, as: UCOTransfer
-
-  alias Archethic.Contracts.Interpreter.Legacy.UtilsInterpreter
-
-  alias Archethic.Contracts.Interpreter.Library
 
   @doc """
   Set the transaction type
@@ -20,7 +18,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
        %Transaction{type: :transfer}
   """
   @spec set_type(Transaction.t(), binary()) :: Transaction.t()
-  def set_type(tx = %Transaction{}, type)
+  def set_type(%Transaction{} = tx, type)
       when type in ["transfer", "token", "hosting", "data", "contract"] do
     %{tx | type: String.to_existing_atom(type)}
   end
@@ -53,8 +51,8 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
       }
   """
   @spec add_uco_transfer(Transaction.t(), list()) :: Transaction.t()
-  def add_uco_transfer(tx = %Transaction{}, args) when is_list(args) do
-    %{"to" => to, "amount" => amount} = Enum.into(args, %{})
+  def add_uco_transfer(%Transaction{} = tx, args) when is_list(args) do
+    %{"to" => to, "amount" => amount} = Map.new(args)
 
     if amount <= 0 do
       raise ArgumentError, message: "Contract used add_uco_transfer with an invalid amount"
@@ -105,9 +103,9 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
       }
   """
   @spec add_token_transfer(Transaction.t(), list()) :: Transaction.t()
-  def add_token_transfer(tx = %Transaction{}, args) when is_list(args) do
+  def add_token_transfer(%Transaction{} = tx, args) when is_list(args) do
     map_args =
-      %{"to" => to, "amount" => amount, "token_address" => token_address} = Enum.into(args, %{})
+      %{"to" => to, "amount" => amount, "token_address" => token_address} = Map.new(args)
 
     if amount <= 0 do
       raise ArgumentError, message: "Contract used add_token_transfer with an invalid amount"
@@ -146,15 +144,15 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
         }
   """
   @spec set_content(Transaction.t(), binary()) :: Transaction.t()
-  def set_content(tx = %Transaction{}, content) when is_binary(content) do
+  def set_content(%Transaction{} = tx, content) when is_binary(content) do
     put_in(tx, [Access.key(:data), Access.key(:content)], content)
   end
 
-  def set_content(tx = %Transaction{}, content) when is_integer(content) do
+  def set_content(%Transaction{} = tx, content) when is_integer(content) do
     put_in(tx, [Access.key(:data), Access.key(:content)], Integer.to_string(content))
   end
 
-  def set_content(tx = %Transaction{}, content) when is_float(content) do
+  def set_content(%Transaction{} = tx, content) when is_float(content) do
     put_in(tx, [Access.key(:data), Access.key(:content)], Float.to_string(content))
   end
 
@@ -174,7 +172,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
       }
   """
   @spec set_code(Transaction.t(), binary()) :: Transaction.t()
-  def set_code(tx = %Transaction{}, code) when is_binary(code) do
+  def set_code(%Transaction{} = tx, code) when is_binary(code) do
     put_in(tx, [Access.key(:data), Access.key(:code)], code)
   end
 
@@ -203,17 +201,16 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
       ]
   """
   @spec add_ownership(Transaction.t(), list()) :: Transaction.t()
-  def add_ownership(tx = %Transaction{}, args) when is_list(args) do
-    %{"secret" => secret, "authorized_keys" => authorized_keys} = Enum.into(args, %{})
+  def add_ownership(%Transaction{} = tx, args) when is_list(args) do
+    %{"secret" => secret, "authorized_keys" => authorized_keys} = Map.new(args)
 
     authorized_keys =
-      Enum.map(authorized_keys, fn {pub, key} ->
+      Map.new(authorized_keys, fn {pub, key} ->
         decoded_pub = UtilsInterpreter.get_public_key(pub, :add_ownership)
         decoded_key = UtilsInterpreter.maybe_decode_hex(key)
 
         {decoded_pub, decoded_key}
       end)
-      |> Enum.into(%{})
 
     secret = UtilsInterpreter.maybe_decode_hex(secret)
 
@@ -228,7 +225,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
         )
 
       {:error, reason} ->
-        raise Library.Error, message: Atom.to_string(reason) |> String.replace("_", " ")
+        raise Library.Error, message: reason |> Atom.to_string() |> String.replace("_", " ")
     end
   end
 
@@ -254,8 +251,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
       }
   """
   @spec add_recipient(Transaction.t(), binary()) :: Transaction.t()
-  def add_recipient(tx = %Transaction{}, recipient_address)
-      when is_binary(recipient_address) do
+  def add_recipient(%Transaction{} = tx, recipient_address) when is_binary(recipient_address) do
     recipient_address = UtilsInterpreter.get_address(recipient_address, :add_recipient)
     recipient = %Recipient{address: recipient_address}
 
@@ -288,7 +284,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
     }
   """
   @spec add_recipients(Transaction.t(), list(binary())) :: Transaction.t()
-  def add_recipients(tx = %Transaction{}, args) when is_list(args) do
+  def add_recipients(%Transaction{} = tx, args) when is_list(args) do
     Enum.reduce(args, tx, &add_recipient(&2, &1))
   end
 
@@ -332,7 +328,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
     ...>   ])
   """
   @spec add_ownerships(Transaction.t(), list(list())) :: Transaction.t()
-  def add_ownerships(tx = %Transaction{}, args) when is_list(args) do
+  def add_ownerships(%Transaction{} = tx, args) when is_list(args) do
     Enum.reduce(args, tx, &add_ownership(&2, &1))
   end
 
@@ -384,7 +380,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
       ...>   ])
   """
   @spec add_token_transfers(Transaction.t(), list(list())) :: Transaction.t()
-  def add_token_transfers(tx = %Transaction{}, args) when is_list(args) do
+  def add_token_transfers(%Transaction{} = tx, args) when is_list(args) do
     Enum.reduce(args, tx, &add_token_transfer(&2, &1))
   end
 
@@ -420,7 +416,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
     ...>   ])
   """
   @spec add_uco_transfers(Transaction.t(), list(list())) :: Transaction.t()
-  def add_uco_transfers(tx = %Transaction{}, args) when is_list(args) do
+  def add_uco_transfers(%Transaction{} = tx, args) when is_list(args) do
     Enum.reduce(args, tx, &add_uco_transfer(&2, &1))
   end
 end

@@ -1,9 +1,10 @@
 defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArchethic do
   @moduledoc false
 
+  @behaviour Archethic.OracleChain.Services.UCOPrice.Providers.Impl
+
   alias Archethic.OracleChain.Services.UCOPrice.Providers.Impl
 
-  @behaviour Impl
   require Logger
 
   @impl Impl
@@ -24,8 +25,8 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArcheth
       )
 
     returned_prices =
-      Task.Supervisor.async_stream_nolink(
-        Archethic.task_supervisors(),
+      Archethic.task_supervisors()
+      |> Task.Supervisor.async_stream_nolink(
         pairs,
         fn pair ->
           req = Req.merge(req, headers: %{"Cookie" => "currency=#{pair}"})
@@ -33,8 +34,7 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArcheth
           with {:ok, %Req.Response{status: 200, body: body}} <- Req.get(req),
                {:ok, document} <- Floki.parse_document(body) do
             price =
-              extract_methods()
-              |> Enum.reduce_while(nil, fn extract_fn, acc ->
+              Enum.reduce_while(extract_methods(), nil, fn extract_fn, acc ->
                 try do
                   {:halt, extract_fn.(document)}
                 rescue
@@ -58,13 +58,12 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArcheth
         end
       )
       |> Stream.filter(&match?({:ok, {:ok, _}}, &1))
-      |> Stream.map(fn {:ok, {:ok, val}} -> val end)
-      |> Enum.into(%{})
+      |> Map.new(fn {:ok, {:ok, val}} -> val end)
 
     {:ok, returned_prices}
   end
 
-  defp extract_methods() do
+  defp extract_methods do
     [
       &extract_method1/1,
       &extract_method2/1,
@@ -75,7 +74,8 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArcheth
   end
 
   defp extract_method1(document) do
-    Floki.find(document, "div.priceTitle > div.priceValue > span")
+    document
+    |> Floki.find("div.priceTitle > div.priceValue > span")
     |> Floki.text()
     |> String.graphemes()
     |> Enum.filter(&(&1 in [".", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9"]))
@@ -86,7 +86,8 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.CoinMarketCapArcheth
   defp extract_method2(document) do
     regex = ~r/price today is (.+) with a/
 
-    Floki.find(document, "meta[name=description]")
+    document
+    |> Floki.find("meta[name=description]")
     |> Floki.attribute("content")
     |> Enum.join()
     |> then(&Regex.run(regex, &1, capture: :all_but_first))

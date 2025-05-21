@@ -1,14 +1,13 @@
 defmodule ArchethicWeb.Explorer.Components.UnspentOutputList do
   @moduledoc false
 
-  alias ArchethicWeb.ExplorerRouter.Helpers, as: Routes
-
   use Phoenix.Component
   use PhoenixHTMLHelpers
 
-  alias ArchethicWeb.Explorer.Components.Amount
-
   import ArchethicWeb.WebUtils
+
+  alias ArchethicWeb.Explorer.Components.Amount
+  alias ArchethicWeb.ExplorerRouter.Helpers, as: Routes
 
   def display_all(assigns) do
     # uco_price_at_time is optional because sometimes we do not have the time context

@@ -1,9 +1,9 @@
 defmodule Archethic.OracleChain.Services.UCOPrice.Providers.Coingecko do
   @moduledoc false
 
-  alias Archethic.OracleChain.Services.UCOPrice.Providers.Impl
+  @behaviour Archethic.OracleChain.Services.UCOPrice.Providers.Impl
 
-  @behaviour Impl
+  alias Archethic.OracleChain.Services.UCOPrice.Providers.Impl
 
   require Logger
 
@@ -18,9 +18,7 @@ defmodule Archethic.OracleChain.Services.UCOPrice.Providers.Coingecko do
     with {:ok, %Req.Response{status: 200, body: body}} <- Req.get(url, req_opts),
          {:ok, prices} <- Map.fetch(body, "archethic") do
       formatted_prices =
-        prices
-        |> Enum.map(fn {pair, price} -> {pair, [price]} end)
-        |> Map.new()
+        Map.new(prices, fn {pair, price} -> {pair, [price]} end)
 
       {:ok, formatted_prices}
     else
