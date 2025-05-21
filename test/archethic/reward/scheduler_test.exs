@@ -56,7 +56,6 @@ defmodule Archethic.Reward.SchedulerTest do
       :erlang.trace(pid, true, [:receive])
 
       assert_receive {:trace, ^pid, :receive, :mint_rewards}, 1200
-      Process.exit(pid, :kill)
     end
   end
 
@@ -104,7 +103,6 @@ defmodule Archethic.Reward.SchedulerTest do
       assert_receive :mint_rewards, 1_500
       assert_receive :node_rewards, 1_500
       :persistent_term.erase(:reward_gen_addr)
-      Process.exit(pid, :kill)
     end
 
     test "should not send transaction when burning fees = 0 and should send node rewards" do
@@ -133,7 +131,6 @@ defmodule Archethic.Reward.SchedulerTest do
       refute_receive :mint_rewards, 1_200
       assert_receive :node_rewards, 1_500
       :persistent_term.erase(:reward_gen_addr)
-      Process.exit(pid, :kill)
     end
   end
 

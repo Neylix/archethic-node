@@ -53,8 +53,8 @@ defmodule Archethic.SharedSecrets.MemTables.OriginKeyLookup do
       ...> {:ets.tab2list(:archethic_origin_keys), :ets.tab2list(:archethic_origin_key_by_type)}
       {
         [
-          {"key1", :software},
           {"key2", :hardware},
+          {"key1", :software},
           {"key3", :hardware}
         ],
         [
@@ -103,8 +103,8 @@ defmodule Archethic.SharedSecrets.MemTables.OriginKeyLookup do
       ...> :ok = OriginKeyLookup.add_public_key(:hardware, "key3")
       ...> OriginKeyLookup.list_public_keys()
       [
-        "key1",
         "key2",
+        "key1",
         "key3"
       ]
   """

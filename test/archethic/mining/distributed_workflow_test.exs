@@ -553,7 +553,6 @@ defmodule Archethic.Mining.DistributedWorkflowTest do
       assert confirmed_cross_validations == <<1::1>>
       assert chain_storage_nodes_view == <<1::1, 1::1, 1::1>>
       assert beacon_storage_nodes_view == <<1::1, 1::1, 1::1>>
-      Process.exit(coordinator_pid, :kill)
     end
   end
 

@@ -156,6 +156,8 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
         _node = {:=, meta, [{{:atom, var_name}, _, nil}, value]},
         acc
       ) do
+    value = try_unquote(value)
+
     new_node =
       quote line: Keyword.fetch!(meta, :line) do
         Scope.write_cascade(unquote(var_name), unquote(value))
@@ -180,9 +182,26 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
     {new_node, acc}
   end
 
+  # Dot access non-nested (x.y)
+  def prewalk(
+        _node =
+          {:{}, [:escape],
+           [:., meta, [{:{}, [:escape], [{:atom, map_name}, _, nil]}, {:atom, key_name}]]},
+        acc
+      ) do
+    new_node =
+      quote line: Keyword.fetch!(meta, :line) do
+        Scope.read(unquote(map_name), unquote(key_name))
+      end
+
+    {new_node, acc}
+  end
+
   # Dot access nested (x.y.z)
   # or Module.function().z
   def prewalk({{:., meta, [first_arg, {:atom, key_name}]}, _, []}, acc) do
+    first_arg = try_unquote(first_arg)
+
     new_node =
       quote line: Keyword.fetch!(meta, :line) do
         Map.get(unquote(first_arg), unquote(key_name))
@@ -197,6 +216,8 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
         acc
       ) do
     # accessor can be a variable, a function call, a dot access, a string
+    accessor = try_unquote(accessor)
+
     new_node =
       quote line: Keyword.fetch!(meta, :line) do
         Scope.read(unquote(map_name), unquote(accessor))
@@ -210,6 +231,9 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
         _node = {{:., meta, [Access, :get]}, _, [first_arg, accessor]},
         acc
       ) do
+    first_arg = try_unquote(first_arg)
+    accessor = try_unquote(accessor)
+
     new_node =
       quote line: Keyword.fetch!(meta, :line) do
         Map.get(unquote(first_arg), unquote(accessor))
@@ -249,6 +273,8 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
   # TODO: should be implemented in a module Logger (only available if config allows it)
   # will soon be updated to log into the playground console
   def prewalk(_node = {{:atom, "log"}, meta, [data]}, acc) do
+    data = try_unquote(data)
+
     new_node =
       quote line: Keyword.fetch!(meta, :line) do
         apply(IO, :inspect, [unquote(data)])
@@ -289,6 +315,10 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
     end
   end
 
+  def prewalk(_node = {:{}, [:escape], [new_node, meta, value]}, acc) do
+    {{new_node, meta, value}, acc}
+  end
+
   # blacklist rest
   def prewalk(node, _acc), do: throw({:error, node, "unexpected term"})
 
@@ -308,6 +338,8 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
         acc
       ) do
     {last_expression, expressions} = List.pop_at(expressions, -1)
+
+    last_expression = try_unquote(last_expression)
 
     {:__block__, [], new_expressions} =
       quote do
@@ -333,6 +365,8 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
     if !module.check_types(function, args) do
       throw({:error, node, "invalid function arguments"})
     end
+
+    args = try_unquote(args)
 
     new_node =
       if Library.function_tagged_with?(module_name, function_name, :write_contract) do
@@ -384,6 +418,8 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
 
     # transform the for-loop into Enum.each
     # and create a variable in the scope
+    block = try_unquote(block)
+
     new_node =
       quote line: Keyword.fetch!(meta, :line) do
         Enum.each(unquote(list), fn x ->
@@ -414,6 +450,8 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
   end
 
   def postwalk({{:atom, function_name}, meta, args}, acc) when is_list(args) do
+    args = try_unquote(args)
+
     new_node =
       quote line: Keyword.fetch!(meta, :line) do
         Scope.execute_function_ast(unquote(function_name), unquote(args))
@@ -435,4 +473,23 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
 
   # whitelist rest
   def postwalk(node, acc), do: {node, acc}
+
+  def try_unquote(value) do
+    quote do
+      unquote(value)
+    end
+
+    value
+  rescue
+    _ ->
+      Macro.escape(value) |> add_escape_meta()
+  end
+
+  defp add_escape_meta({:{}, _, node}), do: {:{}, [:escape], add_escape_meta(node)}
+  defp add_escape_meta(list) when is_list(list), do: Enum.map(list, &add_escape_meta/1)
+
+  defp add_escape_meta(tuple) when is_tuple(tuple),
+    do: Tuple.to_list(tuple) |> Enum.map(&add_escape_meta/1) |> List.to_tuple()
+
+  defp add_escape_meta(value), do: value
 end

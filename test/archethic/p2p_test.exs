@@ -271,7 +271,7 @@ defmodule Archethic.P2PTest do
         availability_update: ~U[2022-09-11 00:00:00Z]
       })
 
-      assert ["key1", "key2"] =
+      assert ["key2", "key1"] =
                P2P.authorized_and_available_nodes(~U[2022-09-11 02:00:00Z])
                |> Enum.map(& &1.first_public_key)
     end

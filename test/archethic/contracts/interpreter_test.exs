@@ -1373,10 +1373,9 @@ defmodule Archethic.Contracts.InterpreterTest do
           tokens_map = Map.set(tokens_map, "#{token_address}##{token_id}", token_balance)
         end
 
-        map_balance = [
-          uco: balance.uco,
-          tokens: tokens_map
-        ]
+        map_balance = Map.new()
+        map_balance = Map.set(map_balance, "uco", balance.uco)
+        map_balance = Map.set(map_balance, "tokens", tokens_map)
 
         Contract.set_content(Json.to_string(map_balance))
       end
