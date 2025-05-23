@@ -134,13 +134,10 @@ defmodule Archethic.TransactionFactory do
         []
       else
         storage_nodes = Election.storage_nodes(tx.address, all_nodes)
-        elected_nodes = Election.validation_nodes(tx, sorting_seed, all_nodes, storage_nodes)
 
-        Enum.map(elected_nodes, fn node ->
-          Enum.find_value(validation_nodes, fn {n, seed} ->
-            if n.first_public_key == node.first_public_key, do: seed, else: false
-          end)
-        end)
+        tx
+        |> Election.validation_nodes(sorting_seed, all_nodes, storage_nodes)
+        |> Enum.map(fn node -> find_validation_seed(validation_nodes, node) end)
       end
 
     {validation_stamp, cross_validation_stamps} =
@@ -492,5 +489,11 @@ defmodule Archethic.TransactionFactory do
       | validation_stamp: validation_stamp,
         cross_validation_stamps: [cross_validation_stamp]
     }
+  end
+
+  defp find_validation_seed(validation_nodes, node) do
+    Enum.find_value(validation_nodes, fn {n, seed} ->
+      if n.first_public_key == node.first_public_key, do: seed, else: false
+    end)
   end
 end

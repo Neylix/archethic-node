@@ -221,7 +221,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.TransactionStatements do
         update_in(
           tx,
           [Access.key(:data, %{}), Access.key(:ownerships, [])],
-          &(&1 ++ [ownership])
+          &Enum.concat(&1, [ownership])
         )
 
       {:error, reason} ->

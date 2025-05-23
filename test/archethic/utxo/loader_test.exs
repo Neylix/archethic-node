@@ -112,7 +112,7 @@ defmodule Archethic.UTXO.LoaderTest do
       new_unspent_output = Enum.concat(token_utxos, unspent_outputs)
 
       MockUTXOLedger
-      |> stub(:append, fn _genesis, utxo -> Agent.update(agent_pid, &(&1 ++ [utxo])) end)
+      |> stub(:append, fn _genesis, utxo -> Agent.update(agent_pid, &Enum.concat(&1, [utxo])) end)
       |> stub(:stream, fn _ -> Agent.get(agent_pid, & &1) end)
       |> expect(:flush, fn ^genesis_address, ^new_unspent_output -> :ok end)
 

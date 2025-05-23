@@ -402,16 +402,16 @@ defmodule Archethic.BeaconChain.NetworkCoordinates do
     summary_time
     |> SummaryCache.stream_slots(subset)
     |> Stream.filter(&match?({%Slot{p2p_view: %{network_stats: [_ | _]}}, _}, &1))
-    |> Stream.map(fn
-      {%Slot{p2p_view: %{network_stats: net_stats}}, node} ->
-        {node, net_stats}
+    |> Stream.map(fn {%Slot{p2p_view: %{network_stats: net_stats}}, node} ->
+      {node, net_stats}
     end)
     |> Enum.reduce(%{}, fn {node, net_stats}, acc ->
-      Map.update(acc, node, [net_stats], &(&1 ++ [net_stats]))
+      Map.update(acc, node, [net_stats], &[net_stats | &1])
     end)
     |> Map.new(fn {node, net_stats} ->
       aggregated_stats =
         net_stats
+        |> Enum.reverse()
         |> Enum.zip()
         |> Enum.map(fn stats ->
           aggregated_latency =

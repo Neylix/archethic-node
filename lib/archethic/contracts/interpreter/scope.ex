@@ -23,17 +23,15 @@ defmodule Archethic.Contracts.Interpreter.Scope do
     current_scope_hierarchy = get_context_scope_hierarchy(current_context)
     ref = new_ref()
 
+    scope_access = Enum.concat([[current_context], current_scope_hierarchy, [ref]])
+
     new_scope =
       :scope
       |> Process.get()
-      |> put_in([current_context] ++ current_scope_hierarchy ++ [ref], %{})
-      |> update_in([current_context, :scope_hierarchy], &(&1 ++ [ref]))
+      |> put_in(scope_access, %{})
+      |> update_in([current_context, :scope_hierarchy], &Enum.concat(&1, [ref]))
 
-    Process.put(
-      :scope,
-      new_scope
-    )
-
+    Process.put(:scope, new_scope)
     :ok
   end
 
@@ -132,14 +130,10 @@ defmodule Archethic.Contracts.Interpreter.Scope do
     current_context = get_current_context()
     context_scope_hierarchy = get_context_scope_hierarchy(current_context)
 
-    Process.put(
-      :scope,
-      put_in(
-        Process.get(:scope),
-        where_is(current_context, context_scope_hierarchy, var_name) ++ [var_name],
-        value
-      )
-    )
+    scope_access =
+      current_context |> where_is(context_scope_hierarchy, var_name) |> Enum.concat([var_name])
+
+    Process.put(:scope, put_in(Process.get(:scope), scope_access, value))
 
     value
   end
@@ -151,15 +145,9 @@ defmodule Archethic.Contracts.Interpreter.Scope do
   def write_at(var_name, value) do
     current_context = get_current_context()
     current_scope_hierarchy = get_context_scope_hierarchy(current_context)
+    scope_access = Enum.concat([[current_context], current_scope_hierarchy, [var_name]])
 
-    Process.put(
-      :scope,
-      put_in(
-        Process.get(:scope),
-        [current_context] ++ current_scope_hierarchy ++ [var_name],
-        value
-      )
-    )
+    Process.put(:scope, put_in(Process.get(:scope), scope_access, value))
 
     value
   end
@@ -169,15 +157,7 @@ defmodule Archethic.Contracts.Interpreter.Scope do
   """
   @spec update_global(list(String.t() | atom()), (any() -> any())) :: :ok
   def update_global(path, update_fn) do
-    Process.put(
-      :scope,
-      update_in(
-        Process.get(:scope),
-        path,
-        update_fn
-      )
-    )
-
+    Process.put(:scope, update_in(Process.get(:scope), path, update_fn))
     :ok
   end
 
@@ -186,10 +166,7 @@ defmodule Archethic.Contracts.Interpreter.Scope do
   """
   @spec read_global(list(String.t() | atom())) :: any()
   def read_global(path) do
-    get_in(
-      Process.get(:scope),
-      path
-    )
+    get_in(Process.get(:scope), path)
   end
 
   @doc """
@@ -201,10 +178,10 @@ defmodule Archethic.Contracts.Interpreter.Scope do
     current_context = get_current_context()
     scope_hierarchy = get_context_scope_hierarchy(current_context)
 
-    get_in(
-      Process.get(:scope),
-      where_is(current_context, scope_hierarchy, var_name) ++ [var_name]
-    )
+    scope_access =
+      current_context |> where_is(scope_hierarchy, var_name) |> Enum.concat([var_name])
+
+    get_in(Process.get(:scope), scope_access)
   end
 
   @doc """
@@ -215,17 +192,16 @@ defmodule Archethic.Contracts.Interpreter.Scope do
     current_context = get_current_context()
     current_scope_hierarchy = get_context_scope_hierarchy(current_context)
 
-    get_in(
-      Process.get(:scope),
-      where_is(current_context, current_scope_hierarchy, map_name) ++ [map_name, key_name]
-    )
+    scope_access =
+      current_context
+      |> where_is(current_scope_hierarchy, map_name)
+      |> Enum.concat([map_name, key_name])
+
+    get_in(Process.get(:scope), scope_access)
   end
 
   defp get_current_context do
-    :scope
-    |> Process.get()
-    |> get_in([:context_list])
-    |> List.first()
+    :scope |> Process.get() |> get_in([:context_list]) |> List.first()
   end
 
   defp get_context_scope_hierarchy(context) do
@@ -256,10 +232,7 @@ defmodule Archethic.Contracts.Interpreter.Scope do
       write_at(arg_name, arg_value)
     end)
 
-    result =
-      ast
-      |> Code.eval_quoted()
-      |> elem(0)
+    result = ast |> Code.eval_quoted() |> elem(0)
 
     leave_context()
     result

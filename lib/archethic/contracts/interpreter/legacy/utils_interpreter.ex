@@ -489,7 +489,7 @@ defmodule Archethic.Contracts.Interpreter.Legacy.UtilsInterpreter do
          acc
        ) do
     {
-      {:get_in, metadata, [{:scope, metadata, nil}, access ++ [field]]},
+      {:get_in, metadata, [{:scope, metadata, nil}, Enum.concat(access, [field])]},
       acc
     }
   end

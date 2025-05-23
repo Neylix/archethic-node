@@ -241,29 +241,27 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
     rdnsequence =
       rdnsequence_attribute
       |> List.flatten()
-      |> Enum.reduce(rdnsequence, fn attr, rdnsequence ->
-        {:AttributeTypeAndValue, oid, attribute_value} = attr
-
-        attr_atom =
-          case oid do
-            {2, 5, 4, 3} -> :CN
-            {2, 5, 4, 6} -> :C
-            {2, 5, 4, 7} -> :L
-            {2, 5, 4, 8} -> :ST
-            {2, 5, 4, 10} -> :O
-            {2, 5, 4, 11} -> :OU
-            {1, 2, 840, 113_549, 1, 9, 1} -> :emailAddress
-            _ -> nil
+      |> Enum.reduce(
+        rdnsequence,
+        fn {:AttributeTypeAndValue, oid, attribute_value}, rdnsequence ->
+          case parse_oid(oid) do
+            nil -> rdnsequence
+            attr -> Map.put(rdnsequence, attr, coerce_to_string(attribute_value))
           end
-
-        case attr_atom do
-          nil -> rdnsequence
-          _ -> %{rdnsequence | attr_atom => attribute_value |> coerce_to_string() |> to_string()}
         end
-      end)
+      )
 
     Map.put(rdnsequence, :aggregated, aggregate_rdnsequence(rdnsequence))
   end
+
+  defp parse_oid({2, 5, 4, 3}), do: :CN
+  defp parse_oid({2, 5, 4, 6}), do: :C
+  defp parse_oid({2, 5, 4, 7}), do: :L
+  defp parse_oid({2, 5, 4, 8}), do: :ST
+  defp parse_oid({2, 5, 4, 10}), do: :O
+  defp parse_oid({2, 5, 4, 11}), do: :OU
+  defp parse_oid({1, 2, 840, 113_549, 1, 9, 1}), do: :emailAddress
+  defp parse_oid(_), do: nil
 
   defp parse_crl_distribution_points(crl_distribution_points)
        when is_binary(crl_distribution_points) do
@@ -274,25 +272,10 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
     crl_distribution_points
   end
 
-  defp coerce_to_string(attribute_value) do
-    case attribute_value do
-      {:printableString, string} ->
-        string
-
-      {:utf8String, string} ->
-        string
-
-      {:teletexString, string} ->
-        string
-
-      string when is_list(string) ->
-        string
-
-      _ ->
-        Logger.error("Unhandled RDN attribute type #{inspect(attribute_value)}")
-        nil
-    end
-  end
+  defp coerce_to_string({:printableString, string}), do: to_string(string)
+  defp coerce_to_string({:utf8String, string}), do: to_string(string)
+  defp coerce_to_string({:teletexString, string}), do: to_string(string)
+  defp coerce_to_string(list) when is_list(list), do: to_string(list)
 
   defp aggregate_rdnsequence(rdnsequence) do
     rdnsequence
@@ -437,24 +420,25 @@ defmodule ArchethicWeb.AEWeb.SSLParser do
 
   defp parse_extensions(cert) do
     case get_field(cert, :extensions) do
-      :asn1_NOVALUE ->
-        %{}
-
-      extensions ->
-        Enum.reduce(extensions, %{}, fn {:Extension, oid, _, payload}, acc ->
-          case parse_extension(oid, payload) do
-            nil ->
-              acc
-
-            {key, value} ->
-              Map.put(acc, key, value)
-
-            :extra ->
-              value = oid |> Tuple.to_list() |> Enum.join(".")
-              Map.update(acc, :extra, [value], &[value | &1])
-          end
-        end)
+      :asn1_NOVALUE -> %{}
+      extensions -> reduce_extentions(extensions)
     end
+  end
+
+  defp reduce_extentions(extensions) do
+    Enum.reduce(extensions, %{}, fn {:Extension, oid, _, payload}, acc ->
+      case parse_extension(oid, payload) do
+        nil ->
+          acc
+
+        {key, value} ->
+          Map.put(acc, key, value)
+
+        :extra ->
+          value = oid |> Tuple.to_list() |> Enum.join(".")
+          Map.update(acc, :extra, [value], &[value | &1])
+      end
+    end)
   end
 
   defp ip_to_string(ip) do

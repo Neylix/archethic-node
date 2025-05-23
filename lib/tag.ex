@@ -40,7 +40,7 @@ defmodule Archethic.Tag do
   end
 
   def update_tags(tag, current_tags, module, method) do
-    method_tags = Map.get(current_tags, method, []) ++ [tag]
+    method_tags = [tag | Map.get(current_tags, method, [])]
     Module.put_attribute(module, :tags, Map.put(current_tags, method, method_tags))
   end
 

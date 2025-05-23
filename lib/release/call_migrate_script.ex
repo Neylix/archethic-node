@@ -14,6 +14,6 @@ defmodule Archethic.Release.CallMigrateScript do
   defp add_migrate_script_call(new_version, instructions) do
     call_instruction = {:apply, {Migrate, :run, [new_version, true]}}
 
-    instructions ++ [call_instruction]
+    Enum.concat(instructions, [call_instruction])
   end
 end

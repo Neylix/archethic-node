@@ -850,9 +850,12 @@ defmodule Archethic.Mining.ValidationContextTest do
       }
 
       storage_nodes_confirmations =
-        chain_storage_nodes
-        |> Enum.map(&ValidationContext.get_chain_storage_position(node1_ctx, &1.first_public_key))
-        |> Enum.map(fn {:ok, idx} -> {idx, :fake_confirmation} end)
+        Enum.map(chain_storage_nodes, fn node ->
+          {:ok, idx} =
+            ValidationContext.get_chain_storage_position(node1_ctx, node.first_public_key)
+
+          {idx, :fake_confirmation}
+        end)
 
       node2_ctx = %{
         ctx

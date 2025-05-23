@@ -1323,7 +1323,7 @@ defmodule Archethic.Crypto do
       false
   end
 
-  defp valid_certificate?(curve_id, ca_public_key, _data = client_public_key, _sig = certificate) do
+  defp valid_certificate?(curve_id, ca_public_key, client_public_key = _data, certificate = _sig) do
     curve_id
     |> ID.to_curve()
     |> do_valid_certificate?(ca_public_key, Utils.wrap_binary(client_public_key), certificate)

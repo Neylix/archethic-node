@@ -340,11 +340,7 @@ defmodule Archethic.BeaconChain.Slot do
       }
   """
   def add_end_of_node_sync(%__MODULE__{} = slot, %EndOfNodeSync{} = end_of_sync) do
-    Map.update!(
-      slot,
-      :end_of_node_synchronizations,
-      &(&1 ++ [end_of_sync])
-    )
+    Map.update!(slot, :end_of_node_synchronizations, &[end_of_sync | &1])
   end
 
   @doc """
@@ -370,18 +366,21 @@ defmodule Archethic.BeaconChain.Slot do
   @spec add_p2p_view(t(), list(P2PSampling.p2p_view())) :: t()
   def add_p2p_view(%__MODULE__{} = slot, p2p_views) do
     %{availabilities: availabilities, network_stats: network_stats} =
-      Enum.reduce(p2p_views, %{availabilities: [], network_stats: []}, fn {availability, latency},
-                                                                          acc ->
-        acc
-        |> Map.update!(:availabilities, &(&1 ++ [<<availability::16>>]))
-        |> Map.update!(:network_stats, &(&1 ++ [%{latency: latency}]))
-      end)
+      Enum.reduce(
+        p2p_views,
+        %{availabilities: [], network_stats: []},
+        fn {availability, latency}, acc ->
+          acc
+          |> Map.update!(:availabilities, &[<<availability::16>> | &1])
+          |> Map.update!(:network_stats, &[%{latency: latency} | &1])
+        end
+      )
 
     %{
       slot
       | p2p_view: %{
-          availabilities: :erlang.list_to_bitstring(availabilities),
-          network_stats: network_stats
+          availabilities: availabilities |> Enum.reverse() |> :erlang.list_to_bitstring(),
+          network_stats: Enum.reverse(network_stats)
         }
     }
   end

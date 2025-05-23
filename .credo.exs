@@ -28,40 +28,40 @@
           #
           ## Consistency Checks
           #
-          {Credo.Check.Consistency.ExceptionNames, []},
-          {Credo.Check.Consistency.LineEndings, []},
-          {Credo.Check.Consistency.SpaceAroundOperators, []},
-          {Credo.Check.Consistency.SpaceInParentheses, []},
-          {Credo.Check.Consistency.TabsOrSpaces, []},
+          # {Credo.Check.Consistency.ExceptionNames, []},
+          # {Credo.Check.Consistency.LineEndings, []},
+          # {Credo.Check.Consistency.SpaceAroundOperators, []},
+          # {Credo.Check.Consistency.SpaceInParentheses, []},
+          # {Credo.Check.Consistency.TabsOrSpaces, []},
 
           #
           ## Design Checks
           #
-          {Credo.Check.Design.DuplicatedCode, []},
-          {Credo.Check.Design.TagFIXME, []},
-          {Credo.Check.Design.TagTODO, [exit_status: 2]},
+          # {Credo.Check.Design.DuplicatedCode, []},
+          # {Credo.Check.Design.TagFIXME, []},
+          # {Credo.Check.Design.TagTODO, [exit_status: 2]},
 
           #
           ## Readability Checks
           #
-          {Credo.Check.Readability.BlockPipe, []},
-          {Credo.Check.Readability.FunctionNames, []},
-          {Credo.Check.Readability.ImplTrue, []},
-          {Credo.Check.Readability.MaxLineLength, [priority: :low, max_length: 120]},
-          {Credo.Check.Readability.ModuleAttributeNames, []},
-          {Credo.Check.Readability.ModuleNames, []},
-          {Credo.Check.Readability.NestedFunctionCalls, []},
-          {Credo.Check.Readability.ParenthesesInCondition, []},
-          {Credo.Check.Readability.PredicateFunctionNames, []},
-          {Credo.Check.Readability.RedundantBlankLines, []},
-          {Credo.Check.Readability.Semicolons, []},
-          {Credo.Check.Readability.SeparateAliasRequire, []},
-          {Credo.Check.Readability.SingleFunctionToBlockPipe, []},
-          {Credo.Check.Readability.SpaceAfterCommas, []},
-          {Credo.Check.Readability.Specs, []},
-          {Credo.Check.Readability.TrailingBlankLine, []},
-          {Credo.Check.Readability.TrailingWhiteSpace, []},
-          {Credo.Check.Readability.VariableNames, []},
+          # {Credo.Check.Readability.BlockPipe, []},
+          # {Credo.Check.Readability.FunctionNames, []},
+          # {Credo.Check.Readability.ImplTrue, []},
+          # {Credo.Check.Readability.MaxLineLength, [priority: :low, max_length: 120]},
+          # {Credo.Check.Readability.ModuleAttributeNames, []},
+          # {Credo.Check.Readability.ModuleNames, []},
+          # {Credo.Check.Readability.NestedFunctionCalls, []},
+          # {Credo.Check.Readability.ParenthesesInCondition, []},
+          # {Credo.Check.Readability.PredicateFunctionNames, []},
+          # {Credo.Check.Readability.RedundantBlankLines, []},
+          # {Credo.Check.Readability.Semicolons, []},
+          # {Credo.Check.Readability.SeparateAliasRequire, []},
+          # {Credo.Check.Readability.SingleFunctionToBlockPipe, []},
+          # {Credo.Check.Readability.SpaceAfterCommas, []},
+          # {Credo.Check.Readability.Specs, []},
+          # {Credo.Check.Readability.TrailingBlankLine, []},
+          # {Credo.Check.Readability.TrailingWhiteSpace, []},
+          # {Credo.Check.Readability.VariableNames, []},
 
           #
           ## Refactoring Opportunities

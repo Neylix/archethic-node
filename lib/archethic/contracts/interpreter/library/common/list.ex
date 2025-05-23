@@ -52,7 +52,7 @@ defmodule Archethic.Contracts.Interpreter.Library.Common.List do
 
   @spec append(list(), any()) :: list()
   def append(list, element) do
-    list ++ [element]
+    Enum.concat(list, [element])
   end
 
   @spec prepend(list(), any()) :: list()

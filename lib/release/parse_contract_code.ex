@@ -14,6 +14,6 @@ defmodule Archethic.Release.ParseContractCode do
   defp add_contract_reparse(instructions) do
     call_instruction = {:apply, {Loader, :reparse_workers_contract, []}}
 
-    instructions ++ [call_instruction]
+    Enum.concat(instructions, [call_instruction])
   end
 end

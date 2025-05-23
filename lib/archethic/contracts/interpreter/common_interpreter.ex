@@ -245,7 +245,8 @@ defmodule Archethic.Contracts.Interpreter.CommonInterpreter do
 
     new_node =
       quote line: Keyword.fetch!(meta, :line) do
-        apply(IO, :inspect, [unquote(data)])
+        arg = [unquote(data)]
+        apply(IO, :inspect, args)
       end
 
     {new_node, acc}
